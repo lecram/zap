@@ -1,0 +1,18 @@
+# Literals
+
+# None
+nothing := NONE
+# Bool
+ok := TRUE
+cancel := FALSE
+# Byte
+byte := '\x00'
+char := 'A'
+# Word
+word := 0
+# ByteArray
+string := "Texto."
+# List
+list := ['\xFF', 1234, "Blah", [0, 1, '\x02']]
+# Dict
+dict := {"width": 50, "heigth": 100}
