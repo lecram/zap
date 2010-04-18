@@ -1,0 +1,26 @@
+# Test.
+
+c := 'A'
+while <(c, +('Z', '\x01')):
+    print(repr(c))
+    c := +(c, '\x01')
+
+print("\n")
+
+c := 'A'
+while <(c, +('Z', '\x01')):
+    if <(c, 'G'):
+        print("-")
+    elif <(c, 'M'):
+        print("+")
+    elif <(c, 'T'):
+        print("*")
+    elif ==(c, 'W'):
+        print("w")
+    elif ==(c, 'Z'):
+        print("!")
+    else:
+        print(repr(c))
+    c := +(c, '\x01')
+
+print("\n")
