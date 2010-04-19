@@ -1,8 +1,7 @@
-SHELL = cmd.exe
-CC = E:\IDE\gcc\bin\gcc
+-include env
+
 CFLAGS = -Wall -Werror -O2 -I include
 I = include/
-RM = del
 
 objects = zap.o zerr.o ztypes.o zobject.o znone.o zbool.o zbyte.o \
           zword.o zbitarray.o zbytearray.o zwordarray.o \

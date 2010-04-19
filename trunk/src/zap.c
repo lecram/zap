@@ -65,16 +65,7 @@ runstatement(Space *space, List *tmp, char **entry)
     Zob *value;
 
     value = eval((Dict *) space->universal, tmp, &(*entry));
-    /*
-    {
-        char buffer[256];
-
-        repobj(buffer, value);
-        printf("value == %s\n", buffer);
-    }
-    */
     assign((Dict *) space->universal, value, &(*entry));
-    /* emptylist(tmp); */
 }
 
 void
@@ -167,7 +158,6 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                 cursor++;
                 truth = objtruth(eval(namespace, tmp, &cursor));
                 if (truth->value) {
-                    /* printf("Enter IF.\n"); */
                     be = run_block(space, tmp, looplev, &cursor);
                     if (be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
                         return be;
@@ -184,7 +174,6 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                     else {
                         truth = objtruth(eval(namespace, tmp, &cursor));
                         if (truth->value) {
-                            /* printf("Enter ELIF.\n"); */
                             be = run_block(space, tmp, looplev, &cursor);
                             if (be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
                                 return be;
@@ -199,7 +188,6 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                     if (ok)
                         skip_block(&cursor);
                     else {
-                        /* printf("Enter ELSE.\n"); */
                         be = run_block(space, tmp, looplev, &cursor);
                         if (be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
                             return be;
@@ -218,7 +206,6 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                 truth = objtruth(eval(namespace, tmp, &c));
                 while (truth->value) {
                     b = block;
-                    /* printf("Enter WHILE.\n"); */
                     be = run_block(space, tmp, looplev + 1, &b);
                     if (be & BE_RETURN)
                         return be;
