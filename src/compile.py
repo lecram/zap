@@ -2,7 +2,7 @@
 Z Compiler
 """
 
-# Python 2.5
+# Python 2.x
 
 import os.path
 
@@ -409,10 +409,10 @@ def compile(src, cpl=None):
 if __name__ == "__main__":
     import sys
 
-    if len(sys.argv) == 1:
-        src = "E:/IDE/zap/zap/test/test.b"
-    else:
+    if len(sys.argv) == 2:
         src = sys.argv[1]
-    print "Compiling \"%s\"..." %src
-    compile(src)
-    print "OK."
+        print "Compiling \"%s\"..." % src
+        compile(src)
+        print "OK."
+    else:
+        print "<< zap compiler >>\n\nUsage:\npython compile.py app.z\n"
