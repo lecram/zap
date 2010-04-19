@@ -1,0 +1,63 @@
+Program = {SubProgram} BlockExit.
+SubProgram = Statement | Block.
+
+
+
+Statement = Command | (Expression {Assignment} "0x00").
+
+
+Command = Delete | BlockExit.
+
+Delete = "0xDE" Name.
+
+BlockExit = "0xBE" ExitSpec.
+
+ExitSpec = (BREAK Int8) | (CONTINUE Int8) | (RETURN Expression) | END.
+
+END      = "0x01".
+BREAK    = "0x02".
+CONTINUE = "0x03".
+RETURN   = "0x04".
+
+
+Expression = Literal | FunctionCall | Name.
+
+Literal = None | Bool | Byte | ByteArray | Word | List | Dict.
+
+None      = "0x01".
+Bool      = "0x02" (FALSE | TRUE).
+Byte      = "0x03" Int8.
+Word      = "0x04" Int32.
+ByteArray = "0x06" Int32 {Int8}.
+List      = "0x08" {Expression} "0x00".
+Dict      = "0x09" {Expression Expression} "0x00".
+
+FALSE = "0x00".
+TRUE  = "0x01".
+
+Int8  = "0x00-0xFF".
+Int32 = "0x00-0xFF" "0x00-0xFF" "0x00-0xFF" "0x00-0xFF".
+
+FunctionCall = "0xF0" Name {Expression} "0xF1".
+
+Name = Char {Char} "0x00".
+
+Char = "0x20-0x7F".
+
+
+Assignment = Name.
+
+
+
+Block = "0xB0" BlockSpec {SubProgram} "0xB1".
+
+BlockSpec = (IF Expression) | (ELIF Expression) | ELSE |
+            (WHILE Expression) | (DEF Name {Parameter} "0x00").
+
+IF    = "0x01".
+ELIF  = "0x02".
+ELSE  = "0x03".
+WHILE = "0x04".
+DEF   = "0x05".
+
+Parameter = Name.
