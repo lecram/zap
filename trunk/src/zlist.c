@@ -1,0 +1,278 @@
+/*
+ * List Type
+ */
+
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "zap.h"
+
+/* The object in list shares reference
+ *  with the object passed as argument!
+ */
+Node *
+newnode(Zob *object)
+{
+    Node *node;
+
+    node = (Node *) malloc(sizeof(Node));
+    if (node == NULL)
+        raise("Out of memory in newnode().");
+    node->object = object;
+    increfc(object);
+    node->next = NULL; /* Security. */
+    return node;
+}
+
+void
+delnode(Node **node)
+{
+    decrefc((*node)->object);
+    /* delobj(&(*node)->object); */
+    free(*node);
+    *node = NULL;
+}
+
+List *
+newlist()
+{
+    List *list;
+
+    list = (List *) malloc(sizeof(List));
+    if (list == NULL)
+        raise("Out of memory in newlist().");
+    list->type = T_LIST;
+    list->length = 0;
+    list->first = NULL;
+    list->last = NULL;
+    list->refc = 0;
+    return list;
+}
+
+void
+dellist(List **list)
+{
+    while ((*list)->length) remfirst(*list);
+    free(*list);
+    *list = NULL;
+}
+
+/* Remove all items in list.
+ * Used by temp lists to minimize
+ *  malloc() & free() calls.
+ */
+void
+emptylist(List *list)
+{
+    while (list->length) remfirst(list);
+}
+
+/* Items are duplicated in memory,
+ *  i.e.,  items in new list do not
+ *  share reference with items
+ *  in original list.
+ */
+List *
+cpylist(List *list)
+{
+    List *copy;
+    Node *old = list->first;
+    Node *new;
+
+    copy = newlist();
+    copy->length = list->length;
+    if (old->next == NULL)
+        return copy;
+    new = newnode(cpyobj(old->object));
+    copy->first = new;
+    old = old->next;
+    while (old !=NULL) {
+        new->next = newnode(cpyobj(old->object));
+        new = new->next;
+        old = old->next;
+    }
+    copy->last = new;
+    new->next = NULL;
+    return copy;
+}
+
+/* Add object to the end of list. */
+void
+appitem(List *list, Zob *object)
+{
+    Node *item;
+
+    item = newnode(object);
+    item->next = NULL;
+    if (list->first == NULL)
+        list->first = item;
+    else
+        list->last->next = item;
+    list->last = item;
+    list->length++;
+}
+
+/* Set object at index.
+ * The old object is deleted.
+ */
+void
+setitem(List *list, int index, Zob *object)
+{
+    if (index < 0) index += list->length;
+    if (index < 0  ||  index >= list->length)
+        raise("Index out of range.");
+    else {
+        int curidx = 0;
+        Node *cur = list->first;
+
+        while (curidx < index) {
+            cur = cur->next;
+            curidx++;
+        }
+        decrefc(cur->object);
+        /* delobj(&(cur->object)); */
+        cur->object = object;
+    }
+}
+
+/* Insert object in index.
+ * If index == length, append object;
+ */
+void
+insitem(List *list, int index, Zob *object)
+{
+    if (index < 0) index += list->length;
+    if (index < 0  ||  index > list->length)
+        raise("Index out of range.");
+    else if (index == list->length)
+        appitem(list, object);
+    else {
+        int curidx = 0;
+        Node *prev = list->first, *next;
+
+        while (curidx < index - 1) {
+            prev = prev->next;
+            curidx++;
+        }
+        next = prev->next;
+        prev->next = newnode(object);
+        prev->next->next = next;
+    }
+    list->length++;
+}
+
+/* WARNING: The function extlist is deprecated.
+ * This function was build under "copy police".
+ * Should be rewrited under "share police".
+ */
+
+/* Concatenates list + ext and save result to list.
+ * The same pointer can be passed to both args to double a list.
+ * (The local vars count and length prevents an infinity loop
+ * when doubling a list)
+ */
+void
+extlist(List *list, List *ext)
+{
+    unsigned int count = 0;
+    unsigned int length = ext->length;
+    Node *ecur = ext->first;
+
+    for (; count < length; count++) {
+        list->last->next = newnode(ecur->object);
+        list->last = list->last->next;
+        list->length++;
+        ecur = ecur->next;
+    }
+}
+
+void
+remfirst(List *list)
+{
+    if (list->first == NULL)
+        return;
+    if (list->first == list->last) {
+        delnode(&list->first);
+        list->first = NULL;
+        list->last = NULL;
+    }
+    else {
+        Node *second;
+
+        second = list->first->next;
+        delnode(&list->first);
+        list->first = second;
+    }
+    list->length--;
+}
+
+/* Remove item at index. */
+void
+remitem(List *list, int index)
+{
+    if (index < 0) index += list->length;
+    if (index < 0  ||  index >= list->length)
+        raise("Index out of range.");
+    if (index == 0)
+        remfirst(list);
+    else {
+        int curidx = 0;
+        Node *prev = list->first, *next;
+
+        while (curidx < index - 1) {
+            prev = prev->next;
+            curidx++;
+        }
+        next = prev->next->next;
+        delnode(&prev->next);
+        prev->next = next;
+    }
+    list->length--;
+}
+
+char
+eqlist(List *list, Zob *other)
+{
+    if (*other != T_LIST) return 0;
+    else {
+        List *olist;
+        Node *item, *oitem;
+
+        olist = (List *) other;
+        if (list->length != olist->length) return 0;
+        item = list->first;
+        oitem = olist->first;
+        while (item != NULL) {
+            if (!eqobj(item->object, oitem->object)) return 0;
+            item = item->next;
+            oitem = oitem->next;
+        }
+        return 1;
+    }
+}
+
+unsigned int
+replist(char *buffer, List *list)
+{
+    if (list->first == NULL)
+        return sprintf(buffer, "<Empty List>");
+    else {
+        char nodebff[256];
+        Node *cur = list->first;
+        /* buffer length to return */
+        unsigned int blen = 1;
+
+        *buffer = '[';
+        while (1) {
+            if (cur->next == NULL) {
+                repobj(nodebff, cur->object);
+                blen += sprintf(buffer + blen, "%s]", nodebff);
+                break;
+            }
+            repobj(nodebff, cur->object);
+            blen += sprintf(buffer + blen, "%s, ", nodebff);
+            cur = cur->next;
+        }
+        return blen;
+    }
+}
