@@ -21,7 +21,7 @@ This script invokes the `print()` function, causing the interpreter to show a me
 To run this program, we must first compile the file "hello.z", using the compiler "compile.py":
 
 {{{
-%python compile.py hello.z
+% python compile.py hello.z
 Compiling "hello.z"...
 OK.
 %
@@ -30,7 +30,7 @@ OK.
 This operation will generate a file "hello.zbc" which can then be executed by the *zap* interpreter:
 
 {{{
-%zap hello.zbc
+% zap hello.zbc
 Hello, World!
 %
 }}}
