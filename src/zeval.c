@@ -253,14 +253,13 @@ Zob *
 nameval(Dict *namespace, char **entry)
 {
     Zob *obj;
-    Zob *defval = 0;
     ByteArray *key;
     char *cursor = *entry;
 
     key = yarrfromstr(cursor);
-    obj = getkey(namespace, (Zob *) key, defval);
+    obj = getkey(namespace, (Zob *) key, 0);
     delyarr(&key);
-    if (obj == defval) {
+    if (obj == 0) {
         char errbff[256];
 
         sprintf(errbff,
@@ -278,20 +277,20 @@ feval(Dict *namespace, List *tmp, char **entry)
 {
     Func *func;
     List *args;
-    Zob *defval = 0;
     ByteArray *key;
-    char *cursor = *entry;
+    char *fname, *cursor = *entry;
 
     /* Get func. */
     /* printf("func: %s\n", cursor); */
     key = yarrfromstr(cursor);
-    func = (Func *) getkey(namespace, (Zob *) key, defval);
-    if ((Zob *) func == defval) {
+    func = (Func *) getkey(namespace, (Zob *) key, 0);
+    fname = cursor;
+    if ((Zob *) func == 0) {
         char errbff[256];
 
         sprintf(errbff,
                 "Function Name not defined: %s.",
-                cursor);
+                fname);
         raise(errbff);
     }
     cursor += strlen(cursor) + 1; /* To skip STRING_END. */
@@ -304,5 +303,16 @@ feval(Dict *namespace, List *tmp, char **entry)
         /* Copyied append will cause memory leak! */
         appitem(args, eval(namespace, tmp, &cursor));
     *entry = cursor;
+    if (args->length != func->arity) {
+        char errbff[256];
+
+        sprintf(errbff,
+                "%i argument(s) passed to %i-ary function %s().",
+                args->length,
+                func->arity,
+                fname);
+        raise(errbff);
+    }
     return callimp(func->fimp, args);
+    /* Should del/decrefc args here? */
 }
