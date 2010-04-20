@@ -40,13 +40,15 @@ typedef struct {
     unsigned char refc;
     /* Pointer to LowFunc or HighFunc. */
     FImp *fimp;
+    /* Number of arguments that the function takes. */
+    unsigned char arity;
 } Func;
 
 LowFunc *newlowfunc();
 void dellowfunc(LowFunc **lowfunc);
 HighFunc *newhighfunc();
-void delhighfunc(Func **highfunc);
-Func *newfunc(FImp *fimp);
+void delhighfunc(HighFunc **highfunc);
+Func *newfunc(FImp *fimp, unsigned char arity);
 void delfunc(Func **func);
 Func *cpyfunc(Func *func);
 char eqfunc(Func *func, Zob *other);

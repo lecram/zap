@@ -187,14 +187,17 @@ zlt(List *args)
 }
 
 void
-regfunc(Dict *namespace, char *name, Zob *(*cfunc)(List *args))
+regfunc(Dict *namespace,
+        Zob *(*cfunc)(List *args),
+        char *name,
+        unsigned char arity)
 {
     Func *func;
     LowFunc *lowfunc;
 
     lowfunc = newlowfunc();
     lowfunc->func = cfunc;
-    func = newfunc((FImp *) lowfunc);
+    func = newfunc((FImp *) lowfunc, arity);
     setkey(namespace,
            (Zob *) yarrfromstr(name),
            (Zob *) func);
@@ -205,14 +208,14 @@ bbuild()
 {
     Dict *builtins = newdict();
 
-    regfunc(builtins, "print", zprint);
-    regfunc(builtins, "repr", zrepr);
-    regfunc(builtins, "len", zlen);
-    regfunc(builtins, "concat", zconcat);
-    regfunc(builtins, "get", zget);
-    regfunc(builtins, "+", zsum);
-    regfunc(builtins, "==", zeq);
-    regfunc(builtins, "<", zlt);
+    regfunc(builtins, zprint, "print", 1);
+    regfunc(builtins, zrepr, "repr", 1);
+    regfunc(builtins, zlen, "len", 1);
+    regfunc(builtins, zconcat, "concat", 2);
+    regfunc(builtins, zget, "get", 3);
+    regfunc(builtins, zsum, "+", 2);
+    regfunc(builtins, zeq, "==", 2);
+    regfunc(builtins, zlt, "<", 2);
     
     return builtins;
 }

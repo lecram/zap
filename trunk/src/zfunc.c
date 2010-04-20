@@ -59,14 +59,14 @@ newhighfunc()
 }
 
 void
-delhighfunc(Func **highfunc)
+delhighfunc(HighFunc **highfunc)
 {
     free(*highfunc);
     *highfunc = NULL;
 }
 
 Func *
-newfunc(FImp *fimp)
+newfunc(FImp *fimp, unsigned char arity)
 {
     Func *func;
 
@@ -74,8 +74,9 @@ newfunc(FImp *fimp)
     if (func == NULL)
         raise("Out of memory in newfunc().");
     func->type = T_FUNC;
-    func->fimp = fimp;
     func->refc = 0;
+    func->fimp = fimp;
+    func->arity = arity;
     return func;
 }
 
@@ -93,7 +94,7 @@ cpyfunc(Func *func)
 {
     Func *copy;
 
-    copy = newfunc(func->fimp);
+    copy = newfunc(func->fimp, func->arity);
     return copy;
 }
 
@@ -123,7 +124,7 @@ unsigned int
 repfunc(char *buffer, Func *func)
 {
     if (*func->fimp)
-        return sprintf(buffer, "<zap function>");
+        return sprintf(buffer, "<%i-ary zap function>", func->arity);
     else
-        return sprintf(buffer, "<C function>");
+        return sprintf(buffer, "<%i-ary C function>", func->arity);
 }
