@@ -1,10 +1,8 @@
 # Test.
 
-print(repr(print))
-print("\n")
+x := 15
+y := x
+z := [x, y]
 
-print(repr(get))
-print("\n")
-
-print(repr(==))
+print(repr(refc(x)))
 print("\n")
