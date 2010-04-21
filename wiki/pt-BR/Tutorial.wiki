@@ -4,11 +4,11 @@
 
 Este tutorial foi elaborado para programadores que desejam aprender os conceitos básicos de zap.
 
-Você precisará [Build Compilar zap] a partir do código fonte para poder executar scripts zap em seu computador.
+Você precisará [Build compilar zap] a partir do código fonte para poder executar scripts zap em seu computador.
 
 = Hello World =
 
-Um script zap é um arquivo de código fonte com instruções que devem ser executadas pelo interpretador zap. Como um simples exemplo, vamos criar um arquivo chamada "hello.z" contendo o seguinte text:
+Um script zap é um arquivo de código fonte com instruções que devem ser executadas pelo interpretador zap. Como um simples exemplo, vamos criar um arquivo chamado "hello.z" contendo o seguinte texto:
 
 {{{
 print("Hello, World!\n")
@@ -18,7 +18,7 @@ Este script chama a função `print()`, fazendo com que o interpretador exiba um
 
 == Compilando e Executando ==
 
-Para executar este programa nós devemos primeiro compilar o arquivo "hello.z" usando o compilador "compile.py":
+Para executar este programa, deve-se primeiro compilar o arquivo "hello.z" usando o compilador "compile.py":
 
 {{{
 % python compile.py hello.z

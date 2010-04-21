@@ -4,7 +4,7 @@
 
 This tutorial is intended for programmers who want to learn the basics of zap.
 
-You will need to [Build build zap] from sources in order to run zap programs.
+You will need to [Build build zap] from sources in order to run zap programs on your computer.
 
 = Hello World =
 
