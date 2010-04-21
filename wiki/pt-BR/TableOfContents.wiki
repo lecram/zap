@@ -1,7 +1,7 @@
-#summary Índice da documentação.
+ï»¿#summary Ãndice da documentaÃ§Ã£o.
 
   * [Tutorial Tutorial]
-  * [Language Referência da Linguagem]
-  * [API Referência da API]
+  * [Language ReferÃªncia da Linguagem]
+  * [API ReferÃªncia da API]
   * [DevelopersGuide Guia para Desenvolvedores]
     * [Build Compilando zap]
