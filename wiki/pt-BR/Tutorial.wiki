@@ -1,24 +1,24 @@
-#summary zap programming Tutorial.
+﻿#summary Tutorial de programação zap.
 
-= Introducao =
+= Introdução =
 
-This tutorial is intended for programmers who want to learn the basics of zap.
+Este tutorial foi elaborado para programadores que desejam aprender os conceitos básicos de zap.
 
-You will need to [Build build zap] from sources in order to run zap programs.
+Você precisará [Build Compilar zap] a partir do código fonte para poder executar scripts zap em seu computador.
 
 = Hello World =
 
-A zap script is a source code file containing instructions for execution by the zap interpreter. As a simple example, let's create a file called "hello.z" containing the following text:
+Um script zap é um arquivo de código fonte com instruções que devem ser executadas pelo interpretador zap. Como um simples exemplo, vamos criar um arquivo chamada "hello.z" contendo o seguinte text:
 
 {{{
 print("Hello, World!\n")
 }}}
 
-This script invokes the `print()` function, causing the interpreter to show a message on the console. In this example, the message is specified by a string literal containing the text `Hello, World!`. The characters `\n` at the end of the string indicate a line break.
+Este script chama a função `print()`, fazendo com que o interpretador exiba uma mensagem no console. Neste exemplo, a mensagem é especificada por uma string literal. Os caracteres `\n` no final da string indicam uma quebra de linha.
 
-== Compiling and Running ==
+== Compilando e Executando ==
 
-To run this program we must first compile the file "hello.z" using the compiler "compile.py":
+Para executar este programa nós devemos primeiro compilar o arquivo "hello.z" usando o compilador "compile.py":
 
 {{{
 % python compile.py hello.z
@@ -27,7 +27,7 @@ OK.
 %
 }}}
 
-This operation will generate a file "hello.zbc" which can then be executed by the zap interpreter:
+Esta operação gerará um arquivo "hello.zbc" que pode então ser executado pelo interpretador zap:
 
 {{{
 % zap hello.zbc
