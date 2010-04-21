@@ -72,7 +72,7 @@ assign(Dict *dict, Zob *value, char **entry)
         key = yarrfromstr(cursor);
         cursor += strlen(cursor) + 1; /* To skip NAME_END. */
         setkey(dict, (Zob *) key, value);
-        increfc(value);
+        /* increfc(value); */
     }
     cursor++; /* To skip ASSIGN_END. */
     *entry = cursor;

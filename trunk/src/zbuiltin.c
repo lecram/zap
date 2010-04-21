@@ -25,6 +25,16 @@
 
 #include "zap.h"
 
+/* refc(o) */
+Zob *
+zrefc(List *args)
+{
+    Byte *rval = newbyte();
+
+    rval->value = ((RefC *) args->first->object)->refc;
+    return (Zob *) rval;
+}
+
 /* print(s) */
 Zob *
 zprint(List *args)
@@ -208,6 +218,7 @@ bbuild()
 {
     Dict *builtins = newdict();
 
+    regfunc(builtins, zrefc, "refc", 1);
     regfunc(builtins, zprint, "print", 1);
     regfunc(builtins, zrepr, "repr", 1);
     regfunc(builtins, zlen, "len", 1);

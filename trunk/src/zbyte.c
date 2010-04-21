@@ -77,8 +77,5 @@ repbyte(char *buffer, Byte *byte)
 unsigned int
 repbyte(char *buffer, Byte *byte)
 {
-    if (((byte->value < 32) && (byte->value != '\n'))  ||  (byte->value > 127))
-        return sprintf(buffer, "?");
-    else
-        return sprintf(buffer, "%c", byte->value);
+    return sprintf(buffer, "0x%02X", byte->value);
 }

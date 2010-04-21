@@ -1,4 +1,4 @@
-# Test.
+# while and if blocks.
 
 c := 'A'
 while <(c, +('Z', '\x01')):

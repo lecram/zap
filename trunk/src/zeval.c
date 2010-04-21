@@ -275,6 +275,7 @@ nameval(Dict *namespace, char **entry)
 Zob *
 feval(Dict *namespace, List *tmp, char **entry)
 {
+    Zob *ret;
     Func *func;
     List *args;
     ByteArray *key;
@@ -313,6 +314,7 @@ feval(Dict *namespace, List *tmp, char **entry)
                 fname);
         raise(errbff);
     }
-    return callimp(func->fimp, args);
-    /* Should del/decrefc args here? */
+    ret = callimp(func->fimp, args);
+    dellist(&args);
+    return ret;
 }

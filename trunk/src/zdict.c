@@ -91,8 +91,6 @@ setkey(Dict *dict, Zob *key, Zob *value)
         if (eqobj(item->object, key)) {
             /* Set value. */
             decrefc(item->next->object);
-            /* delobj(&item->next->object); */
-            /* should cpyobj(value) ??? */
             item->next->object = value;
             increfc(value);
             return;
@@ -116,14 +114,12 @@ getkey(Dict *dict, Zob *key, Zob *defval)
     while (item != NULL) {
         if (eqobj(item->object, key))
             /* Get value. */
-            /* should cpyobj(item->next->object) ??? */
             return item->next->object;
         item = item->next->next;
     }
 
     /* Key not found. */
     /* Return default. */
-    /* should cpyobj(defval) ??? */
     return defval;
 }
 

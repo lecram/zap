@@ -47,7 +47,6 @@ void
 delnode(Node **node)
 {
     decrefc((*node)->object);
-    /* delobj(&(*node)->object); */
     free(*node);
     *node = NULL;
 }
@@ -149,7 +148,6 @@ setitem(List *list, int index, Zob *object)
             curidx++;
         }
         decrefc(cur->object);
-        /* delobj(&(cur->object)); */
         cur->object = object;
     }
 }

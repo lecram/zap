@@ -355,7 +355,7 @@ def compile(src, cpl=None):
         cmd = split.pop(0)
         if cmd == "del":
             # Compile del.
-            name = split[1]
+            name = split[0]
             cplf.write(DELETE + name + STRING_END)
         elif cmd == "break":
             # Compile break.
