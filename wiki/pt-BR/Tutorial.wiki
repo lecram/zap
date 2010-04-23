@@ -11,7 +11,7 @@ Você precisará [Build compilar zap] a partir do código fonte para poder execu
 Um script zap é um arquivo de código fonte com instruções que devem ser executadas pelo interpretador zap. Como um simples exemplo, vamos criar um arquivo chamado "hello.z" contendo o seguinte texto:
 
 {{{
-print("Hello, World!\n")
+print("Hello, world!\n")
 }}}
 
 Este script chama a função `print()`, fazendo com que o interpretador exiba uma mensagem no console. Neste exemplo, a mensagem é especificada por uma string literal. Os caracteres `\n` no final da string indicam uma quebra de linha.
@@ -31,6 +31,6 @@ Esta operação gerará um arquivo "hello.zbc" que pode então ser executado pel
 
 {{{
 % zap hello.zbc
-Hello, World!
+Hello, world!
 %
 }}}

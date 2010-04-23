@@ -1,4 +1,4 @@
-#summary zap programming Tutorial.
+#summary zap programming tutorial.
 
 = Introduction =
 
@@ -11,7 +11,7 @@ You will need to [Build build zap] from sources in order to run zap programs on 
 A zap script is a source code file with instructions for execution by the zap interpreter. As a simple example, let's create a file called "hello.z" containing the following text:
 
 {{{
-print("Hello, World!\n")
+print("Hello, world!\n")
 }}}
 
 This script invokes the `print()` function, causing the interpreter to show a message on the console. In this example, the message is specified by a string literal. The characters `\n` at the end of the string indicate a line break.
@@ -31,6 +31,6 @@ This operation will generate a file "hello.zbc" which can then be executed by th
 
 {{{
 % zap hello.zbc
-Hello, World!
+Hello, world!
 %
 }}}
