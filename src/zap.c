@@ -72,7 +72,6 @@ assign(Dict *dict, Zob *value, char **entry)
         key = yarrfromstr(cursor);
         cursor += strlen(cursor) + 1; /* To skip NAME_END. */
         setkey(dict, (Zob *) key, value);
-        /* increfc(value); */
     }
     cursor++; /* To skip ASSIGN_END. */
     *entry = cursor;
@@ -296,7 +295,7 @@ main(int argc, char *argv[])
 {
     FILE *fbbc;
     int size;
-    char *sbbc;
+    char *sbbc, *entry;
     Space *space;
     List *tmp = newlist();
 
@@ -325,7 +324,8 @@ main(int argc, char *argv[])
     space->global = (Zob *) newnone();
     space->local = (Zob *) newnone();
 
-    run_block(space, tmp, 0, &sbbc);
+    entry = sbbc;
+    run_block(space, tmp, 0, &entry);
 
     dellist(&tmp);
     delspace(&space);

@@ -432,4 +432,4 @@ if __name__ == "__main__":
         compile(src)
         print "OK."
     else:
-        print "<< zap compiler >>\n\nUsage:\npython compile.py app.z\n"
+        print "<< zap compiler >>\n\nUsage:\npython compile.py app.z"

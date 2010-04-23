@@ -123,7 +123,7 @@ cpyobj(Zob *object)
                 raise(errbff);
             }
     }
-    return " ";
+    return 0;
 }
 
 int
