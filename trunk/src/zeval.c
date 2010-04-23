@@ -31,7 +31,7 @@ unsigned int
 readword(char **entry)
 {
     unsigned int i, word;
-    unsigned char *cursor = (unsigned char *) *entry;
+    char *cursor = *entry;
 
     word = (unsigned int) *cursor;
     cursor++;
