@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 ## Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
 ##
 ## This file is part of zap.
