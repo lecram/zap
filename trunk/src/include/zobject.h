@@ -1,5 +1,4 @@
-/*
- * Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
+/* Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
  *
  * This file is part of zap.
  *
@@ -17,11 +16,10 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Object (header)
- */
+/* Object (header) */
 
 void delobj(Zob **object);
 Zob *cpyobj(Zob *object);
 int eqobj(Zob *object, Zob *other);
 unsigned int repobj(char *buffer, Zob *object);
+Zob *typename(Zob *object);

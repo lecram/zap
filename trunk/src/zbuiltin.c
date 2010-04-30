@@ -1,5 +1,4 @@
-/*
- * Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
+/* Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
  *
  * This file is part of zap.
  *
@@ -17,13 +16,23 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Built-in Functions
+/* Built-in Functions */
+
+/* In This File:
+ * - Implementation of built-in functions.
+ * - Wrapping of built-in functions.
  */
 
 #include <stdio.h>
 
 #include "zap.h"
+
+/* tname(o) */
+Zob *
+ztname(List *args)
+{
+    return typename(args->first->object);
+}
 
 /* refc(o) */
 Zob *
@@ -238,6 +247,7 @@ bbuild()
 {
     Dict *builtins = newdict();
 
+    regfunc(builtins, ztname, "tname", 1);
     regfunc(builtins, zrefc, "refc", 1);
     regfunc(builtins, zprint, "print", 1);
     regfunc(builtins, zrepr, "repr", 1);

@@ -1,5 +1,4 @@
-/*
- * Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
+/* Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
  *
  * This file is part of zap.
  *
@@ -17,15 +16,11 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Built-in Functions (header)
- */
+/* Built-in Functions (header) */
 
-Zob *bprint(List *args);
-Zob *brepr(List *args);
-Zob *blen(List *args);
-Zob *bconcat(List *args);
-Zob *bget(List *args);
+/* Built-in functions are not listed here.
+ * They should not be called from anywhere in the API.
+ */
 
 void regfunc(Dict *namespace, char *name, Zob *(*cfunc)(List *args));
 Dict *bbuild();

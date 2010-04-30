@@ -1,5 +1,4 @@
-/*
- * Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
+/* Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
  *
  * This file is part of zap.
  *
@@ -17,8 +16,10 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Object
+/* Object */
+
+/* In This File:
+ * - General handle functions to Objects.
  */
 
 #include <stdio.h>
@@ -197,6 +198,45 @@ repobj(char *buffer, Zob *object)
 
                 sprintf(errbff,
                         "Unknown Type Number in repobj: %u.",
+                        *object);
+                raise(errbff);
+            }
+    }
+    return 0;
+}
+
+Zob *
+typename(Zob *object)
+{
+    switch (*object) {
+        case T_NONE:
+            return (Zob *) yarrfromstr("None");
+        case T_BOOL:
+            return (Zob *) yarrfromstr("Bool");
+        case T_BYTE:
+            return (Zob *) yarrfromstr("Byte");
+        case T_WORD:
+            return (Zob *) yarrfromstr("Word");
+        case T_IARR:
+            return (Zob *) yarrfromstr("BitArray");
+        case T_YARR:
+            return (Zob *) yarrfromstr("ByteArray");
+        case T_WARR:
+            return (Zob *) yarrfromstr("WordArray");
+        case T_BNUM:
+            return (Zob *) yarrfromstr("BigNum");
+        case T_LIST:
+            return (Zob *) yarrfromstr("List");
+        case T_DICT:
+            return (Zob *) yarrfromstr("Dict");
+        case T_FUNC:
+            return (Zob *) yarrfromstr("Func");
+        default:
+            {
+                char errbff[256];
+
+                sprintf(errbff,
+                        "Unknown Type Number in typename: %u.",
                         *object);
                 raise(errbff);
             }

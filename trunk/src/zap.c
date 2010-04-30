@@ -1,5 +1,4 @@
-/*
- * Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
+/* Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
  *
  * This file is part of zap.
  *
@@ -17,8 +16,12 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Interpreter
+/* Interpreter */
+
+/* In This File:
+ * - Space handle functions.
+ * - Bytecode execution.
+ * - main().
  */
 
 #include <stdlib.h>
