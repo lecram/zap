@@ -1,5 +1,4 @@
-/*
- * Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
+/* Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
  *
  * This file is part of zap.
  *
@@ -17,9 +16,7 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Byte Array Type (header)
- */
+/* Byte Array Type (header) */
 
 typedef struct {
     Zob type;
@@ -31,7 +28,7 @@ typedef struct {
 ByteArray *newyarr(unsigned int length);
 ByteArray *yarrfromstr(char *s);
 void delyarr(ByteArray **bytearray);
-ByteArray * cpyyarr(ByteArray *bytearray);
+ByteArray *cpyyarr(ByteArray *bytearray);
 Byte *getbyteitem(ByteArray *bytearray, int index);
 void setbyteitem(ByteArray *bytearray, int index, Byte *byte);
 void concatstr(ByteArray *bytearray, char *str);

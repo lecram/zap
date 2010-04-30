@@ -1,5 +1,4 @@
-/*
- * Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
+/* Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
  *
  * This file is part of zap.
  *
@@ -17,8 +16,17 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Truth Value
+/* Truth Value */
+
+/* The truth value of an object is a value that
+ *  qualifies its content under a boolean perspective.
+ * A None object always has a FALSE truth value.
+ * A Bool object has a truth value equivalent to its own value.
+ * A numeric object has a FALSE truth value if and
+ *  only if its content is equivalent to 0.
+ * A sequence object has a FALSE truth value if and
+ *  only if its length is 0.
+ * The truth value of an object is TRUE under all other condictions.
  */
 
 #include <stdio.h>
@@ -59,13 +67,13 @@ objtruth(Zob *object)
             truth->value = ((Word *) object)->value;
             break;
         case T_IARR:
-            /* Not Implemented */
+            truth->value = (int) ((BitArray *) object)->length;
             break;
         case T_YARR:
-            /* Not Implemented */
+            truth->value = (int) ((ByteArray *) object)->length;
             break;
         case T_WARR:
-            /* Not Implemented */
+            truth->value = (int) ((WordArray *) object)->length;
             break;
         case T_BNUM:
             /* Not Implemented */
