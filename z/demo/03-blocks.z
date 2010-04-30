@@ -2,7 +2,7 @@
 
 c := 'A'
 while <(c, +('Z', '\x01')):
-    print(repr(c))
+    print(arr(c))
     c := +(c, '\x01')
 
 print("\n")
@@ -20,7 +20,7 @@ while <(c, +('Z', '\x01')):
     elif ==(c, 'Z'):
         print("!")
     else:
-        print(repr(c))
+        print(arr(c))
     c := +(c, '\x01')
 
 print("\n")

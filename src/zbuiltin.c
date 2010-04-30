@@ -88,6 +88,26 @@ zlen(List *args)
     return (Zob *) rval;
 }
 
+/* arr(i) */
+Zob *
+zarr(List *args)
+{
+    Zob *i, *a;
+
+    i = args->first->object;
+    switch (*i) {
+        case T_BYTE:
+            a = (Zob *) newyarr(1);
+            ((ByteArray *) a)->bytes[0] = ((Byte *) i)->value;
+            return a;
+        case T_WORD:
+            a = (Zob *) newwarr(1);
+            ((WordArray *) a)->words[0] = ((Word *) i)->value;
+            return a;
+    }
+    return 0;
+}
+
 /* concat(s1, s2) */
 Zob *
 zconcat(List *args)
@@ -222,6 +242,7 @@ bbuild()
     regfunc(builtins, zprint, "print", 1);
     regfunc(builtins, zrepr, "repr", 1);
     regfunc(builtins, zlen, "len", 1);
+    regfunc(builtins, zarr, "arr", 1);
     regfunc(builtins, zconcat, "concat", 2);
     regfunc(builtins, zget, "get", 3);
     regfunc(builtins, zsum, "+", 2);
