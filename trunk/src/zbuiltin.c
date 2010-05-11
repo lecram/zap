@@ -76,14 +76,8 @@ zlen(List *args)
     Zob *obj = args->first->object;
 
     switch (*obj) {
-        case T_IARR:
-            rval->value = ((BitArray *) obj)->length;
-            break;
         case T_YARR:
             rval->value = ((ByteArray *) obj)->length;
-            break;
-        case T_WARR:
-            rval->value = ((WordArray *) obj)->length;
             break;
         case T_LIST:
             rval->value = ((List *) obj)->length;
@@ -104,17 +98,9 @@ zarr(List *args)
     Zob *i, *a;
 
     i = args->first->object;
-    switch (*i) {
-        case T_BYTE:
-            a = (Zob *) newyarr(1);
-            ((ByteArray *) a)->bytes[0] = ((Byte *) i)->value;
-            return a;
-        case T_WORD:
-            a = (Zob *) newwarr(1);
-            ((WordArray *) a)->words[0] = ((Word *) i)->value;
-            return a;
-    }
-    return 0;
+    a = (Zob *) newyarr(1);
+    ((ByteArray *) a)->bytes[0] = ((Byte *) i)->value;
+    return a;
 }
 
 /* concat(s1, s2) */
@@ -258,6 +244,6 @@ bbuild()
     regfunc(builtins, zsum, "+", 2);
     regfunc(builtins, zeq, "==", 2);
     regfunc(builtins, zlt, "<", 2);
-    
+
     return builtins;
 }

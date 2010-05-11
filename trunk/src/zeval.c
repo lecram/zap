@@ -63,10 +63,6 @@ skip_expr(char **entry)
         case T_WORD:
             cursor += 5;
             break;
-        case T_IARR:
-            /* Currently, there is no literal BitArrays. */
-            raise("There is no literal BitArrays.");
-            break;
         case T_YARR:
             {
                 unsigned int length;
@@ -74,18 +70,6 @@ skip_expr(char **entry)
                 cursor++;
                 length = readword(&cursor);
                 cursor += length;
-            }
-            break;
-        case T_WARR:
-            /* Currently, this case will not be reached.
-             * There is not syntax for WordArrays yet.
-             */
-            {
-                unsigned int length;
-
-                cursor++;
-                length = readword(&cursor);
-                cursor += length * 4;
             }
             break;
         case T_BNUM:
@@ -164,10 +148,6 @@ eval(Dict *namespace, List *tmp, char **entry)
                 obj = (Zob *) word;
             }
             break;
-        case T_IARR:
-            /* Currently, there is no literal BitArrays. */
-            raise("There is no literal BitArrays.");
-            break;
         case T_YARR:
             {
                 ByteArray *bytearray;
@@ -181,22 +161,6 @@ eval(Dict *namespace, List *tmp, char **entry)
                     cursor++;
                 }
                 obj = (Zob *) bytearray;
-            }
-            break;
-        case T_WARR:
-            /* Currently, this case will not be reached.
-             * There is not syntax for WordArrays yet.
-             */
-            {
-                WordArray *wordarray;
-                unsigned int length, index;
-
-                cursor++;
-                length = readword(&cursor);
-                wordarray = newwarr(length);
-                for (index = 0; index < length; index++)
-                    wordarray->words[index] = readword(&cursor);
-                obj = (Zob *) wordarray;
             }
             break;
         case T_BNUM:
