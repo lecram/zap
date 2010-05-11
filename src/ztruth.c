@@ -38,9 +38,7 @@
 #include "zbool.h"
 #include "zbyte.h"
 #include "zword.h"
-#include "zbitarray.h"
 #include "zbytearray.h"
-#include "zwordarray.h"
 #include "zbignum.h"
 #include "zlist.h"
 #include "zdict.h"
@@ -66,14 +64,8 @@ objtruth(Zob *object)
         case T_WORD:
             truth->value = ((Word *) object)->value;
             break;
-        case T_IARR:
-            truth->value = (int) ((BitArray *) object)->length;
-            break;
         case T_YARR:
             truth->value = (int) ((ByteArray *) object)->length;
-            break;
-        case T_WARR:
-            truth->value = (int) ((WordArray *) object)->length;
             break;
         case T_BNUM:
             /* Not Implemented */

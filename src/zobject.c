@@ -31,9 +31,7 @@
 #include "zbool.h"
 #include "zbyte.h"
 #include "zword.h"
-#include "zbitarray.h"
 #include "zbytearray.h"
-#include "zwordarray.h"
 #include "zbignum.h"
 #include "zlist.h"
 #include "zdict.h"
@@ -55,14 +53,8 @@ delobj(Zob **object)
         case T_WORD:
             delword((Word **) object);
             break;
-        case T_IARR:
-            deliarr((BitArray **) object);
-            break;
         case T_YARR:
             delyarr((ByteArray **) object);
-            break;
-        case T_WARR:
-            delwarr((WordArray **) object);
             break;
         case T_BNUM:
             delbnum((BigNum **) object);
@@ -100,12 +92,8 @@ cpyobj(Zob *object)
             return (Zob *) cpybyte((Byte *) object);
         case T_WORD:
             return (Zob *) cpyword((Word *) object);
-        case T_IARR:
-            return (Zob *) cpyiarr((BitArray *) object);
         case T_YARR:
             return (Zob *) cpyyarr((ByteArray *) object);
-        case T_WARR:
-            return (Zob *) cpywarr((WordArray *) object);
         case T_BNUM:
             return (Zob *) cpybnum((BigNum *) object);
         case T_LIST:
@@ -139,12 +127,8 @@ eqobj(Zob *object, Zob *other)
             return eqbyte((Byte *) object, other);
         case T_WORD:
             return eqword((Word *) object, other);
-        case T_IARR:
-            return eqiarr((BitArray *) object, other);
         case T_YARR:
             return eqyarr((ByteArray *) object, other);
-        case T_WARR:
-            return eqwarr((WordArray *) object, other);
         case T_BNUM:
             return eqbnum((BigNum *) object, other);
         case T_LIST:
@@ -178,12 +162,8 @@ repobj(char *buffer, Zob *object)
             return repbyte(buffer, (Byte *) object);
         case T_WORD:
             return repword(buffer, (Word *) object);
-        case T_IARR:
-            return repiarr(buffer, (BitArray *) object);
         case T_YARR:
             return repyarr(buffer, (ByteArray *) object);
-        case T_WARR:
-            return repwarr(buffer, (WordArray *) object);
         case T_BNUM:
             return repbnum(buffer, (BigNum *) object);
         case T_LIST:
@@ -217,12 +197,8 @@ typename(Zob *object)
             return (Zob *) yarrfromstr("Byte");
         case T_WORD:
             return (Zob *) yarrfromstr("Word");
-        case T_IARR:
-            return (Zob *) yarrfromstr("BitArray");
         case T_YARR:
             return (Zob *) yarrfromstr("ByteArray");
-        case T_WARR:
-            return (Zob *) yarrfromstr("WordArray");
         case T_BNUM:
             return (Zob *) yarrfromstr("BigNum");
         case T_LIST:
