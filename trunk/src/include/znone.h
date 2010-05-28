@@ -26,5 +26,6 @@ typedef struct {
 None *newnone();
 void delnone(None **none);
 None *cpynone(None *none);
-char eqnone(None *none, Zob *other);
+int tstnone(None *none);
+int cmpnone(None *none, None *other);
 unsigned int repnone(char *buffer, None *none);

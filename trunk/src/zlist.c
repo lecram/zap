@@ -244,25 +244,29 @@ remitem(List *list, int index)
     list->length--;
 }
 
-char
-eqlist(List *list, Zob *other)
+int
+tstlist(List *list)
 {
-    if (*other != T_LIST) return 0;
-    else {
-        List *olist;
-        Node *item, *oitem;
-
-        olist = (List *) other;
-        if (list->length != olist->length) return 0;
-        item = list->first;
-        oitem = olist->first;
-        while (item != NULL) {
-            if (!eqobj(item->object, oitem->object)) return 0;
-            item = item->next;
-            oitem = oitem->next;
-        }
+    if (list->length)
         return 1;
+    else
+        return 0;
+}
+
+int
+cmplist(List *list, List *other)
+{
+    Node *item, *oitem;
+
+    if (list->length != other->length) return 1;
+    item = list->first;
+    oitem = other->first;
+    while (item != NULL) {
+        if (cmpobj(item->object, oitem->object)) return 1;
+        item = item->next;
+        oitem = oitem->next;
     }
+    return 0;
 }
 
 unsigned int

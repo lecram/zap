@@ -27,5 +27,6 @@ typedef struct {
 Bool *newbool();
 void delbool(Bool **bool);
 Bool *cpybool(Bool *bool);
-char eqbool(Bool *bool, Zob *other);
+int tstbool(Bool *bool);
+int cmpbool(Bool *bool, Bool *other);
 unsigned int repbool(char *buffer, Bool *bool);

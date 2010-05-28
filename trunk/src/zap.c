@@ -31,7 +31,6 @@
 #include "zap.h"
 #include "zeval.h"
 #include "zbuiltin.h"
-#include "ztruth.h"
 
 Space *
 newspace()
@@ -149,7 +148,7 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
 {
     char *cursor = *entry;
     Dict *namespace = (Dict *) space->universal;
-    Bool *truth;
+    int truth;
     unsigned char be;
 
     while (*cursor != (char) BLOCKEXIT) {
@@ -177,8 +176,8 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                 int ok = 0;
 
                 cursor++;
-                truth = objtruth(eval(namespace, tmp, &cursor));
-                if (truth->value) {
+                truth = tstobj(eval(namespace, tmp, &cursor));
+                if (truth) {
                     be = run_block(space, tmp, looplev, &cursor);
                     if (be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
                         return be;
@@ -193,8 +192,8 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                         skip_block(&cursor);
                     }
                     else {
-                        truth = objtruth(eval(namespace, tmp, &cursor));
-                        if (truth->value) {
+                        truth = tstobj(eval(namespace, tmp, &cursor));
+                        if (truth) {
                             be = run_block(space, tmp, looplev, &cursor);
                             if (be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
                                 return be;
@@ -224,8 +223,8 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                 skip_expr(&cursor);
                 block = cursor;
                 c = cond;
-                truth = objtruth(eval(namespace, tmp, &c));
-                while (truth->value) {
+                truth = tstobj(eval(namespace, tmp, &c));
+                while (truth) {
                     b = block;
                     be = run_block(space, tmp, looplev + 1, &b);
                     if (be & BE_RETURN)
@@ -238,9 +237,9 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                     }
                     blockend = b;
                     c = cond;
-                    truth = objtruth(eval(namespace, tmp, &c));
+                    truth = tstobj(eval(namespace, tmp, &c));
                     if (be & BE_CONTINUE)
-                        if (!(truth->value))
+                        if (!truth)
                             if (be - BE_CONTINUE > 0)
                                 /* Propagate. */
                                 return be - 1;

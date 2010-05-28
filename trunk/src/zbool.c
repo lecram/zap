@@ -55,15 +55,27 @@ cpybool(Bool *bool)
     return copy;
 }
 
-char
-eqbool(Bool *bool, Zob *other)
+int
+tstbool(Bool *bool)
 {
-    if (*other != T_BOOL) return 0;
-    if (((Bool *) other)->value) {
-        if (!bool->value) return 0;
+    return bool->value;
+}
+
+int
+cmpbool(Bool *bool, Bool *other)
+{
+    if (other->value) {
+        if (bool->value)
+            return 0;
+        else
+            return 1;
     }
-    else if (bool->value) return 0;
-    return 1;
+    else {
+        if (!bool->value)
+            return 0;
+        else
+            return 1;
+    }
 }
 
 unsigned int

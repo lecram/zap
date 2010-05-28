@@ -95,12 +95,22 @@ cpyfunc(Func *func)
     return copy;
 }
 
-char
-eqfunc(Func *func, Zob *other)
+int
+tstfunc(Func *func)
 {
-    if (*other != T_FUNC) return 0;
-    if (((Func *) other)->fimp != func->fimp) return 0;
-    return 1;
+    if (func->fimp != NULL)
+        return 1;
+    else
+        return 0;
+}
+
+int
+cmpfunc(Func *func, Func *other)
+{
+    if (other->fimp == func->fimp)
+        return 0;
+    else
+        return 1;
 }
 
 Zob *

@@ -33,6 +33,7 @@ Byte *getbyteitem(ByteArray *bytearray, int index);
 void setbyteitem(ByteArray *bytearray, int index, Byte *byte);
 void concatstr(ByteArray *bytearray, char *str);
 void concat(ByteArray *bytearray, ByteArray *other);
-char eqyarr(ByteArray *bytearray, Zob *other);
+int tstyarr(ByteArray *bytearray);
+int cmpyarr(ByteArray *bytearray, ByteArray *other);
 unsigned int repyarr(char *buffer, ByteArray *bytearray);
 unsigned int repplain(char *buffer, ByteArray *bytearray);

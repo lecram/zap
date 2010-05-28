@@ -20,6 +20,7 @@
 
 void delobj(Zob **object);
 Zob *cpyobj(Zob *object);
-int eqobj(Zob *object, Zob *other);
+int tstobj(Zob *object);
+int cmpobj(Zob *object, Zob *other);
 unsigned int repobj(char *buffer, Zob *object);
 Zob *typename(Zob *object);

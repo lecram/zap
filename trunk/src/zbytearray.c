@@ -142,24 +142,27 @@ concat(ByteArray *bytearray, ByteArray *other)
     bytearray->length += other->length;
 }
 
-char
-eqyarr(ByteArray *bytearray, Zob *other)
+int
+tstyarr(ByteArray *bytearray)
 {
-    if (*other != T_YARR) return 0;
+    if (bytearray->length)
+        return 1;
+    else
+        return 0;
+}
+
+int
+cmpyarr(ByteArray *bytearray, ByteArray *other)
+{
+    if (bytearray->length != other->length)
+        return 1;
     else {
-        ByteArray *obytearray;
+        int index;
 
-        obytearray = (ByteArray *) other;
-        if (bytearray->length != obytearray->length)
-            return 0;
-        else {
-            int index;
-
-            for (index = 0; index < bytearray->length; index++)
-                if (bytearray->bytes[index] != obytearray->bytes[index])
-                    return 0;
-            return 1;
-        }
+        for (index = 0; index < bytearray->length; index++)
+            if (bytearray->bytes[index] != other->bytes[index])
+                return 1;
+        return 0;
     }
 }
 

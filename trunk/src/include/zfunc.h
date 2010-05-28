@@ -48,6 +48,7 @@ void delhighfunc(HighFunc **highfunc);
 Func *newfunc(FImp *fimp, unsigned char arity);
 void delfunc(Func **func);
 Func *cpyfunc(Func *func);
-char eqfunc(Func *func, Zob *other);
+int tstfunc(Func *func);
+int cmpfunc(Func *func, Func *other);
 Zob *callimp(FImp *high, List *args);
 unsigned int repfunc(char *buffer, Func *func);

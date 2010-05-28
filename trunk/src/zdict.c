@@ -70,7 +70,7 @@ haskey(Dict *dict, Zob *key)
 
     item = dict->list->first;
     while (item != NULL) {
-        if (eqobj(item->object, key))
+        if (!cmpobj(item->object, key))
             return 1;
         item = item->next->next;
     }
@@ -85,7 +85,7 @@ setkey(Dict *dict, Zob *key, Zob *value)
 
     item = dict->list->first;
     while (item != NULL) {
-        if (eqobj(item->object, key)) {
+        if (!cmpobj(item->object, key)) {
             /* Set value. */
             decrefc(item->next->object);
             item->next->object = value;
@@ -109,7 +109,7 @@ getkey(Dict *dict, Zob *key, Zob *defval)
 
     item = dict->list->first;
     while (item != NULL) {
-        if (eqobj(item->object, key))
+        if (!cmpobj(item->object, key))
             /* Get value. */
             return item->next->object;
         item = item->next->next;
@@ -129,7 +129,7 @@ remkey(Dict *dict, Zob *key)
 
     item = dict->list->first;
     while (item != NULL) {
-        if (eqobj(item->object, key)) {
+        if (!cmpobj(item->object, key)) {
             remitem(dict->list, index);
             remitem(dict->list, index);
             return;
@@ -155,16 +155,19 @@ update(Dict *dict, Dict *other)
     }
 }
 
-char
-eqdict(Dict *dict, Zob *other)
+int
+tstdict(Dict *dict)
 {
-    if (*other != T_DICT) return 0;
-    else {
-        Dict *odict;
+    if (dict->list->length)
+        return 1;
+    else
+        return 0;
+}
 
-        odict = (Dict *) other;
-        return eqlist(dict->list, (Zob *) odict->list);
-    }
+int
+cmpdict(Dict *dict, Dict *other)
+{
+    return cmplist(dict->list, other->list);
 }
 
 unsigned int

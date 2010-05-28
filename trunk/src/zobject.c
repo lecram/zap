@@ -115,34 +115,82 @@ cpyobj(Zob *object)
     return 0;
 }
 
+/* Truth value testing.
+ * The truth value of an object is a value that
+ *  qualifies its content under a boolean perspective.
+ * A None object always has a FALSE truth value.
+ * A Bool object has a truth value equivalent to its own value.
+ * A numeric object has a FALSE truth value if and
+ *  only if its content is equivalent to 0.
+ * A sequence object has a FALSE truth value if and
+ *  only if its length is 0.
+ * The truth value of an object is TRUE under all other condictions.
+ */
+
 int
-eqobj(Zob *object, Zob *other)
+tstobj(Zob *object)
 {
     switch (*object) {
         case T_NONE:
-            return eqnone((None *) object, other);
+            return tstnone((None *) object);
         case T_BOOL:
-            return eqbool((Bool *) object, other);
+            return tstbool((Bool *) object);
         case T_BYTE:
-            return eqbyte((Byte *) object, other);
+            return tstbyte((Byte *) object);
         case T_WORD:
-            return eqword((Word *) object, other);
+            return tstword((Word *) object);
         case T_YARR:
-            return eqyarr((ByteArray *) object, other);
+            return tstyarr((ByteArray *) object);
         case T_BNUM:
-            return eqbnum((BigNum *) object, other);
+            return tstbnum((BigNum *) object);
         case T_LIST:
-            return eqlist((List *) object, other);
+            return tstlist((List *) object);
         case T_DICT:
-            return eqdict((Dict *) object, other);
+            return tstdict((Dict *) object);
         case T_FUNC:
-            return eqfunc((Func *) object, other);
+            return tstfunc((Func *) object);
         default:
             {
                 char errbff[256];
 
                 sprintf(errbff,
-                        "Unknown Type Number in eqobj: %u.",
+                        "Unknown Type Number in tstobj: %u.",
+                        *object);
+                raise(errbff);
+            }
+    }
+    return 0;
+}
+
+int
+cmpobj(Zob *object, Zob *other)
+{
+    if (*object != *other) return 1;
+    switch (*object) {
+        case T_NONE:
+            return cmpnone((None *) object, (None *) other);
+        case T_BOOL:
+            return cmpbool((Bool *) object, (Bool *) other);
+        case T_BYTE:
+            return cmpbyte((Byte *) object, (Byte *) other);
+        case T_WORD:
+            return cmpword((Word *) object, (Word *) other);
+        case T_YARR:
+            return cmpyarr((ByteArray *) object, (ByteArray *) other);
+        case T_BNUM:
+            return cmpbnum((BigNum *) object, (BigNum *) other);
+        case T_LIST:
+            return cmplist((List *) object, (List *) other);
+        case T_DICT:
+            return cmpdict((Dict *) object, (Dict *) other);
+        case T_FUNC:
+            return cmpfunc((Func *) object, (Func *) other);
+        default:
+            {
+                char errbff[256];
+
+                sprintf(errbff,
+                        "Unknown Type Number in cmpobj: %u.",
                         *object);
                 raise(errbff);
             }

@@ -55,12 +55,22 @@ cpybyte(Byte *byte)
     return copy;
 }
 
-char
-eqbyte(Byte *byte, Zob *other)
+int
+tstbyte(Byte *byte)
 {
-    if (*other != T_BYTE) return 0;
-    if (((Byte *) other)->value != byte->value) return 0;
-    return 1;
+    if (byte->value)
+        return 1;
+    else
+        return 0;
+}
+
+int
+cmpbyte(Byte *byte, Byte *other)
+{
+    if (other->value == byte->value)
+        return 0;
+    else
+        return 1;
 }
 
 /*

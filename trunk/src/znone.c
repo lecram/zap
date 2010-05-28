@@ -54,11 +54,16 @@ cpynone(None *none)
     return copy;
 }
 
-char
-eqnone(None *none, Zob *other)
+int
+tstnone(None *none)
 {
-    if (*other != T_NONE) return 0;
-    return 1;
+    return 0;
+}
+
+int
+cmpnone(None *none, None *other)
+{
+    return 0;
 }
 
 unsigned int
