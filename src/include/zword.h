@@ -27,5 +27,6 @@ typedef struct {
 Word *newword();
 void delword(Word **word);
 Word *cpyword(Word *word);
-char eqword(Word *word, Zob *other);
+int tstword(Word *word);
+int cmpword(Word *word, Word *other);
 unsigned int repword(char *buffer, Word *word);

@@ -173,7 +173,7 @@ zeq(List *args)
 
     a = args->first->object;
     b = args->first->next->object;
-    rval->value = eqobj(a, b);
+    rval->value = !cmpobj(a, b);
     return (Zob *) rval;
 }
 

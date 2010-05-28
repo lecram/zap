@@ -45,5 +45,6 @@ void insitem(List *list, int index, Zob *object);
 void extlist(List *list, List *ext);
 void remfirst(List *list);
 void remitem(List *list, int index);
-char eqlist(List *list, Zob *other);
+int tstlist(List *list);
+int cmplist(List *list, List *other);
 unsigned int replist(char *buffer, List *list);

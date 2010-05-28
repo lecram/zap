@@ -32,5 +32,6 @@ void setkey(Dict *dict, Zob *key, Zob *value);
 Zob *getkey(Dict *dict, Zob *key, Zob *defval);
 void remkey(Dict *dict, Zob *key);
 void update(Dict *dict, Dict *other);
-char eqdict(Dict *dict, Zob *other);
+int tstdict(Dict *dict);
+int cmpdict(Dict *dict, Dict *other);
 unsigned int repdict(char *buffer, Dict *dict);

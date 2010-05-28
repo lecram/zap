@@ -55,12 +55,22 @@ cpyword(Word *word)
     return copy;
 }
 
-char
-eqword(Word *word, Zob *other)
+int
+tstword(Word *word)
 {
-    if (*other != T_WORD) return 0;
-    if (((Word *) other)->value != word->value) return 0;
-    return 1;
+    if (word->value)
+        return 1;
+    else
+        return 0;
+}
+
+int
+cmpword(Word *word, Word *other)
+{
+    if (other->value == word->value)
+        return 0;
+    else
+        return 1;
 }
 
 unsigned int

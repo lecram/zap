@@ -22,12 +22,12 @@ I = include/
 
 objects = zap.o zerr.o ztypes.o zobject.o znone.o zbool.o \
           zbyte.o zword.o zbytearray.o zbignum.o zlist.o \
-          zdict.o zfunc.o ztruth.o zeval.o zgc.o zbuiltin.o
+          zdict.o zfunc.o zeval.o zgc.o zbuiltin.o
 
 dist : $(objects)
 	$(CC) -o zap $(objects)
 
-zap.o : zap.c $(I)zeval.h $(I)zbuiltin.h $(I)ztruth.h
+zap.o : zap.c $(I)zeval.h $(I)zbuiltin.h
 	$(CC) -c $(CFLAGS) zap.c
 
 zerr.o : zerr.c $(I)zerr.h
@@ -67,11 +67,6 @@ zdict.o : zdict.c $(I)zap.h
 
 zfunc.o : zfunc.c $(I)zap.h
 	$(CC) -c $(CFLAGS) zfunc.c
-
-ztruth.o : ztruth.c $(I)zerr.h $(I)ztypes.h $(I)zobject.h $(I)znone.h \
-           $(I)zbool.h $(I)zbyte.h $(I)zword.h $(I)zbytearray.h \
-           $(I)zbignum.h $(I)zlist.h $(I)zdict.h $(I)zfunc.h
-	$(CC) -c $(CFLAGS) ztruth.c
 
 zeval.o : zeval.c $(I)zap.h $(I)zeval.h
 	$(CC) -c $(CFLAGS) zeval.c

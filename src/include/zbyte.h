@@ -27,5 +27,6 @@ typedef struct {
 Byte *newbyte();
 void delbyte(Byte **byte);
 Byte *cpybyte(Byte *byte);
-char eqbyte(Byte *byte, Zob *other);
+int tstbyte(Byte *byte);
+int cmpbyte(Byte *byte, Byte *other);
 unsigned int repbyte(char *buffer, Byte *byte);

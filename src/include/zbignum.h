@@ -37,5 +37,6 @@ void rstbit(BigNum *bignum, int index);
 void lshiftbnum(BigNum *bignum, unsigned int shift);
 void rshiftbnum(BigNum *bignum, unsigned int shift);
 void double_dabble(char *buffer, BigNum *bignum);
-char eqbnum(BigNum *bignum, Zob *other);
+int tstbnum(BigNum *bignum);
+int cmpbnum(BigNum *bignum, BigNum *other);
 unsigned int repbnum(char *buffer, BigNum *bignum);

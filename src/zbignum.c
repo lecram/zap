@@ -247,31 +247,35 @@ double_dabble(char *buffer, BigNum *bignum)
     
 }
 
-char
-eqbnum(BigNum *bignum, Zob *other)
+int
+tstbnum(BigNum *bignum)
 {
-    if (*other != T_BNUM) return 0;
+    /* NYI. */
+    if (bignum->length)
+        return 1;
+    else
+        return 0;
+}
+
+int
+cmpbnum(BigNum *bignum, BigNum *other)
+{
+    if (bignum->length != other->length)
+        return 1;
     else {
-        BigNum *obignum;
+        int index;
+        unsigned int wordlen;
+        unsigned int mask;
 
-        obignum = (BigNum *) other;
-        if (bignum->length != obignum->length)
-            return 0;
-        else {
-            int index;
-            unsigned int wordlen;
-            unsigned int mask;
-
-            wordlen = bignum->length / WL;
-            if (bignum->length % WL) wordlen++;
-            for (index = 0; index < wordlen - 1; index++)
-                if (bignum->words[index] != obignum->words[index])
-                    return 0;
-            mask = (1 << (bignum->length % WL)) - 1;
-            if ((bignum->words[index] & mask) != (obignum->words[index] & mask))
-                return 0;
+        wordlen = bignum->length / WL;
+        if (bignum->length % WL) wordlen++;
+        for (index = 0; index < wordlen - 1; index++)
+            if (bignum->words[index] != other->words[index])
+                return 1;
+        mask = (1 << (bignum->length % WL)) - 1;
+        if ((bignum->words[index] & mask) != (other->words[index] & mask))
             return 1;
-        }
+        return 0;
     }
 }
 
