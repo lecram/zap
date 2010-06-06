@@ -25,7 +25,21 @@
 
 #include <stdio.h>
 
-#include "zap.h"
+#include "ztypes.h"
+#include "zerr.h"
+#include "zgc.h"
+
+#include "znone.h"
+#include "zbool.h"
+#include "zbyte.h"
+#include "zword.h"
+#include "zbytearray.h"
+#include "zbignum.h"
+#include "zlist.h"
+#include "zdict.h"
+#include "zfunc.h"
+
+#include "zobject.h"
 
 /* tname(o) */
 Zob *

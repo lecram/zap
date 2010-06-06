@@ -20,7 +20,11 @@
 
 /* Garbage collection is done by simple reference counting. */
 
-#include "zap.h"
+#include "ztypes.h"
+#include "zerr.h"
+#include "zgc.h"
+
+#include "zobject.h"
 
 void
 increfc(Zob *object)

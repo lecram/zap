@@ -27,7 +27,10 @@ objects = zap.o zerr.o ztypes.o zobject.o znone.o zbool.o \
 dist : $(objects)
 	$(CC) -o zap $(objects)
 
-zap.o : zap.c $(I)zeval.h $(I)zbuiltin.h
+zap.o : zap.c $(I)ztypes.h $(I)zerr.h $(I)zgc.h $(I)znone.h $(I)zbool.h \
+        $(I)zbyte.h $(I)zword.h $(I)zbytearray.h $(I)zbignum.h $(I)zlist.h \
+        $(I)zdict.h $(I)zfunc.h $(I)zobject.h $(I)zap.h $(I)zeval.h \
+		$(I)zbuiltin.h
 	$(CC) -c $(CFLAGS) zap.c
 
 zerr.o : zerr.c $(I)zerr.h
@@ -59,22 +62,34 @@ zbytearray.o : zbytearray.c $(I)zerr.h $(I)ztypes.h $(I)zbyte.h $(I)zbytearray.h
 zbignum.o : zbignum.c $(I)zerr.h $(I)ztypes.h $(I)zbyte.h $(I)zbignum.h
 	$(CC) -c $(CFLAGS) zbignum.c
 
-zlist.o : zlist.c $(I)zap.h
+zlist.o : zlist.c $(I)ztypes.h $(I)zerr.h $(I)zgc.h $(I)znone.h $(I)zbool.h \
+          $(I)zbyte.h $(I)zword.h $(I)zbytearray.h $(I)zbignum.h $(I)zlist.h \
+          $(I)zdict.h $(I)zfunc.h $(I)zobject.h
 	$(CC) -c $(CFLAGS) zlist.c
 
-zdict.o : zdict.c $(I)zap.h
+zdict.o : zdict.c $(I)ztypes.h $(I)zerr.h $(I)zgc.h $(I)znone.h $(I)zbool.h \
+          $(I)zbyte.h $(I)zword.h $(I)zbytearray.h $(I)zbignum.h $(I)zlist.h \
+          $(I)zdict.h $(I)zfunc.h $(I)zobject.h
 	$(CC) -c $(CFLAGS) zdict.c
 
-zfunc.o : zfunc.c $(I)zap.h
+zfunc.o : zfunc.c $(I)ztypes.h $(I)zerr.h $(I)zgc.h $(I)znone.h $(I)zbool.h \
+          $(I)zbyte.h $(I)zword.h $(I)zbytearray.h $(I)zbignum.h $(I)zlist.h \
+          $(I)zdict.h $(I)zfunc.h $(I)zobject.h
 	$(CC) -c $(CFLAGS) zfunc.c
 
-zeval.o : zeval.c $(I)zap.h $(I)zeval.h
+zeval.o : zeval.c $(I)ztypes.h $(I)zerr.h $(I)zgc.h $(I)znone.h $(I)zbool.h \
+          $(I)zbyte.h $(I)zword.h $(I)zbytearray.h $(I)zbignum.h $(I)zlist.h \
+          $(I)zdict.h $(I)zfunc.h $(I)zobject.h $(I)zeval.h
 	$(CC) -c $(CFLAGS) zeval.c
 
-zgc.o : zgc.c $(I)zap.h
+zgc.o : zgc.c $(I)ztypes.h $(I)zerr.h $(I)zgc.h $(I)znone.h $(I)zbool.h \
+        $(I)zbyte.h $(I)zword.h $(I)zbytearray.h $(I)zbignum.h $(I)zlist.h \
+        $(I)zdict.h $(I)zfunc.h $(I)zobject.h
 	$(CC) -c $(CFLAGS) zgc.c
 
-zbuiltin.o : zbuiltin.c $(I)zap.h
+zbuiltin.o : zbuiltin.c $(I)ztypes.h $(I)zerr.h $(I)zgc.h $(I)znone.h \
+             $(I)zbool.h $(I)zbyte.h $(I)zword.h $(I)zbytearray.h \
+			 $(I)zbignum.h $(I)zlist.h $(I)zdict.h $(I)zfunc.h $(I)zobject.h
 	$(CC) -c $(CFLAGS) zbuiltin.c
 
 

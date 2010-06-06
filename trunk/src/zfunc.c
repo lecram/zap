@@ -22,7 +22,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "zap.h"
+#include "ztypes.h"
+#include "zerr.h"
+
+#include "zlist.h"
+#include "zfunc.h"
 
 LowFunc *
 newlowfunc()
@@ -119,7 +123,7 @@ callimp(FImp *high, List *args)
     if (*high) {
         /* Call zap function. */
         /* NYI */
-        return (Zob *) newnone();
+        return EMPTY;
     }
     else {
         /* Call C function. */

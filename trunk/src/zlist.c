@@ -21,7 +21,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "zap.h"
+#include "ztypes.h"
+#include "zerr.h"
+#include "zgc.h"
+
+#include "zlist.h"
+
+#include "zobject.h"
 
 /* The object in list shares reference
  *  with the object passed as argument!

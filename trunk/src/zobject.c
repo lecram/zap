@@ -41,6 +41,8 @@ void
 delobj(Zob **object)
 {
     switch (**object) {
+        case EMPTY:
+            break;
         case T_NONE:
             delnone((None **) object);
             break;
@@ -84,6 +86,8 @@ Zob *
 cpyobj(Zob *object)
 {
     switch (*object) {
+        case EMPTY:
+            return EMPTY;
         case T_NONE:
             return (Zob *) cpynone((None *) object);
         case T_BOOL:
@@ -112,7 +116,7 @@ cpyobj(Zob *object)
                 raise(errbff);
             }
     }
-    return 0;
+    return EMPTY;
 }
 
 /* Truth value testing.
@@ -131,6 +135,8 @@ int
 tstobj(Zob *object)
 {
     switch (*object) {
+        case EMPTY:
+            return 0;
         case T_NONE:
             return tstnone((None *) object);
         case T_BOOL:
@@ -167,6 +173,8 @@ cmpobj(Zob *object, Zob *other)
 {
     if (*object != *other) return 1;
     switch (*object) {
+        case EMPTY:
+            return 0;
         case T_NONE:
             return cmpnone((None *) object, (None *) other);
         case T_BOOL:
@@ -202,6 +210,8 @@ unsigned int
 repobj(char *buffer, Zob *object)
 {
     switch (*object) {
+        case EMPTY:
+            return 0;
         case T_NONE:
             return repnone(buffer, (None *) object);
         case T_BOOL:
@@ -237,6 +247,8 @@ Zob *
 typename(Zob *object)
 {
     switch (*object) {
+        case EMPTY:
+            return (Zob *) yarrfromstr("EMPTY");
         case T_NONE:
             return (Zob *) yarrfromstr("None");
         case T_BOOL:
@@ -265,5 +277,5 @@ typename(Zob *object)
                 raise(errbff);
             }
     }
-    return 0;
+    return EMPTY;
 }
