@@ -28,7 +28,20 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "ztypes.h"
+#include "zerr.h"
+#include "zgc.h"
+
+#include "znone.h"
+#include "zbyte.h"
+#include "zbytearray.h"
+#include "zlist.h"
+#include "zdict.h"
+
+#include "zobject.h"
+
 #include "zap.h"
+
 #include "zeval.h"
 #include "zbuiltin.h"
 
@@ -46,9 +59,9 @@ newspace()
 void
 delspace(Space **space)
 {
-    delobj(&(*space)->universal);
-    delobj(&(*space)->global);
-    delobj(&(*space)->local);
+    deldict(&(*space)->universal);
+    deldict(&(*space)->global);
+    deldict(&(*space)->local);
     free(*space);
     *space = NULL;
 }
@@ -84,8 +97,8 @@ runstatement(Space *space, List *tmp, char **entry)
 {
     Zob *value;
 
-    value = eval((Dict *) space->universal, tmp, &(*entry));
-    assign((Dict *) space->universal, value, &(*entry));
+    value = eval(space->universal, tmp, &(*entry));
+    assign(space->universal, value, &(*entry));
 }
 
 void
@@ -147,7 +160,7 @@ unsigned char
 run_block(Space *space, List *tmp, char looplev, char **entry)
 {
     char *cursor = *entry;
-    Dict *namespace = (Dict *) space->universal;
+    Dict *namespace = space->universal;
     int truth;
     unsigned char be;
 
@@ -322,9 +335,9 @@ main(int argc, char *argv[])
     fclose(fbbc);
 
     space = newspace();
-    space->universal = (Zob *) bbuild();
-    space->global = (Zob *) newnone();
-    space->local = (Zob *) newnone();
+    space->universal = bbuild();
+    space->global = newdict();
+    space->local = newdict();
 
     entry = sbbc;
     run_block(space, tmp, 0, &entry);

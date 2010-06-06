@@ -23,6 +23,7 @@
 
 /* Type Signs */
 /* Should use enum? */
+#define EMPTY   0
 #define T_NONE  1
 #define T_BOOL  2
 #define T_BYTE  3

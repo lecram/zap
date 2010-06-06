@@ -21,7 +21,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "zap.h"
+#include "ztypes.h"
+#include "zerr.h"
+#include "zgc.h"
+
+#include "zlist.h"
+#include "zdict.h"
+
+#include "zobject.h"
 
 /* A Dict object holds a list where each pair of items is a
  * key-value pair (i.e. ["a", 1, "b", 2] -> {"a": 1, "b": 2}).

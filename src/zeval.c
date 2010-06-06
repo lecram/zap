@@ -25,7 +25,22 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "zap.h"
+#include "ztypes.h"
+#include "zerr.h"
+#include "zgc.h"
+
+#include "znone.h"
+#include "zbool.h"
+#include "zbyte.h"
+#include "zword.h"
+#include "zbytearray.h"
+#include "zbignum.h"
+#include "zlist.h"
+#include "zdict.h"
+#include "zfunc.h"
+
+#include "zobject.h"
+
 #include "zeval.h"
 
 unsigned int
@@ -222,9 +237,9 @@ nameval(Dict *namespace, char **entry)
     char *cursor = *entry;
 
     key = yarrfromstr(cursor);
-    obj = getkey(namespace, (Zob *) key, 0);
+    obj = getkey(namespace, (Zob *) key, EMPTY);
     delyarr(&key);
-    if (obj == 0) {
+    if (obj == EMPTY) {
         char errbff[256];
 
         sprintf(errbff,
@@ -249,9 +264,9 @@ feval(Dict *namespace, List *tmp, char **entry)
     /* Get func. */
     /* printf("func: %s\n", cursor); */
     key = yarrfromstr(cursor);
-    func = (Func *) getkey(namespace, (Zob *) key, 0);
+    func = (Func *) getkey(namespace, (Zob *) key, EMPTY);
     fname = cursor;
-    if ((Zob *) func == 0) {
+    if ((Zob *) func == EMPTY) {
         char errbff[256];
 
         sprintf(errbff,

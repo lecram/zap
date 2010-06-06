@@ -18,20 +18,6 @@
 
 /* zap (header) */
 
-#include "zerr.h"
-#include "ztypes.h"
-#include "zobject.h"
-#include "zgc.h"
-#include "znone.h"
-#include "zbool.h"
-#include "zbyte.h"
-#include "zword.h"
-#include "zbytearray.h"
-#include "zbignum.h"
-#include "zlist.h"
-#include "zdict.h"
-#include "zfunc.h"
-
 /* Bytecode Tokens */
 #define BLOCKEXIT   0xBE
 #define DELETE      0xDE
@@ -53,9 +39,9 @@
 #define BE_RETURN   0x10
 
 typedef struct {
-    Zob *universal;
-    Zob *global;
-    Zob *local;
+    Dict *universal;
+    Dict *global;
+    Dict *local;
 } Space;
 
 Space *newspace();
