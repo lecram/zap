@@ -41,6 +41,8 @@
 
 #include "zobject.h"
 
+#include "zbuiltin.h"
+
 /* tname(o) */
 Zob *
 ztname(List *args)

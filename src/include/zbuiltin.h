@@ -22,5 +22,6 @@
  * They should not be called from anywhere in the API.
  */
 
-void regfunc(Dict *namespace, char *name, Zob *(*cfunc)(List *args));
+void regfunc(Dict *namespace, Zob *(*cfunc)(List *args),
+             char *name, unsigned char arity);
 Dict *bbuild();

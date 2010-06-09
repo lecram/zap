@@ -24,9 +24,9 @@
 
 #include <stdio.h>
 
-#include "zerr.h"
 #include "ztypes.h"
-#include "zobject.h"
+#include "zerr.h"
+
 #include "znone.h"
 #include "zbool.h"
 #include "zbyte.h"
@@ -36,6 +36,8 @@
 #include "zlist.h"
 #include "zdict.h"
 #include "zfunc.h"
+
+#include "zobject.h"
 
 void
 delobj(Zob **object)
