@@ -22,9 +22,10 @@
 
 #include "ztypes.h"
 #include "zerr.h"
-#include "zgc.h"
 
 #include "zobject.h"
+
+#include "zgc.h"
 
 void
 increfc(Zob *object)

@@ -22,8 +22,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "zerr.h"
 #include "ztypes.h"
+#include "zerr.h"
+
 #include "zbyte.h"
 #include "zbytearray.h"
 

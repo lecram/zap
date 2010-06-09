@@ -21,8 +21,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "zerr.h"
 #include "ztypes.h"
+#include "zerr.h"
+
 #include "zbyte.h"
 
 Byte *

@@ -39,11 +39,10 @@
 #include "zdict.h"
 
 #include "zobject.h"
-
-#include "zap.h"
-
 #include "zeval.h"
 #include "zbuiltin.h"
+
+#include "zap.h"
 
 Space *
 newspace()
