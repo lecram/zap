@@ -1,8 +1,0 @@
-# Test.
-
-x := 15
-y := x
-z := [x, y]
-
-print(repr(refc(x)))
-print("\n")
