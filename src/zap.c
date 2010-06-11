@@ -39,7 +39,7 @@
 #include "zdict.h"
 
 #include "zobject.h"
-#include "zeval.h"
+#include "zruntime.h"
 #include "zbuiltin.h"
 
 #include "zap.h"
