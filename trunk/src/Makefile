@@ -87,8 +87,8 @@ zbuiltin.o : zbuiltin.c $(base) $(types) $(I)zobject.h $(I)zbuiltin.h
 
 # Main.
 
-zap.o : zap.c $(base) $(I)znone.h $(I)zbyte.h $(I)zbytearray.h $(I)zlist.h \
-        $(I)zdict.h $(I)zobject.h $(I)zruntime.h $(I)zbuiltin.h $(I)zap.h
+zap.o : zap.c $(I)ztypes.h $(I)zerr.h $(I)zlist.h $(I)zdict.h \
+        $(I)zruntime.h $(I)zbuiltin.h $(I)zap.h
 	$(CC) -c $(CFLAGS) zap.c
 
 
