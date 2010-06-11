@@ -16,7 +16,7 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Evaluation */
+/* Runtime */
 
 /* In This File:
  * - Bytecode expression evaluation.
@@ -41,7 +41,7 @@
 
 #include "zobject.h"
 
-#include "zeval.h"
+#include "zruntime.h"
 
 unsigned int
 readword(char **entry)

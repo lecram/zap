@@ -22,7 +22,7 @@ I = include/
 
 objects = ztypes.o zerr.o zgc.o znone.o zbool.o zbyte.o \
           zword.o zbytearray.o zbignum.o zlist.o zdict.o \
-          zfunc.o zobject.o zeval.o zbuiltin.o zap.o
+          zfunc.o zobject.o zruntime.o zbuiltin.o zap.o
 
 base = $(I)ztypes.h $(I)zerr.h $(I)zgc.h
 
@@ -79,8 +79,8 @@ zfunc.o : zfunc.c $(I)ztypes.h $(I)zerr.h $(I)zlist.h $(I)zfunc.h
 zobject.o : zobject.c $(I)ztypes.h $(I)zerr.h $(types) $(I)zobject.h
 	$(CC) -c $(CFLAGS) zobject.c
 
-zeval.o : zeval.c $(base) $(types) $(I)zobject.h $(I)zeval.h
-	$(CC) -c $(CFLAGS) zeval.c
+zruntime.o : zruntime.c $(base) $(types) $(I)zobject.h $(I)zruntime.h
+	$(CC) -c $(CFLAGS) zruntime.c
 
 zbuiltin.o : zbuiltin.c $(base) $(types) $(I)zobject.h $(I)zbuiltin.h
 	$(CC) -c $(CFLAGS) zbuiltin.c
@@ -88,7 +88,7 @@ zbuiltin.o : zbuiltin.c $(base) $(types) $(I)zobject.h $(I)zbuiltin.h
 # Main.
 
 zap.o : zap.c $(base) $(I)znone.h $(I)zbyte.h $(I)zbytearray.h $(I)zlist.h \
-        $(I)zdict.h $(I)zobject.h $(I)zeval.h $(I)zbuiltin.h $(I)zap.h
+        $(I)zdict.h $(I)zobject.h $(I)zruntime.h $(I)zbuiltin.h $(I)zap.h
 	$(CC) -c $(CFLAGS) zap.c
 
 
