@@ -32,8 +32,10 @@ newbool()
     Bool *bool;
 
     bool = (Bool *) malloc(sizeof(Bool));
-    if (bool == NULL)
-        raise("Out of memory in newbool().");
+    if (bool == NULL) {
+        raiseOutOfMemory("newbool");
+        exit(EXIT_FAILURE);
+    }
     bool->type = T_BOOL;
     bool->refc = 0;
     return bool;

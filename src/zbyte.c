@@ -32,8 +32,10 @@ newbyte()
     Byte *byte;
 
     byte = (Byte *) malloc(sizeof(Byte));
-    if (byte == NULL)
-        raise("Out of memory in newbyte().");
+    if (byte == NULL) {
+        raiseOutOfMemory("newbyte");
+        exit(EXIT_FAILURE);
+    }
     byte->type = T_BYTE;
     byte->refc = 0;
     return byte;

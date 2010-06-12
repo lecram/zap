@@ -57,8 +57,10 @@ main(int argc, char *argv[])
     size = ftell(fbbc);
     fseek(fbbc, 0L, SEEK_SET);
     sbbc = (char *) malloc(size * sizeof(char));
-    if (sbbc == NULL)
-        raise("Out of memory in main().");
+    if (sbbc == NULL) {
+        raiseOutOfMemory("main");
+        exit(EXIT_FAILURE);
+    }
     fread(sbbc, size, 1, fbbc);
     fclose(fbbc);
 

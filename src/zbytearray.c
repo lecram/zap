@@ -35,14 +35,18 @@ newyarr(unsigned int length)
     char *array;
 
     bytearray = (ByteArray *) malloc(sizeof(ByteArray));
-    if (bytearray == NULL)
-        raise("Out of memory in newyarr().");
+    if (bytearray == NULL) {
+        raiseOutOfMemory("newyarr");
+        exit(EXIT_FAILURE);
+    }
     if (length)
         array = (char *) malloc(length * sizeof(char));
     else
         array = (char *) malloc(1);
-    if (array == NULL)
-        raise("Out of memory in newyarr().");
+    if (array == NULL) {
+        raiseOutOfMemory("newyarr");
+        exit(EXIT_FAILURE);
+    }
     bytearray->type = T_YARR;
     bytearray->length = length;
     bytearray->bytes = array;
@@ -59,11 +63,15 @@ yarrfromstr(char *s)
 
     length = strlen(s);
     bytearray = (ByteArray *) malloc(sizeof(ByteArray));
-    if (bytearray == NULL)
-        raise("Out of memory in yarrfromstr().");
+    if (bytearray == NULL) {
+        raiseOutOfMemory("yarrfromstr");
+        exit(EXIT_FAILURE);
+    }
     array = (char *) malloc(length * sizeof(char));
-    if (array == NULL)
-        raise("Out of memory in yarrfromstr().");
+    if (array == NULL) {
+        raiseOutOfMemory("yarrfromstr");
+        exit(EXIT_FAILURE);
+    }
     strcpy(array, s);
     bytearray->type = T_YARR;
     bytearray->length = length;
@@ -99,8 +107,10 @@ getbyteitem(ByteArray *bytearray, int index)
     Byte *byte = newbyte();
 
     if (index < 0) index += bytearray->length;
-    if (index < 0  ||  index >= bytearray->length)
-        raise("Index out of range.");
+    if (index < 0  ||  index >= bytearray->length) {
+        raiseIndexOutOfRange("getbyteitem", index, bytearray->length);
+        exit(EXIT_FAILURE);
+    }
     byte->value = bytearray->bytes[index];
     return byte;
 }
@@ -109,8 +119,10 @@ void
 setbyteitem(ByteArray *bytearray, int index, Byte *byte)
 {
     if (index < 0) index += bytearray->length;
-    if (index < 0  ||  index >= bytearray->length)
-        raise("Index out of range.");
+    if (index < 0  ||  index >= bytearray->length) {
+        raiseIndexOutOfRange("setbyteitem", index, bytearray->length);
+        exit(EXIT_FAILURE);
+    }
     bytearray->bytes[index] = byte->value;
 }
 
@@ -124,8 +136,10 @@ concatstr(ByteArray *bytearray, char *str)
         return;
     bytearray->bytes = realloc(bytearray->bytes,
                                bytearray->length + length);
-    if (bytearray->bytes == NULL)
-        raise("Out of memory in concatstr().");
+    if (bytearray->bytes == NULL) {
+        raiseOutOfMemory("concatstr");
+        exit(EXIT_FAILURE);
+    }
     memcpy(bytearray->bytes + bytearray->length, str, length);
     bytearray->length += length;
 }
@@ -137,8 +151,10 @@ concat(ByteArray *bytearray, ByteArray *other)
         return;
     bytearray->bytes = realloc(bytearray->bytes,
                                bytearray->length + other->length);
-    if (bytearray->bytes == NULL)
-        raise("Out of memory in concat().");
+    if (bytearray->bytes == NULL) {
+        raiseOutOfMemory("concat");
+        exit(EXIT_FAILURE);
+    }
     memcpy(bytearray->bytes + bytearray->length, other->bytes, other->length);
     bytearray->length += other->length;
 }
