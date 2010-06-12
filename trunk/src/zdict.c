@@ -40,8 +40,10 @@ newdict()
     Dict *dict;
 
     dict = (Dict *) malloc(sizeof(Dict));
-    if (dict == NULL)
-        raise("Out of memory in newdict().");
+    if (dict == NULL) {
+        raiseOutOfMemory("newdict");
+        exit(EXIT_FAILURE);
+    }
     dict->type = T_DICT;
     dict->list = newlist();
     dict->refc = 0;
@@ -62,8 +64,10 @@ cpydict(Dict *dict)
     Dict *copy;
 
     copy = (Dict *) malloc(sizeof(Dict));
-    if (copy == NULL)
-        raise("Out of memory in cpydict().");
+    if (copy == NULL) {
+        raiseOutOfMemory("cpydict");
+        exit(EXIT_FAILURE);
+    }
     copy->type = T_DICT;
     copy->list = cpylist(dict->list);
     copy->refc = 0;
@@ -147,6 +151,7 @@ remkey(Dict *dict, Zob *key)
 
     /* Key not found. */
     raise("Key not found.");
+    exit(EXIT_FAILURE);
 }
 
 void

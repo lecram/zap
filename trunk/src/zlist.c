@@ -38,8 +38,10 @@ newnode(Zob *object)
     Node *node;
 
     node = (Node *) malloc(sizeof(Node));
-    if (node == NULL)
-        raise("Out of memory in newnode().");
+    if (node == NULL) {
+        raiseOutOfMemory("newnode");
+        exit(EXIT_FAILURE);
+    }
     node->object = object;
     increfc(object);
     node->next = NULL; /* Security. */
@@ -60,8 +62,10 @@ newlist()
     List *list;
 
     list = (List *) malloc(sizeof(List));
-    if (list == NULL)
-        raise("Out of memory in newlist().");
+    if (list == NULL) {
+        raiseOutOfMemory("newlist");
+        exit(EXIT_FAILURE);
+    }
     list->type = T_LIST;
     list->length = 0;
     list->first = NULL;
@@ -140,8 +144,10 @@ void
 setitem(List *list, int index, Zob *object)
 {
     if (index < 0) index += list->length;
-    if (index < 0  ||  index >= list->length)
-        raise("Index out of range.");
+    if (index < 0  ||  index >= list->length) {
+        raiseIndexOutOfRange("setitem", index, list->length);
+        exit(EXIT_FAILURE);
+    }
     else {
         int curidx = 0;
         Node *cur = list->first;
@@ -162,8 +168,10 @@ void
 insitem(List *list, int index, Zob *object)
 {
     if (index < 0) index += list->length;
-    if (index < 0  ||  index > list->length)
-        raise("Index out of range.");
+    if (index < 0  ||  index > list->length) {
+        raiseIndexOutOfRange("insitem", index, list->length);
+        exit(EXIT_FAILURE);
+    }
     else if (index == list->length)
         appitem(list, object);
     else {
@@ -231,8 +239,10 @@ void
 remitem(List *list, int index)
 {
     if (index < 0) index += list->length;
-    if (index < 0  ||  index >= list->length)
-        raise("Index out of range.");
+    if (index < 0  ||  index >= list->length) {
+        raiseIndexOutOfRange("remitem", index, list->length);
+        exit(EXIT_FAILURE);
+    }
     if (index == 0)
         remfirst(list);
     else {

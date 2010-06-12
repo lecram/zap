@@ -32,8 +32,10 @@ newword()
     Word *word;
 
     word = (Word *) malloc(sizeof(Word));
-    if (word == NULL)
-        raise("Out of memory in newword().");
+    if (word == NULL) {
+        raiseOutOfMemory("newword");
+        exit(EXIT_FAILURE);
+    }
     word->type = T_WORD;
     word->refc = 0;
     return word;

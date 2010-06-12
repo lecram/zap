@@ -52,8 +52,10 @@ newspace()
     Space *space;
 
     space = (Space *) malloc(sizeof(Space));
-    if (space == NULL)
-        raise("Out of memory in newspace().");
+    if (space == NULL) {
+        raiseOutOfMemory("newspace");
+        exit(EXIT_FAILURE);
+    }
     return space;
 }
 
@@ -114,6 +116,7 @@ skip_expr(char **entry)
         case T_BNUM:
             /* Currently, there is no literal BigNums. */
             raise("There is no literal BigNums.");
+            exit(EXIT_FAILURE);
             break;
         case T_LIST:
             cursor++;
@@ -205,6 +208,7 @@ eval(Dict *namespace, List *tmp, char **entry)
         case T_BNUM:
             /* Currently, there is no literal BigNums. */
             raise("There is no literal BigNums.");
+            exit(EXIT_FAILURE);
             break;
         case T_LIST:
             {
@@ -264,12 +268,8 @@ nameval(Dict *namespace, char **entry)
     obj = getkey(namespace, (Zob *) key, EMPTY);
     delyarr(&key);
     if (obj == EMPTY) {
-        char errbff[256];
-
-        sprintf(errbff,
-                "Name not defined: %s.",
-                cursor);
-        raise(errbff);
+        raiseNameNotDefined(cursor);
+        exit(EXIT_FAILURE);
     }
     cursor += strlen(cursor) + 1; /* To skip STRING_END. */
     *entry = cursor;
@@ -291,12 +291,8 @@ feval(Dict *namespace, List *tmp, char **entry)
     func = (Func *) getkey(namespace, (Zob *) key, EMPTY);
     fname = cursor;
     if ((Zob *) func == EMPTY) {
-        char errbff[256];
-
-        sprintf(errbff,
-                "Function Name not defined: %s.",
-                fname);
-        raise(errbff);
+        raiseFunctionNameNotDefined(fname);
+        exit(EXIT_FAILURE);
     }
     cursor += strlen(cursor) + 1; /* To skip STRING_END. */
     delyarr(&key);
@@ -309,14 +305,8 @@ feval(Dict *namespace, List *tmp, char **entry)
         appitem(args, eval(namespace, tmp, &cursor));
     *entry = cursor;
     if (args->length != func->arity) {
-        char errbff[256];
-
-        sprintf(errbff,
-                "%i argument(s) passed to %i-ary function %s().",
-                args->length,
-                func->arity,
-                fname);
-        raise(errbff);
+        raiseArityError(args->length, func->arity, fname);
+        exit(EXIT_FAILURE);
     }
     ret = callimp(func->fimp, args);
     dellist(&args);
@@ -430,12 +420,8 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
             if (haskey(namespace, (Zob *) key))
                 remkey(namespace, (Zob *) key);
             else {
-                char errbff[256];
-
-                sprintf(errbff,
-                        "del: Name not defined: %s.",
-                        cursor);
-                raise(errbff);
+                raiseNameNotDefined(cursor);
+                exit(EXIT_FAILURE);
             }
             delyarr(&key);
             cursor += strlen(cursor) + 1;
@@ -542,8 +528,10 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
 
         cursor++;
         lev = *cursor;
-        if (lev > looplev)
+        if (lev > looplev) {
             raise("Break without loop.");
+            exit(EXIT_FAILURE);
+        }
         return BE_BREAK | lev;
     }
     if (*cursor == (char) CONTINUE) {
@@ -551,8 +539,10 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
 
         cursor++;
         lev = *cursor;
-        if (lev > looplev)
+        if (lev > looplev) {
             raise("Continue without loop.");
+            exit(EXIT_FAILURE);
+        }
         return CONTINUE | lev;
     }
     if (*cursor == (char) RETURN) {

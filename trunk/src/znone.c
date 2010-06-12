@@ -32,8 +32,10 @@ newnone()
     None *none;
 
     none = (None *) malloc(sizeof(None));
-    if (none == NULL)
-        raise("Out of memory in newnone().");
+    if (none == NULL) {
+        raiseOutOfMemory("newnone");
+        exit(EXIT_FAILURE);
+    }
     none->type = T_NONE;
     none->refc = 0;
     return none;

@@ -22,6 +22,7 @@
  * - General handle functions to Objects.
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 
 #include "ztypes.h"
@@ -74,12 +75,8 @@ delobj(Zob **object)
             break;
         default:
             {
-                char errbff[256];
-
-                sprintf(errbff,
-                        "Unknown Type Number in delobj: %u.",
-                        **object);
-                raise(errbff);
+                raiseUnknownTypeNumber("delobj", **object);
+                exit(EXIT_FAILURE);
             }
     }
 }
@@ -110,12 +107,8 @@ cpyobj(Zob *object)
             return (Zob *) cpyfunc((Func *) object);
         default:
             {
-                char errbff[256];
-
-                sprintf(errbff,
-                        "Unknown Type Number in cpyobj: %u.",
-                        *object);
-                raise(errbff);
+                raiseUnknownTypeNumber("cpyobj", *object);
+                exit(EXIT_FAILURE);
             }
     }
     return EMPTY;
@@ -159,12 +152,8 @@ tstobj(Zob *object)
             return tstfunc((Func *) object);
         default:
             {
-                char errbff[256];
-
-                sprintf(errbff,
-                        "Unknown Type Number in tstobj: %u.",
-                        *object);
-                raise(errbff);
+                raiseUnknownTypeNumber("tstobj", *object);
+                exit(EXIT_FAILURE);
             }
     }
     return 0;
@@ -197,12 +186,8 @@ cmpobj(Zob *object, Zob *other)
             return cmpfunc((Func *) object, (Func *) other);
         default:
             {
-                char errbff[256];
-
-                sprintf(errbff,
-                        "Unknown Type Number in cmpobj: %u.",
-                        *object);
-                raise(errbff);
+                raiseUnknownTypeNumber("cmpobj", *object);
+                exit(EXIT_FAILURE);
             }
     }
     return 1;
@@ -234,12 +219,8 @@ repobj(char *buffer, Zob *object)
             return repfunc(buffer, (Func *) object);
         default:
             {
-                char errbff[256];
-
-                sprintf(errbff,
-                        "Unknown Type Number in repobj: %u.",
-                        *object);
-                raise(errbff);
+                raiseUnknownTypeNumber("repobj", *object);
+                exit(EXIT_FAILURE);
             }
     }
     return 0;
@@ -271,12 +252,8 @@ typename(Zob *object)
             return (Zob *) yarrfromstr("Func");
         default:
             {
-                char errbff[256];
-
-                sprintf(errbff,
-                        "Unknown Type Number in typename: %u.",
-                        *object);
-                raise(errbff);
+                raiseUnknownTypeNumber("typename", *object);
+                exit(EXIT_FAILURE);
             }
     }
     return EMPTY;

@@ -31,5 +31,43 @@ void
 raise(char *msg)
 {
     printf("Error: %s\n", msg);
-    exit(EXIT_FAILURE);
+}
+
+void
+raiseOutOfMemory(const char *caller)
+{
+    printf("Error: Out of memory in %s().\n", caller);
+}
+
+void
+raiseUnknownTypeNumber(const char *caller, unsigned char tnum)
+{
+    printf("Error: Unknown type number in %s(): %u.\n", caller, tnum);
+}
+
+void
+raiseIndexOutOfRange(const char *caller, int index, int length)
+{
+    printf("Error: Index out of range in %s(): %d > %d.\n", caller, index, length - 1);
+}
+
+void
+raiseNameNotDefined(const char *name)
+{
+    printf("Error: Name \"%s\" is not defined.\n", name);
+}
+
+void
+raiseFunctionNameNotDefined(const char *fname)
+{
+    printf("Error: Function name \"%s\" is not defined.\n", fname);
+}
+
+void
+raiseArityError(unsigned int passed, unsigned char expected, const char *fname)
+{
+    printf("Error: %d argument(s) passed to %d-ary function %s().\n",
+           passed,
+           expected,
+           fname);
 }

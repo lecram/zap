@@ -34,8 +34,10 @@ newlowfunc()
     LowFunc *lowfunc;
 
     lowfunc = (LowFunc *) malloc(sizeof(LowFunc));
-    if (lowfunc == NULL)
-        raise("Out of memory in newlowfunc().");
+    if (lowfunc == NULL) {
+        raiseOutOfMemory("newlowfunc");
+        exit(EXIT_FAILURE);
+    }
     lowfunc->high = 0;
     return lowfunc;
 }
@@ -53,8 +55,10 @@ newhighfunc()
     HighFunc *highfunc;
 
     highfunc = (HighFunc *) malloc(sizeof(HighFunc));
-    if (highfunc == NULL)
-        raise("Out of memory in newhighfunc().");
+    if (highfunc == NULL) {
+        raiseOutOfMemory("newhighfunc");
+        exit(EXIT_FAILURE);
+    }
     highfunc->high = 1;
     return highfunc;
 }
@@ -72,8 +76,10 @@ newfunc(FImp *fimp, unsigned char arity)
     Func *func;
 
     func = (Func *) malloc(sizeof(Func));
-    if (func == NULL)
-        raise("Out of memory in newfunc().");
+    if (func == NULL) {
+        raiseOutOfMemory("newfunc");
+        exit(EXIT_FAILURE);
+    }
     func->type = T_FUNC;
     func->refc = 0;
     func->fimp = fimp;

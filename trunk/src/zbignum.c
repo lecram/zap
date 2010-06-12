@@ -75,8 +75,10 @@ strbitlen(char *str)
 
     strlength = strlen(str);
     tmpstr = (char *) malloc(strlength + 1);
-    if (tmpstr == NULL)
-        raise("Out of memory in strbitlen().");
+    if (tmpstr == NULL) {
+        raiseOutOfMemory("strbitlen");
+        exit(EXIT_FAILURE);
+    }
     memcpy(tmpstr, str, strlength + 1);
     while (*tmpstr != '0') {
         halfstr(tmpstr);
@@ -96,13 +98,17 @@ newbnum(unsigned int length)
 
     if (length < 32) length = 32;
     bignum = (BigNum *) malloc(sizeof(BigNum));
-    if (bignum == NULL)
-        raise("Out of memory in newbnum().");
+    if (bignum == NULL) {
+        raiseOutOfMemory("newbnum");
+        exit(EXIT_FAILURE);
+    }
     wordlen = length / WL;
     if (length % WL) wordlen++;
     array = (unsigned int *) calloc(wordlen, sizeof(unsigned int));
-    if (array == NULL)
-        raise("Out of memory in newbnum().");
+    if (array == NULL) {
+        raiseOutOfMemory("newbnum");
+        exit(EXIT_FAILURE);
+    }
     bignum->type = T_BNUM;
     bignum->length = length;
     bignum->words = array;
@@ -160,8 +166,10 @@ getbit(BigNum *bignum, int index)
     Byte *byte = newbyte();
 
     if (index < 0) index += bignum->length;
-    if (index < 0  ||  index >= bignum->length)
-        raise("Index out of range.");
+    if (index < 0  ||  index >= bignum->length) {
+        raiseIndexOutOfRange("getbit", index, bignum->length);
+        exit(EXIT_FAILURE);
+    }
     if (bignum->words[index / WL] & (1 << (index % WL))) {
         byte->value = 1;
         return byte;
@@ -174,8 +182,10 @@ void
 setbit(BigNum *bignum, int index)
 {
     if (index < 0) index += bignum->length;
-    if (index < 0  ||  index >= bignum->length)
-        raise("Index out of range.");
+    if (index < 0  ||  index >= bignum->length) {
+        raiseIndexOutOfRange("setbit", index, bignum->length);
+        exit(EXIT_FAILURE);
+    }
     bignum->words[index / WL] |= 1 << (index % WL);
 }
 
@@ -183,8 +193,10 @@ void
 rstbit(BigNum *bignum, int index)
 {
     if (index < 0) index += bignum->length;
-    if (index < 0  ||  index >= bignum->length)
-        raise("Index out of range.");
+    if (index < 0  ||  index >= bignum->length) {
+        raiseIndexOutOfRange("rstbit", index, bignum->length);
+        exit(EXIT_FAILURE);
+    }
     bignum->words[index / WL] &= ~(1 << (index % WL));
 }
 
