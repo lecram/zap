@@ -103,6 +103,20 @@ def isnumber(s):
             return False
     return True
 
+def isvalidname(s):
+    if not s:
+        return False
+    if (ord('0') <= ord(s[0]) <= ord('9')):
+        return False
+    validchars = [c for c in "=+-*/._?!@$%&|<>^"]
+    validchars.extend(chr(x) for x in range(ord('A'), ord('Z') + 1))
+    validchars.extend(chr(x) for x in range(ord('a'), ord('z') + 1))
+    validchars.extend(chr(x) for x in range(ord('0'), ord('9') + 1))
+    for c in s:
+        if c not in validchars:
+            return False
+    return True
+
 def cplword(s):
     n = int(s)
     cpl = ""
@@ -171,19 +185,6 @@ def cplexpr(expr):
     i = 0
     temp = ""
     c = expr[i]
-    if c == '<' and '>' in expr[2:5]:
-        # Compile Byte.
-        n = expr[1:expr.find('>')]
-        for d in n:
-            if ord(d) < ord('0') or ord(d) > ord('9'):
-                break
-        else:
-            b = int(n)
-            if b > 255:
-                raise Exception('Byte out of range.')
-            cpl = BYTE + chr(b)
-            rest = expr[expr.find('>') + 1:]
-            return cpl, rest
     while True:
         if c == '(':
             # Compile Function.
@@ -288,9 +289,15 @@ def cplexpr(expr):
             elif isnumber(temp):
                 # Compile Word.
                 cpl = WORD + cplword(temp)
-            # Compile Reference.
-            else:
+            elif len(temp) == 4 and temp.find("0x") == 0:
+                # Compile Byte from hex.
+                x = chr(int(temp, 16))
+                cpl = BYTE + x
+            elif isvalidname(temp):
+                # Compile Reference.
                 cpl = temp + STRING_END
+            else:
+                raise Exception("Syntax error: invalid expression: \"%s\"." % (temp))
             rest = expr[i:]
             return cpl, rest
         else:
@@ -309,7 +316,10 @@ def cplasgn(asgns):
                 cpl += ref.strip() + STRING_END
             cpl += CASGN_END
         else:
-            cpl += asgn + STRING_END
+            if isvalidname(asgn):
+                cpl += asgn + STRING_END
+            else:
+                raise Exception("Syntax error: invalid name: \"%s\"." % (asgn))
     cpl += ASGN_END
     return cpl
 
