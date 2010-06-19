@@ -1,14 +1,14 @@
 # while and if blocks.
 
 c := 'A'
-while <(c, +('Z', '\x01')):
+while <(c, +('Z', 0x01)):
     print(arr(c))
-    c := +(c, '\x01')
+    c := +(c, 0x01)
 
 print("\n")
 
 c := 'A'
-while <(c, +('Z', '\x01')):
+while <(c, +('Z', 0x01)):
     if <(c, 'G'):
         print("-")
     elif <(c, 'M'):
@@ -21,6 +21,6 @@ while <(c, +('Z', '\x01')):
         print("!")
     else:
         print(arr(c))
-    c := +(c, '\x01')
+    c := +(c, 0x01)
 
 print("\n")

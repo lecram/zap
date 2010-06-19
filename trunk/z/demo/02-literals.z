@@ -6,7 +6,7 @@ nothing := NONE
 ok := TRUE
 cancel := FALSE
 # Byte
-byte := '\x00'
+byte := 0x00
 char := 'A'
 # Word
 word := 0
