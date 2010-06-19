@@ -18,12 +18,10 @@
 
 /* List Type (header) */
 
-struct Node {
+typedef struct Node {
     Zob *object;
     struct Node *next;
-};
-
-typedef struct Node Node;
+} Node;
 
 typedef struct {
     Zob type;
