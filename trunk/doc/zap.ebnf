@@ -3,17 +3,17 @@ SubProgram = BlankLine | Comment | Statement | Block.
 
 BlankLine = {Whitespace} LineBreak.
 Comment = {Whitespace} '"#"' {ASCIICharacter} LineBreak.
-LineBreak = '"\x10"' | '"\x13"' ['"\x10"'].
+LineBreak = '0x0A' | '0x0D' ['0x0A'].
 
 Statement = {Whitespace} {Assign} \n Expression (BlankLine | Comment).
-Whitespace = '" "' | '"\t"'.
+Whitespace = '" "'.
 Assign = Identifier '" := "'.
 Expression = (Identifier | Literal | Function).
 
-Literal = (None | Bool | Byte | ByteArray | Word | List | Dict).
+Literal = None | Bool | Byte | ByteArray | Word | List | Dict.
 None = 'NONE'.
-Bool = ('TRUE' | 'FALSE').
-Byte = "'" [Char] "'".
+Bool = 'TRUE' | 'FALSE'.
+Byte = ("'" Char "'") | '0x00-0xFF'.
 ByteArray = '"' {Char} '"'.
 Word = Number.
 List = '[' {{Whitespace} Expression {Whitespace} ','} \n
@@ -26,4 +26,4 @@ Number = Digit {Digit}.
 Digit = '"0"' | '"1"' | '"2"' | '"3"' | '"4"'
       | '"5"' | '"6"' | '"7"' | '"8"' | '"9"'.
 
-Char = ASCIICharacter | \x00-\xFF
+Char = ASCIICharacter | '\x00-\xFF'.
