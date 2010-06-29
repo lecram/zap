@@ -17,7 +17,12 @@
 
 -include env
 
-CFLAGS = -Wall -Werror -O2 -I include
+ifeq ($(CC), gcc)
+	CFLAGS = -Wall -Werror -O2 -I include
+else ifeq ($(CC), tcc)
+	CFLAGS = -Wall -Werror -Wunsupported -Iinclude
+endif
+
 I = include/
 
 objects = ztypes.o zerr.o zgc.o znone.o zbool.o zbyte.o \
@@ -31,7 +36,7 @@ types = $(I)znone.h $(I)zbool.h $(I)zbyte.h $(I)zword.h $(I)zbytearray.h \
 
 
 dist : $(objects)
-	$(CC) -o zap $(objects)
+	$(CC) -o zap$(BINEXT) $(objects)
 
 
 # Base.
