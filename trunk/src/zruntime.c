@@ -353,10 +353,12 @@ skip_block(char **entry)
 {
     char *cursor = *entry;
 
-    while (*cursor != (char) BLOCKEXIT  ||  *(cursor + 1) != (char) END) {
+    while (*cursor != (char) BLOCKEXIT  ||
+           *(cursor + 1) != (char) END) {
         if (*cursor == (char) BLOCKEXIT) {
             cursor++;
-            if (*cursor == (char) BREAK || *cursor == (char) CONTINUE)
+            if (*cursor == (char) BREAK ||
+                *cursor == (char) CONTINUE)
                 cursor += 2;
             else if (*cursor == (char) RETURN) {
                 /* Function Return. */
@@ -374,12 +376,14 @@ skip_block(char **entry)
                 skip_expr(&cursor);
                 skip_block(&cursor);
             }
-            while (*cursor == (char) BLOCK  &&  *(cursor + 1) == (char) ELIF) {
+            while (*cursor == (char) BLOCK  &&
+                   *(cursor + 1) == (char) ELIF) {
                 cursor += 2;
                 skip_expr(&cursor);
                 skip_block(&cursor);
             }
-            if (*cursor == (char) BLOCK  &&  *(cursor + 1) == (char) ELSE) {
+            if (*cursor == (char) BLOCK  &&
+                *(cursor + 1) == (char) ELSE) {
                 cursor += 2;
                 skip_block(&cursor);
             }
@@ -441,7 +445,8 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                 }
                 else
                     skip_block(&cursor);
-                while (*cursor == (char) BLOCK  &&  *(cursor + 1) == (char) ELIF) {
+                while (*cursor == (char) BLOCK  &&
+                       *(cursor + 1) == (char) ELIF) {
                     cursor += 2;
                     if (ok) {
                         skip_expr(&cursor);
@@ -459,7 +464,8 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                             skip_block(&cursor);
                     }
                 }
-                if (*cursor == (char) BLOCK  &&  *(cursor + 1) == (char) ELSE) {
+                if (*cursor == (char) BLOCK  &&
+                    *(cursor + 1) == (char) ELSE) {
                     cursor += 2;
                     if (ok)
                         skip_block(&cursor);

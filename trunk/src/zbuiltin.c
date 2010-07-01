@@ -162,18 +162,21 @@ zsum(List *args)
             switch (*b) {
                 case T_BYTE:
                     c = (Zob *) newbyte();
-                    ((Byte *) c)->value = ((Byte *) a)->value + ((Byte *) b)->value;
+                    ((Byte *) c)->value = ((Byte *) a)->value +
+                                          ((Byte *) b)->value;
                     return c;
                 case T_WORD:
                     c = (Zob *) newword();
-                    ((Word *) c)->value = ((Byte *) a)->value + ((Word *) b)->value;
+                    ((Word *) c)->value = ((Byte *) a)->value +
+                                          ((Word *) b)->value;
                     return c;
             }
         case T_WORD:
             switch (*b) {
                 case T_WORD:
                     c = (Zob *) newword();
-                    ((Word *) c)->value = ((Word *) a)->value + ((Word *) b)->value;
+                    ((Word *) c)->value = ((Word *) a)->value +
+                                          ((Word *) b)->value;
                     return c;
             }
     }

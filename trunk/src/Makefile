@@ -66,7 +66,8 @@ zbyte.o : zbyte.c $(I)ztypes.h $(I)zerr.h $(I)zbyte.h
 zword.o : zword.c $(I)ztypes.h $(I)zerr.h $(I)zword.h
 	$(CC) -c $(CFLAGS) zword.c
 
-zbytearray.o : zbytearray.c $(I)ztypes.h $(I)zerr.h $(I)zbyte.h $(I)zbytearray.h
+zbytearray.o : zbytearray.c $(I)ztypes.h $(I)zerr.h \
+               $(I)zbyte.h $(I)zbytearray.h
 	$(CC) -c $(CFLAGS) zbytearray.c
 
 zbignum.o : zbignum.c $(I)ztypes.h $(I)zerr.h $(I)zbyte.h $(I)zbignum.h

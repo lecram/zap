@@ -297,7 +297,8 @@ def cplexpr(expr):
                 # Compile Reference.
                 cpl = temp + STRING_END
             else:
-                raise Exception("Syntax error: invalid expression: \"%s\"." % (temp))
+                raise Exception("Syntax error: "
+                                "invalid expression: \"%s\"." % (temp))
             rest = expr[i:]
             return cpl, rest
         else:
@@ -319,7 +320,8 @@ def cplasgn(asgns):
             if isvalidname(asgn):
                 cpl += asgn + STRING_END
             else:
-                raise Exception("Syntax error: invalid name: \"%s\"." % (asgn))
+                raise Exception("Syntax error: "
+                                "invalid name: \"%s\"." % (asgn))
     cpl += ASGN_END
     return cpl
 
