@@ -17,10 +17,12 @@
 
 -include env
 
-ifeq ($(CC), gcc)
-	CFLAGS = -Wall -Werror -O2 -I include
+ifeq ($(CC), cc)
+CFLAGS = -Wall -Werror -O2 -I include
+else ifeq ($(CC), gcc)
+CFLAGS = -Wall -Werror -O2 -I include
 else ifeq ($(CC), tcc)
-	CFLAGS = -Wall -Werror -Wunsupported -Iinclude
+CFLAGS = -Wall -Werror -Wunsupported -Iinclude
 endif
 
 I = include/
