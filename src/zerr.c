@@ -48,7 +48,8 @@ raiseUnknownTypeNumber(const char *caller, unsigned char tnum)
 void
 raiseIndexOutOfRange(const char *caller, int index, int length)
 {
-    printf("Error: Index out of range in %s(): %d > %d.\n", caller, index, length - 1);
+    printf("Error: Index out of range in %s(): %d > %d.\n",
+           caller, index, length - 1);
 }
 
 void
@@ -64,7 +65,9 @@ raiseFunctionNameNotDefined(const char *fname)
 }
 
 void
-raiseArityError(unsigned int passed, unsigned char expected, const char *fname)
+raiseArityError(unsigned int passed,
+                unsigned char expected,
+                const char *fname)
 {
     printf("Error: %d argument(s) passed to %d-ary function %s().\n",
            passed,

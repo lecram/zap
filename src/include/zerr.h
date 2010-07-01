@@ -24,4 +24,6 @@ void raiseUnknownTypeNumber(const char *caller, unsigned char tnum);
 void raiseIndexOutOfRange(const char *caller, int index, int length);
 void raiseNameNotDefined(const char *name);
 void raiseFunctionNameNotDefined(const char *fname);
-void raiseArityError(unsigned int passed, unsigned char expected, const char *fname);
+void raiseArityError(unsigned int passed,
+                     unsigned char expected,
+                     const char *fname);
