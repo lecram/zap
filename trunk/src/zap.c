@@ -114,5 +114,6 @@ main(int argc, char *argv[])
     delspace(&space);
     free(sbbc);
     sbbc = NULL;
+
     return 0;
 }
