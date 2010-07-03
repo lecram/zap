@@ -184,7 +184,6 @@ cpl_bytearray(char **expr, char *bin)
 unsigned int
 cpl_list(char **expr, char *bin)
 {
-    char *c = bin;
     unsigned int length, total = 2;
 
     bin[0] = T_LIST;
