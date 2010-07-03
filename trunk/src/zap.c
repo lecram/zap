@@ -28,10 +28,46 @@
 #include "zlist.h"
 #include "zdict.h"
 
+#include "zobject.h"
 #include "zruntime.h"
 #include "zbuiltin.h"
 
+#include "zcpl_expr.h"
+
 #include "zap.h"
+
+void
+interactive()
+{
+    char buffer[1024];
+    char expr[256], bin[256];
+    char *expr_entry, *bin_entry;
+    Zob *result;
+    Dict *namespace;
+    List *tmp;
+
+    namespace = bbuild();
+    tmp = newlist();
+
+    while (1) {
+        printf("> ");
+        fgets(expr, 256, stdin);
+        if (strcmp(expr, "exit\n")) {
+            expr_entry = expr;
+            cpl_expr(&expr_entry, bin);
+            bin_entry = bin;
+            result = eval(namespace, tmp, &bin_entry);
+            repobj(buffer, result);
+            printf("%s\n", buffer);
+            emptylist(tmp);
+        }
+        else
+            break;
+    }
+
+    dellist(&tmp);
+    deldict(&namespace);
+}
 
 int
 main(int argc, char *argv[])
@@ -42,8 +78,10 @@ main(int argc, char *argv[])
     Space *space;
     List *tmp = newlist();
 
-    if (argc == 1)
-        printf("<< zap interpreter >>\n\nUsage:\nzap app.zbc\n");
+    if (argc == 1) {
+        printf("<< zap interpreter >>\n\nInteractive mode.\n\n");
+        interactive();
+    }
 
     if (argc != 2)
         return 0;

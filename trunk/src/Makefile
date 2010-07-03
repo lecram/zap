@@ -29,7 +29,7 @@ I = include/
 
 objects = ztypes.o zerr.o zgc.o znone.o zbool.o zbyte.o \
           zword.o zbytearray.o zbignum.o zlist.o zdict.o \
-          zfunc.o zobject.o zruntime.o zbuiltin.o zap.o
+          zfunc.o zobject.o zruntime.o zbuiltin.o zcpl_expr.o zap.o
 
 base = $(I)ztypes.h $(I)zerr.h $(I)zgc.h
 
@@ -93,10 +93,14 @@ zruntime.o : zruntime.c $(base) $(types) $(I)zobject.h $(I)zruntime.h
 zbuiltin.o : zbuiltin.c $(base) $(types) $(I)zobject.h $(I)zbuiltin.h
 	$(CC) -c $(CFLAGS) zbuiltin.c
 
+zcpl_expr.o : zcpl_expr.c $(I)ztypes.h $(I)zlist.h \
+              $(I)zdict.h $(I)zruntime.h $(I)zcpl_expr.h
+	$(CC) -c $(CFLAGS) zcpl_expr.c
+
 # Main.
 
-zap.o : zap.c $(I)ztypes.h $(I)zerr.h $(I)zlist.h $(I)zdict.h \
-        $(I)zruntime.h $(I)zbuiltin.h $(I)zap.h
+zap.o : zap.c $(I)ztypes.h $(I)zerr.h $(I)zlist.h $(I)zdict.h $(I)zobject.h\
+        $(I)zruntime.h $(I)zbuiltin.h $(I)zcpl_expr.h $(I)zap.h
 	$(CC) -c $(CFLAGS) zap.c
 
 
