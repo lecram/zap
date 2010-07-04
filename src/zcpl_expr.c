@@ -198,6 +198,8 @@ cpl_list(char **expr, char *bin)
             total += length;
         }
     }
+    else
+        (*expr)++;
     (*expr)++;
     *bin = '\x00';
     return total;
@@ -233,6 +235,8 @@ cpl_func(char **expr, char *bin)
             total += length;
         }
     }
+    else
+        (*expr)++;
     (*expr)++;
     *bin = '\xF1';
     return total + 3;
@@ -297,6 +301,7 @@ cpl_expr(char **expr, char *bin)
                         length++;
                     }
                     strncpy(bin, *expr, length);
+                    *expr += length;
                     bin[length] = '\x00';
                     return (unsigned int) length + 1;
                 }
