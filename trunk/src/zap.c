@@ -42,7 +42,8 @@ debug_bin(char *bin, unsigned int length)
     unsigned int i;
     unsigned char *c;
 
-    for (i = 0U, c = bin; i < length; i++, c++)
+    c = (unsigned char *) bin;
+    for (i = 0U; i < length; i++, c++)
         printf("0x%02X ", *c);
     printf("\n");
 }
