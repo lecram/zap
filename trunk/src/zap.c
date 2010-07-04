@@ -37,6 +37,17 @@
 #include "zap.h"
 
 void
+debug_bin(char *bin, unsigned int length)
+{
+    unsigned int i;
+    unsigned char *c;
+
+    for (i = 0U, c = bin; i < length; i++, c++)
+        printf("0x%02X ", *c);
+    printf("\n");
+}
+
+void
 interactive()
 {
     char buffer[1024];
@@ -45,6 +56,7 @@ interactive()
     Zob *result;
     Dict *namespace;
     List *tmp;
+    unsigned int length;
 
     namespace = bbuild();
     tmp = newlist();
@@ -54,7 +66,8 @@ interactive()
         fgets(expr, 256, stdin);
         if (strcmp(expr, "exit\n")) {
             expr_entry = expr;
-            cpl_expr(&expr_entry, bin);
+            length = cpl_expr(&expr_entry, bin);
+            /* debug_bin(bin, length); */
             bin_entry = bin;
             result = eval(namespace, tmp, &bin_entry);
             repobj(buffer, result);
