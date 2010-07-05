@@ -13,6 +13,6 @@ word := 0
 # ByteArray
 string := "Texto."
 # List
-list := ['\xFF', 1234, "Blah", [0, 1, '\x02']]
+list := [0xFF, 1234, "Blah", [0, 1, 0x02]]
 # Dict
 dict := {"width": 50, "heigth": 100}
