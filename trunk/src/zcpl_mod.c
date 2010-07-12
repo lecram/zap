@@ -60,5 +60,8 @@ cpl_mod(char *srcname)
         lineyarr = lineyarr->next;
     }
 
+    free(binname);
+    binname = NULL;
+
     return 1;
 }
