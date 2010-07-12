@@ -33,6 +33,7 @@
 #include "zbuiltin.h"
 
 #include "zcpl_expr.h"
+#include "zcpl_mod.h"
 
 #include "zap.h"
 
@@ -132,10 +133,12 @@ main(int argc, char *argv[])
         interactive();
     }
 
-    if (argc != 2)
-        return 0;
-
-    run_mod(argv[1]);
+    if (argc == 2) {
+        if (!strcmp(strrchr(argv[1], '.'), ".z"))
+            cpl_mod(argv[1]);
+        else
+            run_mod(argv[1]);
+    }
 
     return 0;
 }
