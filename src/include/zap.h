@@ -17,5 +17,3 @@
  */
 
 /* zap (header) */
-
-int main(int argc, char *argv[]);

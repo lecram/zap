@@ -84,14 +84,49 @@ interactive()
 }
 
 int
-main(int argc, char *argv[])
+run_mod(char *binname)
 {
-    FILE *fbbc;
+    FILE *fzbc;
     int size;
-    char *sbbc, *entry;
+    char *szbc, *entry;
     Space *space;
     List *tmp = newlist();
 
+    fzbc = fopen(binname, "rb");
+    if (fzbc == NULL) {
+        printf("Error: Cannot open file \"%s\".\n", binname);
+        exit(EXIT_FAILURE);
+    }
+    fseek(fzbc, 0L, SEEK_END);
+    size = ftell(fzbc);
+    fseek(fzbc, 0L, SEEK_SET);
+    szbc = (char *) malloc(size * sizeof(char));
+    if (szbc == NULL) {
+        raiseOutOfMemory("run_mod");
+        exit(EXIT_FAILURE);
+    }
+    fread(szbc, size, 1, fzbc);
+    fclose(fzbc);
+
+    space = newspace();
+    space->universal = bbuild();
+    space->global = newdict();
+    space->local = newdict();
+
+    entry = szbc;
+    run_block(space, tmp, 0, &entry);
+
+    dellist(&tmp);
+    delspace(&space);
+    free(szbc);
+    szbc = NULL;
+
+    return 0;
+}
+
+int
+main(int argc, char *argv[])
+{
     if (argc == 1) {
         printf("<< zap interpreter >>\n\nInteractive mode.\n\n");
         interactive();
@@ -100,34 +135,7 @@ main(int argc, char *argv[])
     if (argc != 2)
         return 0;
 
-    fbbc = fopen(argv[1], "rb");
-    if (fbbc == NULL) {
-        printf("Error: Cannot open file \"%s\".\n", argv[1]);
-        exit(EXIT_FAILURE);
-    }
-    fseek(fbbc, 0L, SEEK_END);
-    size = ftell(fbbc);
-    fseek(fbbc, 0L, SEEK_SET);
-    sbbc = (char *) malloc(size * sizeof(char));
-    if (sbbc == NULL) {
-        raiseOutOfMemory("main");
-        exit(EXIT_FAILURE);
-    }
-    fread(sbbc, size, 1, fbbc);
-    fclose(fbbc);
-
-    space = newspace();
-    space->universal = bbuild();
-    space->global = newdict();
-    space->local = newdict();
-
-    entry = sbbc;
-    run_block(space, tmp, 0, &entry);
-
-    dellist(&tmp);
-    delspace(&space);
-    free(sbbc);
-    sbbc = NULL;
+    run_mod(argv[1]);
 
     return 0;
 }
