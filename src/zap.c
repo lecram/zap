@@ -138,7 +138,7 @@ main(int argc, char *argv[])
     if (argc == 2) {
         if (!strcmp(strrchr(argv[1], '.'), ".z")) {
             if (cpl_mod(argv[1])) {
-                binname = (char *) malloc(strlen(argv[1]) + 3);
+                binname = (char *) malloc(strlen(argv[1]) + 4);
                 if (binname == NULL) {
                     printf("Error: Out of memory.\n");
                     return 0;

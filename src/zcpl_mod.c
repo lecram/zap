@@ -95,7 +95,7 @@ cpl_mod(char *srcname)
         printf("Error: Cannot open file \"%s\".\n", srcname);
         return 0;
     }
-    binname = (char *) malloc(strlen(srcname) + 3);
+    binname = (char *) malloc(strlen(srcname) + 4);
     if (binname == NULL) {
         printf("Error: Out of memory.\n");
         fclose(fsrc);
