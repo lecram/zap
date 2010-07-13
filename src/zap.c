@@ -128,14 +128,28 @@ run_mod(char *binname)
 int
 main(int argc, char *argv[])
 {
+    char *binname;
+
     if (argc == 1) {
         printf("<< zap interpreter >>\n\nInteractive mode.\n\n");
         interactive();
     }
 
     if (argc == 2) {
-        if (!strcmp(strrchr(argv[1], '.'), ".z"))
-            cpl_mod(argv[1]);
+        if (!strcmp(strrchr(argv[1], '.'), ".z")) {
+            if (cpl_mod(argv[1])) {
+                binname = (char *) malloc(strlen(argv[1]) + 3);
+                if (binname == NULL) {
+                    printf("Error: Out of memory.\n");
+                    return 0;
+                }
+                strcpy(binname, argv[1]);
+                strcat(binname, "bc_");
+                run_mod(binname);
+                free(binname);
+                binname = NULL;
+            }
+        }
         else
             run_mod(argv[1]);
     }
