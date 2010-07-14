@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "zcpl_expr.h"
 
@@ -82,6 +83,22 @@ showquoted(char *str, char *quoted)
     }
 }
 
+void
+remtail(char *str)
+{
+    char *tail;
+
+    /* Remove comments. */
+    tail = strchr(str, '#');
+    if (tail != NULL)
+        *tail = '\0';
+    /* Remove trailing whitespaces. */
+    tail = str + strlen(str) - 1;
+    while (isspace(*tail))
+        tail--;
+    *(tail + 1) = '\0';
+}
+
 int
 cpl_mod(char *srcname)
 {
@@ -113,6 +130,10 @@ cpl_mod(char *srcname)
     }
     while (fgets(line, 256, fsrc) != NULL) {
         hidequoted(line, quoted);
+        remtail(line);
+        /* Ignore blank lines. */
+        if (!strlen(line))
+            continue;
         if (strchr(line, ':') != NULL)
             break;
         showquoted(line, quoted);
