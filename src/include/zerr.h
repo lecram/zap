@@ -27,3 +27,4 @@ void raiseFunctionNameNotDefined(const char *fname);
 void raiseArityError(unsigned int passed,
                      unsigned char expected,
                      const char *fname);
+void raiseOpenFileError(const char *name);

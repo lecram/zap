@@ -23,6 +23,8 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "zerr.h"
+
 #include "zcpl_expr.h"
 
 void
@@ -109,12 +111,12 @@ cpl_mod(char *srcname)
 
     fsrc = fopen(srcname, "r");
     if (fsrc == NULL) {
-        printf("Error: Cannot open file \"%s\".\n", srcname);
+        raiseOpenFileError(srcname);
         return 0;
     }
     binname = (char *) malloc(strlen(srcname) + 4);
     if (binname == NULL) {
-        printf("Error: Out of memory.\n");
+        raiseOutOfMemory("cpl_mod");
         fclose(fsrc);
         return 0;
     }
@@ -122,7 +124,7 @@ cpl_mod(char *srcname)
     strcat(binname, "bc_");
     fbin = fopen(binname, "wb");
     if (fbin == NULL) {
-        printf("Error: Cannot open file \"%s\".\n", binname);
+        raiseOpenFileError(binname);
         fclose(fsrc);
         free(binname);
         binname = NULL;
