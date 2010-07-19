@@ -35,9 +35,12 @@ O arquivo Makefile em zap/src permite compilar o interpretador zap com apenas um
 Isto fará com que o shell e compilador padrões (e.g. bash e GCC) sejam utilizados.
 
 No Windows, alguns cuidados extras são necessários. Deve-se especificar as variáveis SHELL, CC e BINEXT.
+
 SHELL determina o ambiente shell utilizado e seu valor típico é "cmd".
+
 CC determina o compilador utilizado. Se estiver utilizando o GCC da distribuição MinGW, seu valor típico é "C:\MinGW\bin\gcc" (ou apenas "gcc", caso o diretório "C:\MinGW\bin\" esteja listado na variável %PATH% do sistema operacional).
-BINEXT determina a extensão do arquivo binário gerado e seu valor típico é ".exe"
+
+BINEXT determina a extensão do arquivo binário gerado e seu valor típico é ".exe".
 
 Para invocar o GNU make no Windows, fornecendo os argumentos adequados, pode-se utilizar o comando típico:
 
@@ -59,6 +62,7 @@ Este arquivo permite que o interpretador zap seja compilado no Windows de forma 
 == Manualmente ==
 
 Para compilar manualmente, é preciso gerar os arquivos objeto e ordem adequada, e linkeditá-los em seguida.
+
 Supondo que o compilador utilizado é o GCC, os comandos são, em sequência:
 
 {{{
@@ -84,4 +88,5 @@ Supondo que o compilador utilizado é o GCC, os comandos são, em sequência:
 }}}
 
 Pode ser necessário especificar a extensão do arquivo binário zap no último comando (e.g. "zap.exe").
+
 É recomendável salvar estes comandos em um script, para facilitar possíveis repetições no processo.
