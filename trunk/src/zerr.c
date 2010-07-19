@@ -74,3 +74,9 @@ raiseArityError(unsigned int passed,
            expected,
            fname);
 }
+
+void
+raiseOpenFileError(const char *name)
+{
+    printf("Error: Cannot open file \"%s\".\n", name);
+}

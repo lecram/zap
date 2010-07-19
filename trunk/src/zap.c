@@ -95,7 +95,7 @@ run_mod(char *binname)
 
     fzbc = fopen(binname, "rb");
     if (fzbc == NULL) {
-        printf("Error: Cannot open file \"%s\".\n", binname);
+        raiseOpenFileError(binname);
         exit(EXIT_FAILURE);
     }
     fseek(fzbc, 0L, SEEK_END);
@@ -128,19 +128,20 @@ run_mod(char *binname)
 int
 main(int argc, char *argv[])
 {
-    char *binname;
-
-    if (argc == 1) {
-        printf("<< zap interpreter >>\n\nInteractive mode.\n\n");
-        interactive();
-    }
+    char *binname, *ext;
+    int compile = 0;
 
     if (argc == 2) {
-        if (!strcmp(strrchr(argv[1], '.'), ".z")) {
+        ext = strrchr(argv[1], '.');
+        if (ext != NULL) {
+            if (!strcmp(ext, ".z"))
+                compile = 1;
+        }
+        if (compile) {
             if (cpl_mod(argv[1])) {
                 binname = (char *) malloc(strlen(argv[1]) + 4);
                 if (binname == NULL) {
-                    printf("Error: Out of memory.\n");
+                    raiseOutOfMemory("main");
                     return 0;
                 }
                 strcpy(binname, argv[1]);
@@ -152,6 +153,13 @@ main(int argc, char *argv[])
         }
         else
             run_mod(argv[1]);
+    }
+    else {
+        printf("<< zap interpreter >>\n");
+        if (argc == 1) {
+            printf("\nInteractive mode.\n\n");
+            interactive();
+        }
     }
 
     return 0;

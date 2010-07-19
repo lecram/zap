@@ -98,7 +98,7 @@ zcpl_expr.o : zcpl_expr.c $(I)ztypes.h $(I)zlist.h \
               $(I)zdict.h $(I)zruntime.h $(I)zcpl_expr.h
 	$(CC) -c $(CFLAGS) zcpl_expr.c
 
-zcpl_mod.o : zcpl_mod.c $(I)zcpl_expr.h $(I)zcpl_mod.h
+zcpl_mod.o : zcpl_mod.c $(I)zerr.h $(I)zcpl_expr.h $(I)zcpl_mod.h
 	$(CC) -c $(CFLAGS) zcpl_mod.c
 
 # Main.
