@@ -105,7 +105,7 @@ int
 cpl_mod(char *srcname)
 {
     FILE *fsrc, *fbin;
-    char *binname, *expr_entry;
+    char *binname, *expr_entry, *colon, *assign;
     char line[256], quoted[256], bin[256];
     unsigned int length;
 
@@ -136,14 +136,39 @@ cpl_mod(char *srcname)
         /* Ignore blank lines. */
         if (!strlen(line))
             continue;
-        if (strchr(line, ':') != NULL)
-            break;
+        colon = strrchr(line, ':');
+        if (colon == NULL)
+            expr_entry = line;
+        else {
+            colon += 2;
+            if (*colon == '\0')
+                /* Blocks NYI. */
+                break;
+            else {
+                expr_entry = colon;
+                skip_space(&expr_entry);
+            }
+        }
         showquoted(line, quoted);
-        expr_entry = line;
         length = cpl_expr(&expr_entry, bin);
         fwrite(bin, 1, length, fbin);
-        /* No Assignment. */
-        fwrite("\0", 1, 1, fbin);
+        if (colon == NULL)
+            /* No Assignment. */
+            fwrite("\0", 1, 1, fbin);
+        else {
+            assign = line;
+            while (assign != colon) {
+                skip_space(&assign);
+                while (!isspace(*assign)) {
+                    fwrite(assign, 1, 1, fbin);
+                    assign++;
+                }
+                skip_space(&assign);
+                assign += 2;
+                fwrite("\0", 1, 1, fbin);
+            }
+            fwrite("\0", 1, 1, fbin);
+        }
     }
     fclose(fsrc);
     /* Block End. */
