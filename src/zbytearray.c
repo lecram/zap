@@ -67,7 +67,7 @@ yarrfromstr(char *s)
         raiseOutOfMemory("yarrfromstr");
         exit(EXIT_FAILURE);
     }
-    array = (char *) malloc(length * sizeof(char));
+    array = (char *) malloc((length + 1) * sizeof(char));
     if (array == NULL) {
         raiseOutOfMemory("yarrfromstr");
         exit(EXIT_FAILURE);
