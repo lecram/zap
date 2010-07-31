@@ -88,7 +88,7 @@ haskey(Dict *dict, Zob *key)
     return 0;
 }
 
-void
+int
 setkey(Dict *dict, Zob *key, Zob *value)
 {
     /* Seek key. */
@@ -101,7 +101,7 @@ setkey(Dict *dict, Zob *key, Zob *value)
             decrefc(item->next->object);
             item->next->object = value;
             increfc(value);
-            return;
+            return 0;
         }
         item = item->next->next;
     }
@@ -110,6 +110,7 @@ setkey(Dict *dict, Zob *key, Zob *value)
     /* New key. */
     appitem(dict->list, key);
     appitem(dict->list, value);
+    return 1;
 }
 
 Zob *
