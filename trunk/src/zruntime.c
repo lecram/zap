@@ -333,7 +333,8 @@ assign(Dict *dict, Zob *value, char **entry)
     while (*cursor) {
         key = yarrfromstr(cursor);
         cursor += strlen(cursor) + 1; /* To skip NAME_END. */
-        setkey(dict, (Zob *) key, value);
+        if (setkey(dict, (Zob *) key, value) == 0)
+            delyarr(&key);
     }
     cursor++; /* To skip ASSIGN_END. */
     *entry = cursor;
