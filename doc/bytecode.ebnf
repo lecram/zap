@@ -22,13 +22,14 @@ RETURN   = "0x04".
 
 Expression = Literal | FunctionCall | Name.
 
-Literal = None | Bool | Byte | ByteArray | Word | List | Dict.
+Literal = None | Bool | Byte | Word | ByteArray | BigNum | List | Dict.
 
 None      = "0x01".
 Bool      = "0x02" (FALSE | TRUE).
 Byte      = "0x03" Int8.
 Word      = "0x04" Int32.
 ByteArray = "0x05" Int32 {Int8}.
+BigNum    = "0x06" Int32 {Int32}.
 List      = "0x07" {Expression} "0x00".
 Dict      = "0x08" {Expression Expression} "0x00".
 
