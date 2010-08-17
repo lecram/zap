@@ -206,9 +206,17 @@ eval(Dict *namespace, List *tmp, char **entry)
             }
             break;
         case T_BNUM:
-            /* Currently, there is no literal BigNums. */
-            raise("There is no literal BigNums.");
-            exit(EXIT_FAILURE);
+            {
+                BigNum *bignum;
+                unsigned int length, index;
+
+                cursor++;
+                length = readword(&cursor);
+                bignum = newbnum(length);
+                for (index = 0; index < length; index++)
+                    bnum->words[index] = readword(&cursor);
+                obj = (Zob *) bnum;
+            }
             break;
         case T_LIST:
             {
