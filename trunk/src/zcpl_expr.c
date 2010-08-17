@@ -24,6 +24,8 @@
 
 #include "ztypes.h"
 
+#include "zbyte.h"
+#include "zbignum.h"
 #include "zlist.h"
 #include "zdict.h"
 
@@ -182,6 +184,28 @@ cpl_bytearray(char **expr, char *bin)
 }
 
 unsigned int
+cpl_bignum(char **expr, char *bin)
+{
+    char *end;
+    BigNum *bignum;
+    int i;
+    unsigned int w, total;
+
+    end = strchr(*expr, '!');
+    *end = '\0';
+    bignum = bnumfromstr(*expr);
+    memcpy(bin + WL / 8 + 1, bignum->words, bignum->length * WL / 8);
+    bin[0] = T_BNUM;
+    for (i = WL / 8, w = bignum->length; i > 0; i--, w /= 256)
+        bin[i] = (char) w % 256;
+    delbnum(&bignum);
+    *end = '!';
+    total = (bignum->length + 1) * WL / 8 + 1;
+    *expr += total;
+    return total;
+}
+
+unsigned int
 cpl_list(char **expr, char *bin)
 {
     unsigned int length, total = 2;
@@ -245,8 +269,16 @@ cpl_func(char **expr, char *bin)
 unsigned int
 cpl_expr(char **expr, char *bin)
 {
-    if (isdigit(**expr) && strncmp(*expr, "0x", 2))
-        return cpl_word(expr, bin);
+    if (isdigit(**expr) && strncmp(*expr, "0x", 2)) {
+            char *d = *expr;
+
+            while (isdigit(*d))
+                d++;
+            if (*d == '!')
+                return cpl_bignum(expr, bin);
+            else
+                return cpl_word(expr, bin);
+        }
     switch (**expr) {
         case '\'':
             return cpl_asciibyte(expr, bin);
