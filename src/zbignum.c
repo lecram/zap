@@ -20,7 +20,7 @@
 
 /* A BigNum object stores a number on an array of words (unsigned int).
  * The words are stored in little-endian: least significant word first.
- * Bits inside words are in big-endian: most significant first.
+ * Bits inside words are in big-endian: most significant bit first.
  */
 
 #include <stdlib.h>
@@ -34,7 +34,7 @@
 #include "zbignum.h"
 
 /* Divides str by two in place.
- * Return previus last character in str.
+ * Return previous last character in str.
  * First character in str should not be '0'.
  */
 char
