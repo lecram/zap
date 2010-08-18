@@ -194,13 +194,13 @@ cpl_bignum(char **expr, char *bin)
     end = strchr(*expr, '!');
     *end = '\0';
     bignum = bnumfromstr(*expr);
-    memcpy(bin + WL / 8 + 1, bignum->words, bignum->length * WL / 8);
+    memcpy(bin + WL / 8 + 1, bignum->words, bignum->length / 8);
     bin[0] = T_BNUM;
-    for (i = WL / 8, w = bignum->length; i > 0; i--, w /= 256)
+    for (i = WL / 8, w = bignum->length / WL; i > 0; i--, w /= 256)
         bin[i] = (char) w % 256;
-    delbnum(&bignum);
     *end = '!';
-    total = (bignum->length + 1) * WL / 8 + 1;
+    total = (WL + bignum->length) / 8 + 1;
+    delbnum(&bignum);
     *expr += total;
     return total;
 }
