@@ -23,6 +23,7 @@ void skip_space(char **str);
 unsigned int cpl_word(char **expr, char *bin);
 unsigned int cpl_asciibyte(char **expr, char *bin);
 unsigned int cpl_bytearray(char **expr, char *bin);
+unsigned int cpl_bignum(char **expr, char *bin);
 unsigned int cpl_list(char **expr, char *bin);
 unsigned int cpl_dict(char **expr, char *bin);
 unsigned int cpl_func(char **expr, char *bin);
