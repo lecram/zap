@@ -208,15 +208,13 @@ eval(Dict *namespace, List *tmp, char **entry)
         case T_BNUM:
             {
                 BigNum *bignum;
-                unsigned int wordlen, index, word;
+                unsigned int wordlen, index;
 
                 cursor++;
                 wordlen = readword(&cursor);
                 bignum = newbnum(wordlen * WL);
-                for (index = 0; index < wordlen; index++) {
-                    word = readword(&cursor);
-                    bignum->words[index] = word;
-                }
+                for (index = 0; index < wordlen; index++)
+                    bignum->words[index] = readword(&cursor);
                 obj = (Zob *) bignum;
             }
             break;

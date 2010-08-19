@@ -206,8 +206,7 @@ cpl_bignum(char **expr, char *bin)
     *end = '!';
     total = (1 + wordlen) * WL / 8 + 1;
     delbnum(&bignum);
-    *expr = strchr(*expr, '!');
-    (*expr)++;
+    *expr = end + 1;
     return total;
 }
 
