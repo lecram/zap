@@ -73,11 +73,11 @@ unsigned int
 readword(char **entry)
 {
     unsigned int i, word;
-    char *cursor = *entry;
+    unsigned char *cursor = *entry;
 
     word = (unsigned int) *cursor;
     cursor++;
-    for (i = 1; i < 4; i++) {
+    for (i = 1; i < WL / 8; i++) {
         word <<= 8;
         word += (unsigned int) *cursor;
         cursor++;
@@ -208,13 +208,15 @@ eval(Dict *namespace, List *tmp, char **entry)
         case T_BNUM:
             {
                 BigNum *bignum;
-                unsigned int length, index;
+                unsigned int wordlen, index, word;
 
                 cursor++;
-                length = readword(&cursor);
-                bignum = newbnum(length);
-                for (index = 0; index < length; index++)
-                    bignum->words[index] = readword(&cursor);
+                wordlen = readword(&cursor);
+                bignum = newbnum(wordlen * WL);
+                for (index = 0; index < wordlen; index++) {
+                    word = readword(&cursor);
+                    bignum->words[index] = word;
+                }
                 obj = (Zob *) bignum;
             }
             break;

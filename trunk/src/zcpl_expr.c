@@ -188,20 +188,26 @@ cpl_bignum(char **expr, char *bin)
 {
     char *end;
     BigNum *bignum;
-    int i;
-    unsigned int w, total;
+    int i, n;
+    unsigned int w, total, wordlen;
 
     end = strchr(*expr, '!');
     *end = '\0';
     bignum = bnumfromstr(*expr);
-    memcpy(bin + WL / 8 + 1, bignum->words, bignum->length / 8);
+    wordlen = bignum->length / WL;
+    if (bignum->length % WL) wordlen++;
+    for (n = 0; n < wordlen; n++) {
+        for (i = WL / 8, w = bignum->words[n]; i > 0; i--, w /= 256)
+            bin[i + (n + 1) * WL / 8] = (char) w % 256;
+    }
     bin[0] = T_BNUM;
-    for (i = WL / 8, w = bignum->length / WL; i > 0; i--, w /= 256)
+    for (i = WL / 8, w = wordlen; i > 0; i--, w /= 256)
         bin[i] = (char) w % 256;
     *end = '!';
-    total = (WL + bignum->length) / 8 + 1;
+    total = (1 + wordlen) * WL / 8 + 1;
     delbnum(&bignum);
-    *expr += total;
+    *expr = strchr(*expr, '!');
+    (*expr)++;
     return total;
 }
 
