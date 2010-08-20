@@ -44,15 +44,15 @@ halfstr(char *str)
     char outchar, lastchar = '0';
     int index = -1, nonzero = 0, back = 0;
 
-    while (curchar) {
+    while (curchar != '\0') {
         nextchar = *(str + index + 1);
         outchar = (nextchar - '0') >> 1;
         outchar += 5 * (curchar & 1) + '0';
         *(str + index + 1 - back) = outchar;
-        if ((outchar == '0') && (nonzero == 0))
+        if (outchar == '0' && nonzero == 0)
             back++;
         else nonzero = 1;
-        if (curchar)
+        if (curchar != '\0')
             lastchar = curchar;
         curchar = nextchar;
         index++;
@@ -96,14 +96,16 @@ newbnum(unsigned int length)
     unsigned int *array;
     unsigned int wordlen;
 
-    if (length < 32) length = 32;
+    if (length < 32)
+        length = 32;
     bignum = (BigNum *) malloc(sizeof(BigNum));
     if (bignum == NULL) {
         raiseOutOfMemory("newbnum");
         exit(EXIT_FAILURE);
     }
     wordlen = length / WL;
-    if (length % WL) wordlen++;
+    if (length % WL)
+        wordlen++;
     array = (unsigned int *) calloc(wordlen, sizeof(unsigned int));
     if (array == NULL) {
         raiseOutOfMemory("newbnum");
@@ -126,7 +128,7 @@ bnumfromstr(char *str)
 
     length = strbitlen(str);
     bignum = newbnum(length);
-    while (length) {
+    while (length > 0) {
         lastchar = halfstr(str);
         if (lastchar % 2)
             bignum->words[index / WL] |= 1 << (index % WL);
@@ -153,7 +155,8 @@ cpybnum(BigNum *bignum)
     BigNum *copy;
 
     wordlen = bignum->length / WL;
-    if (bignum->length % WL) wordlen++;
+    if (bignum->length % WL)
+        wordlen++;
     copy = newbnum(bignum->length);
     for (index = wordlen - 1; index >=0; index--)
         *(copy->words + index) = *(bignum->words + index);
@@ -165,8 +168,9 @@ getbit(BigNum *bignum, int index)
 {
     Byte *byte = newbyte();
 
-    if (index < 0) index += bignum->length;
-    if (index < 0  ||  index >= bignum->length) {
+    if (index < 0)
+        index += bignum->length;
+    if (index < 0 || index >= bignum->length) {
         raiseIndexOutOfRange("getbit", index, bignum->length);
         exit(EXIT_FAILURE);
     }
@@ -181,8 +185,9 @@ getbit(BigNum *bignum, int index)
 void
 setbit(BigNum *bignum, int index)
 {
-    if (index < 0) index += bignum->length;
-    if (index < 0  ||  index >= bignum->length) {
+    if (index < 0)
+        index += bignum->length;
+    if (index < 0 || index >= bignum->length) {
         raiseIndexOutOfRange("setbit", index, bignum->length);
         exit(EXIT_FAILURE);
     }
@@ -192,8 +197,9 @@ setbit(BigNum *bignum, int index)
 void
 rstbit(BigNum *bignum, int index)
 {
-    if (index < 0) index += bignum->length;
-    if (index < 0  ||  index >= bignum->length) {
+    if (index < 0)
+        index += bignum->length;
+    if (index < 0 || index >= bignum->length) {
         raiseIndexOutOfRange("rstbit", index, bignum->length);
         exit(EXIT_FAILURE);
     }
@@ -208,7 +214,8 @@ lshiftbnum(BigNum *bignum, unsigned int shift)
     wordshift = shift / WL;
     bitshift = shift % WL;
     wordlen = bignum->length / WL;
-    if (bignum->length % WL) wordlen++;
+    if (bignum->length % WL)
+        wordlen++;
     if (wordshift) {
         for (index = wordlen - 1; index >= wordshift; index--)
             bignum->words[index] = bignum->words[index - wordshift];
@@ -235,7 +242,8 @@ rshiftbnum(BigNum *bignum, unsigned int shift)
     wordshift = shift / WL;
     bitshift = shift % WL;
     wordlen = bignum->length / WL;
-    if (bignum->length % WL) wordlen++;
+    if (bignum->length % WL)
+        wordlen++;
     if (wordshift) {
         for (index = 0; index < wordlen - wordshift; index++)
             bignum->words[index] = bignum->words[index + wordshift];
@@ -252,12 +260,6 @@ rshiftbnum(BigNum *bignum, unsigned int shift)
         }
         bignum->words[index] >>= bitshift;
     }
-}
-
-void
-double_dabble(char *buffer, BigNum *bignum)
-{
-    
 }
 
 int
@@ -281,7 +283,8 @@ cmpbnum(BigNum *bignum, BigNum *other)
         unsigned int mask;
 
         wordlen = bignum->length / WL;
-        if (bignum->length % WL) wordlen++;
+        if (bignum->length % WL)
+            wordlen++;
         for (index = 0; index < wordlen - 1; index++)
             if (bignum->words[index] != other->words[index])
                 return 1;

@@ -134,7 +134,7 @@ cpl_mod(char *srcname)
         hidequoted(line, quoted);
         remtail(line);
         /* Ignore blank lines. */
-        if (!strlen(line))
+        if (strlen(line) == 0)
             continue;
         colon = strrchr(line, ':');
         if (colon == NULL)

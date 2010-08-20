@@ -162,7 +162,8 @@ tstobj(Zob *object)
 int
 cmpobj(Zob *object, Zob *other)
 {
-    if (*object != *other) return 1;
+    if (*object != *other)
+        return 1;
     switch (*object) {
         case EMPTY:
             return 0;

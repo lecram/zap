@@ -77,7 +77,8 @@ newlist()
 void
 dellist(List **list)
 {
-    while ((*list)->length) remfirst(*list);
+    while ((*list)->length > 0)
+        remfirst(*list);
     free(*list);
     *list = NULL;
 }
@@ -89,7 +90,8 @@ dellist(List **list)
 void
 emptylist(List *list)
 {
-    while (list->length) remfirst(list);
+    while (list->length > 0)
+        remfirst(list);
 }
 
 /* Items are duplicated in memory,
@@ -111,7 +113,7 @@ cpylist(List *list)
     new = newnode(cpyobj(old->object));
     copy->first = new;
     old = old->next;
-    while (old !=NULL) {
+    while (old != NULL) {
         new->next = newnode(cpyobj(old->object));
         new = new->next;
         old = old->next;
@@ -143,8 +145,9 @@ appitem(List *list, Zob *object)
 void
 setitem(List *list, int index, Zob *object)
 {
-    if (index < 0) index += list->length;
-    if (index < 0  ||  index >= list->length) {
+    if (index < 0)
+        index += list->length;
+    if (index < 0 || index >= list->length) {
         raiseIndexOutOfRange("setitem", index, list->length);
         exit(EXIT_FAILURE);
     }
@@ -167,8 +170,9 @@ setitem(List *list, int index, Zob *object)
 void
 insitem(List *list, int index, Zob *object)
 {
-    if (index < 0) index += list->length;
-    if (index < 0  ||  index > list->length) {
+    if (index < 0)
+        index += list->length;
+    if (index < 0 || index > list->length) {
         raiseIndexOutOfRange("insitem", index, list->length);
         exit(EXIT_FAILURE);
     }
@@ -202,11 +206,11 @@ insitem(List *list, int index, Zob *object)
 void
 extlist(List *list, List *ext)
 {
-    unsigned int count = 0;
+    unsigned int count;
     unsigned int length = ext->length;
     Node *ecur = ext->first;
 
-    for (; count < length; count++) {
+    for (count = 0; count < length; count++) {
         list->last->next = newnode(ecur->object);
         list->last = list->last->next;
         list->length++;
@@ -238,8 +242,9 @@ remfirst(List *list)
 void
 remitem(List *list, int index)
 {
-    if (index < 0) index += list->length;
-    if (index < 0  ||  index >= list->length) {
+    if (index < 0)
+        index += list->length;
+    if (index < 0 || index >= list->length) {
         raiseIndexOutOfRange("remitem", index, list->length);
         exit(EXIT_FAILURE);
     }
@@ -274,11 +279,13 @@ cmplist(List *list, List *other)
 {
     Node *item, *oitem;
 
-    if (list->length != other->length) return 1;
+    if (list->length != other->length)
+        return 1;
     item = list->first;
     oitem = other->first;
     while (item != NULL) {
-        if (cmpobj(item->object, oitem->object)) return 1;
+        if (cmpobj(item->object, oitem->object))
+            return 1;
         item = item->next;
         oitem = oitem->next;
     }

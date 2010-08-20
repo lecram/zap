@@ -76,14 +76,6 @@ cmpbyte(Byte *byte, Byte *other)
         return 1;
 }
 
-/*
-unsigned int
-repbyte(char *buffer, Byte *byte)
-{
-    return sprintf(buffer, "<%u>", byte->value);
-}
-*/
-
 unsigned int
 repbyte(char *buffer, Byte *byte)
 {

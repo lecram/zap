@@ -120,29 +120,29 @@ skip_expr(char **entry)
             break;
         case T_LIST:
             cursor++;
-            while (*cursor) /* Require LIST_END == 0. */
+            while (*cursor != '\0')
                 skip_expr(&cursor);
-            cursor++; /* To skip LIST_END. */
+            cursor++; /* Skip LIST_END. */
             break;
         case T_DICT:
             cursor++;
-            while (*cursor) { /* Require DICT_END == 0. */
-                skip_expr(&cursor);  /*  Skip key.  */
+            while (*cursor != '\0') {
+                skip_expr(&cursor);  /* Skip key. */
                 skip_expr(&cursor);  /* Skip value. */
             }
-            cursor++; /* To skip DICT_END. */
+            cursor++; /* Skip DICT_END. */
             break;
         case (char) 0xF0:
             /* Function Call. */
             cursor++;
-            cursor += strlen(cursor) + 1; /* To skip STRING_END. */
+            cursor += strlen(cursor) + 1; /* Skip STRING_END. */
             while (*cursor != (char) 0xF1)
                 skip_expr(&cursor);
-            cursor++; /* To skip CALL_END. */
+            cursor++; /* Skip CALL_END. */
             break;
         default:
             /* Name. */
-            cursor += strlen(cursor) + 1; /* To skip STRING_END. */
+            cursor += strlen(cursor) + 1; /* Skip STRING_END. */
     }
     *entry = cursor;
 }
@@ -224,11 +224,11 @@ eval(Dict *namespace, List *tmp, char **entry)
 
                 list = newlist();
                 cursor++;
-                while (*cursor) /* Require LIST_END == 0. */
+                while (*cursor != '\0')
                     /* WARNING: Require reference sharing! */
                     /* Copyied append will cause memory leak! */
                     appitem(list, eval(namespace, tmp, &cursor));
-                cursor++; /* To skip LIST_END. */
+                cursor++; /* Skip LIST_END. */
                 obj = (Zob *) list;
             }
             break;
@@ -239,14 +239,14 @@ eval(Dict *namespace, List *tmp, char **entry)
 
                 dict = newdict();
                 cursor++;
-                while (*cursor) { /* Require DICT_END == 0. */
+                while (*cursor != '\0') {
                     /* WARNING: Require reference sharing! */
                     /* Copyied key setting will cause memory leak! */
                     key = eval(namespace, tmp, &cursor);
                     value = eval(namespace, tmp, &cursor);
                     setkey(dict, key, value);
                 }
-                cursor++; /* To skip DICT_END. */
+                cursor++; /* Skip DICT_END. */
                 obj = (Zob *) dict;
             }
             break;
@@ -254,7 +254,7 @@ eval(Dict *namespace, List *tmp, char **entry)
             /* Function Call. */
             cursor++;
             obj = feval(namespace, tmp, &cursor);
-            cursor++; /* To skip CALL_END. */
+            cursor++; /* Skip CALL_END. */
             break;
         default:
             /* Name. */
@@ -279,7 +279,7 @@ nameval(Dict *namespace, char **entry)
         raiseNameNotDefined(cursor);
         exit(EXIT_FAILURE);
     }
-    cursor += strlen(cursor) + 1; /* To skip STRING_END. */
+    cursor += strlen(cursor) + 1; /* Skip STRING_END. */
     *entry = cursor;
     return obj;
 }
@@ -294,7 +294,6 @@ feval(Dict *namespace, List *tmp, char **entry)
     char *fname, *cursor = *entry;
 
     /* Get func. */
-    /* printf("func: %s\n", cursor); */
     key = yarrfromstr(cursor);
     func = (Func *) getkey(namespace, (Zob *) key, EMPTY);
     fname = cursor;
@@ -302,7 +301,7 @@ feval(Dict *namespace, List *tmp, char **entry)
         raiseFunctionNameNotDefined(fname);
         exit(EXIT_FAILURE);
     }
-    cursor += strlen(cursor) + 1; /* To skip STRING_END. */
+    cursor += strlen(cursor) + 1; /* Skip STRING_END. */
     delyarr(&key);
 
     /* Get arg list. */
@@ -326,9 +325,9 @@ skip_assign(char **entry)
 {
     char *cursor = *entry;
 
-    while (*cursor)
-        cursor += strlen(cursor) + 1; /* To skip NAME_END. */
-    cursor++; /* To skip ASSIGN_END. */
+    while (*cursor != '\0')
+        cursor += strlen(cursor) + 1; /* Skip NAME_END. */
+    cursor++; /* Skip ASSIGN_END. */
     *entry = cursor;
 }
 
@@ -338,13 +337,13 @@ assign(Dict *dict, Zob *value, char **entry)
     ByteArray *key;
     char *cursor = *entry;
 
-    while (*cursor) {
+    while (*cursor != '\0') {
         key = yarrfromstr(cursor);
-        cursor += strlen(cursor) + 1; /* To skip NAME_END. */
+        cursor += strlen(cursor) + 1; /* Skip NAME_END. */
         if (setkey(dict, (Zob *) key, value) == 0)
             delyarr(&key);
     }
-    cursor++; /* To skip ASSIGN_END. */
+    cursor++; /* Skip ASSIGN_END. */
     *entry = cursor;
 }
 
