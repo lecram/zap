@@ -81,7 +81,7 @@ haskey(Dict *dict, Zob *key)
 
     item = dict->list->first;
     while (item != NULL) {
-        if (!cmpobj(item->object, key))
+        if (cmpobj(item->object, key) == 0)
             return 1;
         item = item->next->next;
     }
@@ -96,7 +96,7 @@ setkey(Dict *dict, Zob *key, Zob *value)
 
     item = dict->list->first;
     while (item != NULL) {
-        if (!cmpobj(item->object, key)) {
+        if (cmpobj(item->object, key) == 0) {
             /* Set value. */
             decrefc(item->next->object);
             item->next->object = value;
@@ -121,7 +121,7 @@ getkey(Dict *dict, Zob *key, Zob *defval)
 
     item = dict->list->first;
     while (item != NULL) {
-        if (!cmpobj(item->object, key))
+        if (cmpobj(item->object, key) == 0)
             /* Get value. */
             return item->next->object;
         item = item->next->next;

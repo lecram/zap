@@ -39,7 +39,7 @@ newyarr(unsigned int length)
         raiseOutOfMemory("newyarr");
         exit(EXIT_FAILURE);
     }
-    if (length)
+    if (length > 0)
         array = (char *) malloc(length * sizeof(char));
     else
         array = (char *) malloc(1);
@@ -106,8 +106,9 @@ getbyteitem(ByteArray *bytearray, int index)
 {
     Byte *byte = newbyte();
 
-    if (index < 0) index += bytearray->length;
-    if (index < 0  ||  index >= bytearray->length) {
+    if (index < 0)
+        index += bytearray->length;
+    if (index < 0 || index >= bytearray->length) {
         raiseIndexOutOfRange("getbyteitem", index, bytearray->length);
         exit(EXIT_FAILURE);
     }
@@ -118,8 +119,9 @@ getbyteitem(ByteArray *bytearray, int index)
 void
 setbyteitem(ByteArray *bytearray, int index, Byte *byte)
 {
-    if (index < 0) index += bytearray->length;
-    if (index < 0  ||  index >= bytearray->length) {
+    if (index < 0)
+        index += bytearray->length;
+    if (index < 0 || index >= bytearray->length) {
         raiseIndexOutOfRange("setbyteitem", index, bytearray->length);
         exit(EXIT_FAILURE);
     }
@@ -132,7 +134,7 @@ concatstr(ByteArray *bytearray, char *str)
     int length;
 
     length = strlen(str);
-    if (!length)
+    if (length == 0)
         return;
     bytearray->bytes = realloc(bytearray->bytes,
                                bytearray->length + length);
@@ -147,7 +149,7 @@ concatstr(ByteArray *bytearray, char *str)
 void
 concat(ByteArray *bytearray, ByteArray *other)
 {
-    if (!other->length)
+    if (other->length == 0)
         return;
     bytearray->bytes = realloc(bytearray->bytes,
                                bytearray->length + other->length);
@@ -162,7 +164,7 @@ concat(ByteArray *bytearray, ByteArray *other)
 int
 tstyarr(ByteArray *bytearray)
 {
-    if (bytearray->length)
+    if (bytearray->length > 0)
         return 1;
     else
         return 0;
@@ -192,7 +194,7 @@ repyarr(char *buffer, ByteArray *bytearray)
     *tmpbff++ = '"';
     for (index = 0; index < bytearray->length; index++) {
         character = bytearray->bytes[index];
-        if (((character < 32) && (character != '\n'))  ||  (character < 0))
+        if ((character < 32 && character != '\n') || (character < 0))
             blen += sprintf(tmpbff + blen, "?");
         else
             blen += sprintf(tmpbff + blen,
@@ -211,7 +213,7 @@ repplain(char *buffer, ByteArray *bytearray)
 
     for (index = 0; index < bytearray->length; index++) {
         character = bytearray->bytes[index];
-        if (((character < 32) && (character != '\n'))  ||  (character < 0))
+        if ((character < 32 && character != '\n') || (character < 0))
             blen += sprintf(tmpbff + blen, "?");
         else
             blen += sprintf(tmpbff + blen,

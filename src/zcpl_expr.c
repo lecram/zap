@@ -195,7 +195,8 @@ cpl_bignum(char **expr, char *bin)
     *end = '\0';
     bignum = bnumfromstr(*expr);
     wordlen = bignum->length / WL;
-    if (bignum->length % WL) wordlen++;
+    if (bignum->length % WL)
+        wordlen++;
     for (n = 0; n < wordlen; n++) {
         for (i = WL / 8, w = bignum->words[n]; i > 0; i--, w /= 256)
             bin[i + (n + 1) * WL / 8] = (char) w % 256;
@@ -274,7 +275,7 @@ cpl_func(char **expr, char *bin)
 unsigned int
 cpl_expr(char **expr, char *bin)
 {
-    if (isdigit(**expr) && strncmp(*expr, "0x", 2)) {
+    if (isdigit(**expr) && strncmp(*expr, "0x", 2) != 0) {
             char *d = *expr;
 
             while (isdigit(*d))
@@ -301,24 +302,24 @@ cpl_expr(char **expr, char *bin)
 
                 for (si = 0, c = *expr; !is_separator(*c); si++, c++);
 
-                if (si == 4 && !strncmp(*expr, "NONE", 4)) {
+                if (si == 4 && strncmp(*expr, "NONE", 4) == 0) {
                     bin[0] = T_NONE;
                     *expr += 4;
                     return 1U;
                 }
-                else if (si == 5 && !strncmp(*expr, "FALSE", 5)) {
+                else if (si == 5 && strncmp(*expr, "FALSE", 5) == 0) {
                     bin[0] = T_BOOL;
                     bin[1] = '\x00';
                     *expr += 5;
                     return 2U;
                 }
-                else if (si == 4 && !strncmp(*expr, "TRUE", 4)) {
+                else if (si == 4 && strncmp(*expr, "TRUE", 4) == 0) {
                     bin[0] = T_BOOL;
                     bin[1] = '\x01';
                     *expr += 4;
                     return 2U;
                 }
-                else if (si == 4 && !strncmp(*expr, "0x", 2)) {
+                else if (si == 4 && strncmp(*expr, "0x", 2) == 0) {
                     unsigned char c;
 
                     c = (unsigned char) strtol(*expr, expr, 0);

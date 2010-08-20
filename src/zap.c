@@ -66,7 +66,7 @@ interactive()
     while (1) {
         printf("> ");
         fgets(expr, 256, stdin);
-        if (strcmp(expr, "exit\n")) {
+        if (strcmp(expr, "exit\n") != 0) {
             expr_entry = expr;
             length = cpl_expr(&expr_entry, bin);
             /* debug_bin(bin, length); */
@@ -134,7 +134,7 @@ main(int argc, char *argv[])
     if (argc == 2) {
         ext = strrchr(argv[1], '.');
         if (ext != NULL) {
-            if (!strcmp(ext, ".z"))
+            if (strcmp(ext, ".z") == 0)
                 compile = 1;
         }
         if (compile) {
