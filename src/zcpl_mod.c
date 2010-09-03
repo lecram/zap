@@ -107,7 +107,7 @@ cpl_mod(char *srcname)
     FILE *fsrc, *fbin;
     char *binname, *expr_entry, *colon, *assign;
     char line[256], quoted[256], bin[256];
-    unsigned int length;
+    unsigned int length, linum;
 
     fsrc = fopen(srcname, "r");
     if (fsrc == NULL) {
@@ -130,12 +130,22 @@ cpl_mod(char *srcname)
         binname = NULL;
         return 0;
     }
-    while (fgets(line, 256, fsrc) != NULL) {
+    for (linum = 1; fgets(line, 256, fsrc) != NULL; linum++) {
         hidequoted(line, quoted);
         remtail(line);
         /* Ignore blank lines. */
         if (strlen(line) == 0)
             continue;
+        if (strncmp(line, "del ", 4) == 0) {
+            char *name;
+
+            /* Compile del statement. */
+            fwrite("\xDE", 1, 1, fbin);
+            name = (char *) line + 4;
+            skip_space(&name);
+            fwrite(name, 1, strlen(name) + 1, fbin);
+            continue;
+        }
         colon = strrchr(line, ':');
         if (colon == NULL)
             expr_entry = line;
