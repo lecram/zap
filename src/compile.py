@@ -372,14 +372,14 @@ def compile(src, cpl=None):
         elif cmd == "break":
             # Compile break.
             if split:
-                level = chr(int(split[0]))
+                level = chr(int(split[0], 16))
             else:
                 level = '\x00'
             cplf.write(BLOCK_EXIT + BREAK + level)
         elif cmd == "continue":
             # Compile continue.
             if split:
-                level = chr(int(split[0]))
+                level = chr(int(split[0], 16))
             else:
                 level = '\x00'
             cplf.write(BLOCK_EXIT + CONTINUE + level)
