@@ -146,6 +146,42 @@ cpl_mod(char *srcname)
             fwrite(name, 1, strlen(name) + 1, fbin);
             continue;
         }
+        else if (strncmp(line, "break", 5) == 0) {
+            if (line[5] == '\0') {
+                /* Compile single break statement. */
+                fwrite("\xBE\x02\x00", 1, 3, fbin);
+                continue;
+            }
+            else if (line[5] == ' ') {
+                char *level, blevel;
+
+                /* Compile compound break statement. */
+                fwrite("\xBE\x02", 1, 2, fbin);
+                level = (char *) line + 5;
+                skip_space(&level);
+                blevel = (char) strtol(level, (char **) NULL, 16);
+                fwrite(&blevel, 1, 1, fbin);
+                continue;
+            }
+        }
+        else if (strncmp(line, "continue", 8) == 0) {
+            if (line[8] == '\0') {
+                /* Compile single continue statement. */
+                fwrite("\xBE\x03\x00", 1, 3, fbin);
+                continue;
+            }
+            else if (line[8] == ' ') {
+                char *level, blevel;
+
+                /* Compile compound continue statement. */
+                fwrite("\xBE\x03", 1, 2, fbin);
+                level = (char *) line + 8;
+                skip_space(&level);
+                blevel = (char) strtol(level, (char **) NULL, 16);
+                fwrite(&blevel, 1, 1, fbin);
+                continue;
+            }
+        }
         colon = strrchr(line, ':');
         if (colon == NULL)
             expr_entry = line;
