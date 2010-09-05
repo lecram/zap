@@ -322,7 +322,7 @@ cpl_expr(char **expr, char *bin)
                 else if (si == 4 && strncmp(*expr, "0x", 2) == 0) {
                     unsigned char c;
 
-                    c = (unsigned char) strtol(*expr, expr, 0);
+                    c = (unsigned char) strtol(*expr, expr, 16);
                     bin[0] = T_BYTE;
                     bin[1] = c;
                     return 2U;
