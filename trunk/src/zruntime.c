@@ -542,7 +542,7 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
 
         cursor++;
         lev = *cursor;
-        if (lev > looplev) {
+        if (lev >= looplev) {
             raise("Break without loop.");
             exit(EXIT_FAILURE);
         }
@@ -553,11 +553,11 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
 
         cursor++;
         lev = *cursor;
-        if (lev > looplev) {
+        if (lev >= looplev) {
             raise("Continue without loop.");
             exit(EXIT_FAILURE);
         }
-        return CONTINUE | lev;
+        return BE_CONTINUE | lev;
     }
     if (*cursor == (char) RETURN) {
         /* Function Return. */
