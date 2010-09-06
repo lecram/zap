@@ -19,6 +19,7 @@
 /* Errors (header) */
 
 void raise(char *msg);
+void raisecpl(char *msg, char *srcname, unsigned int linum);
 void raiseOutOfMemory(const char *caller);
 void raiseUnknownTypeNumber(const char *caller, unsigned char tnum);
 void raiseIndexOutOfRange(const char *caller, int index, int length);

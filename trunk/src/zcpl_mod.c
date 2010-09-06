@@ -105,9 +105,10 @@ int
 cpl_mod(char *srcname)
 {
     FILE *fsrc, *fbin;
-    char *binname, *expr_entry, *colon, *assign;
+    char *binname, *expr_entry, *colon, *assign, *stt;
     char line[256], quoted[256], bin[256];
     unsigned int length, linum;
+    int identlevel, identwidth, ident;
 
     fsrc = fopen(srcname, "r");
     if (fsrc == NULL) {
@@ -130,79 +131,141 @@ cpl_mod(char *srcname)
         binname = NULL;
         return 0;
     }
+    identlevel = 0;
+    identwidth = 0;
     for (linum = 1; fgets(line, 256, fsrc) != NULL; linum++) {
         hidequoted(line, quoted);
         remtail(line);
-        /* Ignore blank lines. */
         if (strlen(line) == 0)
+            /* Ignore blank lines. */
             continue;
-        if (strncmp(line, "del ", 4) == 0) {
+        ident = 0;
+        stt = line;
+        while (isspace(*stt)) {
+            stt++;
+            ident++;
+        }
+        if (identwidth > 0) {
+            int level;
+
+            level = ident / identwidth;
+            if (level > identlevel) {
+                raisecpl("Incorrect identation.", srcname, linum);
+                break;
+            }
+            for (; level < identlevel; identlevel--)
+                /* Compile end of block. */
+                fwrite("\xBE\x01", 1, 2, fbin);
+        }
+        else if (identlevel > 0) {
+            /* Define identation width. */
+            if (ident == 0) {
+                raisecpl("Incorrect identation.", srcname, linum);
+                break;
+            }
+            else
+                identwidth = ident;
+        }
+        if (strncmp(stt, "del ", 4) == 0) {
             char *name;
 
             /* Compile del statement. */
             fwrite("\xDE", 1, 1, fbin);
-            name = (char *) line + 4;
+            name = (char *) stt + 4;
             skip_space(&name);
             fwrite(name, 1, strlen(name) + 1, fbin);
             continue;
         }
-        else if (strncmp(line, "break", 5) == 0) {
-            if (line[5] == '\0') {
+        else if (strncmp(stt, "break", 5) == 0) {
+            if (stt[5] == '\0') {
                 /* Compile single break statement. */
                 fwrite("\xBE\x02\x00", 1, 3, fbin);
                 continue;
             }
-            else if (line[5] == ' ') {
+            else if (stt[5] == ' ') {
                 char *level, blevel;
 
                 /* Compile compound break statement. */
                 fwrite("\xBE\x02", 1, 2, fbin);
-                level = (char *) line + 5;
+                level = (char *) stt + 5;
                 skip_space(&level);
                 blevel = (char) strtol(level, (char **) NULL, 16);
                 fwrite(&blevel, 1, 1, fbin);
                 continue;
             }
         }
-        else if (strncmp(line, "continue", 8) == 0) {
-            if (line[8] == '\0') {
+        else if (strncmp(stt, "continue", 8) == 0) {
+            if (stt[8] == '\0') {
                 /* Compile single continue statement. */
                 fwrite("\xBE\x03\x00", 1, 3, fbin);
                 continue;
             }
-            else if (line[8] == ' ') {
+            else if (stt[8] == ' ') {
                 char *level, blevel;
 
                 /* Compile compound continue statement. */
                 fwrite("\xBE\x03", 1, 2, fbin);
-                level = (char *) line + 8;
+                level = (char *) stt + 8;
                 skip_space(&level);
                 blevel = (char) strtol(level, (char **) NULL, 16);
                 fwrite(&blevel, 1, 1, fbin);
                 continue;
             }
         }
-        colon = strrchr(line, ':');
+        colon = strrchr(stt, ':');
+        showquoted(line, quoted);
         if (colon == NULL)
-            expr_entry = line;
+            expr_entry = stt;
         else {
             colon += 2;
-            if (*colon == '\0')
-                /* Blocks NYI. */
-                break;
+            if (*colon == '\0') {
+                identlevel++;
+                fwrite("\xB0", 1, 1, fbin);
+                if (strncmp(stt, "while", 5) == 0) {
+                    /* Compile while block header. */
+                    fwrite("\x04", 1, 1, fbin);
+                    expr_entry = (char *) stt + 5;
+                    skip_space(&expr_entry);
+                    length = cpl_expr(&expr_entry, bin);
+                    fwrite(bin, 1, length, fbin);
+                    continue;
+                }
+                else if (strncmp(stt, "if", 2) == 0) {
+                    /* Compile if block header. */
+                    fwrite("\x01", 1, 1, fbin);
+                    expr_entry = (char *) stt + 2;
+                    skip_space(&expr_entry);
+                    length = cpl_expr(&expr_entry, bin);
+                    fwrite(bin, 1, length, fbin);
+                    continue;
+                }
+                else if (strncmp(stt, "elif", 4) == 0) {
+                    /* Compile elif block header. */
+                    fwrite("\x02", 1, 1, fbin);
+                    expr_entry = (char *) stt + 4;
+                    skip_space(&expr_entry);
+                    length = cpl_expr(&expr_entry, bin);
+                    fwrite(bin, 1, length, fbin);
+                    continue;
+                }
+                else if (strncmp(stt, "else", 4) == 0) {
+                    /* Compile else block header. */
+                    fwrite("\x03", 1, 1, fbin);
+                    continue;
+                }
+            }
             else {
                 expr_entry = colon;
                 skip_space(&expr_entry);
             }
         }
-        showquoted(line, quoted);
         length = cpl_expr(&expr_entry, bin);
         fwrite(bin, 1, length, fbin);
         if (colon == NULL)
             /* No Assignment. */
             fwrite("\0", 1, 1, fbin);
         else {
-            assign = line;
+            assign = stt;
             while (assign != colon) {
                 skip_space(&assign);
                 while (!isspace(*assign)) {
