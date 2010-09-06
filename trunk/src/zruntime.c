@@ -73,8 +73,9 @@ unsigned int
 readword(char **entry)
 {
     unsigned int i, word;
-    unsigned char *cursor = *entry;
+    unsigned char *cursor;
 
+    cursor = (unsigned char *) *entry;
     word = (unsigned int) *cursor;
     cursor++;
     for (i = 1; i < WL / 8; i++) {
@@ -82,7 +83,7 @@ readword(char **entry)
         word += (unsigned int) *cursor;
         cursor++;
     }
-    *entry = cursor;
+    *entry = (char *) cursor;
     return word;
 }
 
