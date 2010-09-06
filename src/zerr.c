@@ -34,6 +34,12 @@ raise(char *msg)
 }
 
 void
+raisecpl(char *msg, char *srcname, unsigned int linum)
+{
+    printf("%s[%u]: Error: %s\n", srcname, linum, msg);
+}
+
+void
 raiseOutOfMemory(const char *caller)
 {
     printf("Error: Out of memory in %s().\n", caller);
