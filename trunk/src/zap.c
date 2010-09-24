@@ -65,7 +65,8 @@ interactive()
 
     while (1) {
         printf("> ");
-        fgets(expr, 256, stdin);
+        if (fgets(expr, 256, stdin) == NULL)
+            break;
         if (strcmp(expr, "exit\n") != 0) {
             expr_entry = expr;
             length = cpl_expr(&expr_entry, bin);
@@ -103,10 +104,15 @@ run_mod(char *binname)
     fseek(fzbc, 0L, SEEK_SET);
     szbc = (char *) malloc(size * sizeof(char));
     if (szbc == NULL) {
+        fclose(fzbc);
         raiseOutOfMemory("run_mod");
         exit(EXIT_FAILURE);
     }
-    fread(szbc, size, 1, fzbc);
+    if (fread(szbc, size, 1, fzbc) < size) {
+        fclose(fzbc);
+        raiseOpenFileError(binname);
+        exit(EXIT_FAILURE);
+    }
     fclose(fzbc);
 
     space = newspace();
