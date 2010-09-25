@@ -105,7 +105,8 @@ int
 cpl_mod(char *srcname)
 {
     FILE *fsrc, *fbin;
-    char *binname, *expr_entry, *colon, *assign, *stt;
+    char *binname, *expr_entry, *def;
+    char *colon, *assign, *stt;
     char line[256], quoted[256], bin[256];
     unsigned int length, linum;
     int identlevel, identwidth, ident;
@@ -212,6 +213,22 @@ cpl_mod(char *srcname)
                 continue;
             }
         }
+        else if (strncmp(stt, "return", 6) == 0) {
+            if (stt[6] == '\0') {
+                /* Compile return NONE. */
+                fwrite("\xBE\x04\x01", 1, 3, fbin);
+                continue;
+            }
+            else if (stt[8] == ' ') {
+                /* Compile return statement. */
+                fwrite("\xBE\x04", 1, 2, fbin);
+                expr_entry = (char *) stt + 8;
+                skip_space(&expr_entry);
+                length = cpl_expr(&expr_entry, bin);
+                fwrite(bin, 1, length, fbin);
+                continue;
+            }
+        }
         colon = strrchr(stt, ':');
         showquoted(line, quoted);
         if (colon == NULL)
@@ -251,6 +268,31 @@ cpl_mod(char *srcname)
                 else if (strncmp(stt, "else", 4) == 0) {
                     /* Compile else block header. */
                     fwrite("\x03", 1, 1, fbin);
+                    continue;
+                }
+                else if (strncmp(stt, "def", 3) == 0) {
+                    /* Compile function definition header. */
+                    fwrite("\x05", 1, 1, fbin);
+                    def = (char *) stt + 3;
+                    skip_space(&def);
+                    while (*def != '(') {
+                        fwrite(def, 1, 1, fbin);
+                        def++;
+                    }
+                    fwrite("\0", 1, 1, fbin);
+                    def++;
+                    skip_space(&def);
+                    while (*def != ')') {
+                        while (!is_separator(*def)) {
+                            fwrite(def, 1, 1, fbin);
+                            def++;
+                        }
+                        fwrite("\0", 1, 1, fbin);
+                        skip_space(&def);
+                        def++;
+                        skip_space(&def);
+                    }
+                    fwrite("\0", 1, 1, fbin);
                     continue;
                 }
             }
