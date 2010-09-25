@@ -108,7 +108,7 @@ run_mod(char *binname)
         raiseOutOfMemory("run_mod");
         exit(EXIT_FAILURE);
     }
-    if (fread(szbc, size, 1, fzbc) < size) {
+    if (fread(szbc, size, 1, fzbc) == 0) {
         fclose(fzbc);
         raiseOpenFileError(binname);
         exit(EXIT_FAILURE);
