@@ -219,10 +219,10 @@ cpl_mod(char *srcname)
                 fwrite("\xBE\x04\x01", 1, 3, fbin);
                 continue;
             }
-            else if (stt[8] == ' ') {
+            else if (stt[6] == ' ') {
                 /* Compile return statement. */
                 fwrite("\xBE\x04", 1, 2, fbin);
-                expr_entry = (char *) stt + 8;
+                expr_entry = (char *) stt + 6;
                 skip_space(&expr_entry);
                 length = cpl_expr(&expr_entry, bin);
                 fwrite(bin, 1, length, fbin);
