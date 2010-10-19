@@ -370,8 +370,8 @@ skip_block(char **entry)
                 *cursor == (char) CONTINUE)
                 cursor += 2;
             else if (*cursor == (char) RETURN) {
-                /* Function Return. */
-                /* NYI. */
+                cursor++;
+                skip_expr(&cursor);
             }
         }
         else if (*cursor == (char) DELETE) {
@@ -402,8 +402,12 @@ skip_block(char **entry)
                 skip_block(&cursor);
             }
             else if (*cursor == (char) DEF) {
-                /* Function definition. */
-                /* NYI. */
+                cursor++;
+                cursor += strlen(cursor) + 1;
+                while (*cursor != '\0')
+                    cursor += strlen(cursor) + 1;
+                cursor++;
+                skip_block(&cursor);
             }
         }
         else {
