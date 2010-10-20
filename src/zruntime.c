@@ -526,7 +526,28 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
             }
             else if (*cursor == (char) DEF) {
                 /* Function definition. */
-                /* NYI. */
+                char *name;
+                char *zapfunc;
+                unsigned char arity = 0;
+                Func *func;
+                HighFunc *highfunc;
+
+                cursor++;
+                name = cursor;
+                cursor += strlen(name) + 1;
+                zapfunc = cursor;
+                while (*cursor != '\0') {
+                    arity++;
+                    cursor += strlen(cursor) + 1;
+                }
+                cursor++;
+                skip_block(&cursor);
+                highfunc = newhighfunc();
+                highfunc->func = zapfunc;
+                func = newfunc((FImp *) highfunc, arity);
+                setkey(namespace,
+                       (Zob *) yarrfromstr(name),
+                       (Zob *) func);
             }
         }
         else {
