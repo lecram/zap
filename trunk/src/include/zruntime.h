@@ -49,6 +49,8 @@ typedef struct {
 
 Context *newcontext();
 void delcontext(Context **context);
+void pushlocal(Context *context);
+Zob *poplocal(Context *context);
 unsigned int readword(char **entry);
 void skip_expr(char **entry);
 Zob *eval(Dict *namespace, List *tmp, char **entry);
