@@ -68,6 +68,26 @@ delcontext(Context **context)
     *context = NULL;
 }
 
+void
+pushlocal(Context *context)
+{
+    pushitem(context->local, (Zob *) newdict());
+}
+
+Zob *
+poplocal(Context *context)
+{
+    Dict *poped;
+    ByteArray *retkey;
+    Zob *retvalue;
+
+    poped = (Dict *) popitem(context->local);
+    retkey = yarrfromstr("_ret_");
+    retvalue = getkey(poped, (Zob *) retkey, EMPTY);
+    delyarr(&retkey);
+    return retvalue;
+}
+
 unsigned int
 readword(char **entry)
 {

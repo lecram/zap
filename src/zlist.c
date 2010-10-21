@@ -123,6 +123,71 @@ cpylist(List *list)
     return copy;
 }
 
+void
+remfirst(List *list)
+{
+    if (list->first == NULL)
+        return;
+    if (list->first == list->last) {
+        delnode(&list->first);
+        list->first = NULL;
+        list->last = NULL;
+    }
+    else {
+        Node *second;
+
+        second = list->first->next;
+        delnode(&list->first);
+        list->first = second;
+    }
+    list->length--;
+}
+
+/* Return the first item in the list and remove it. */
+Zob *
+popitem(List *list)
+{
+    Zob *item;
+
+    if (list->first == NULL)
+        return EMPTY;
+    item = list->first->object;
+    increfc(item);
+    if (list->first == list->last) {
+        delnode(&list->first);
+        list->first = NULL;
+        list->last = NULL;
+    }
+    else {
+        Node *second;
+
+        second = list->first->next;
+        delnode(&list->first);
+        list->first = second;
+    }
+    list->length--;
+    return item;
+}
+
+/* Insert an object in front of the list. */
+void
+pushitem(List *list, Zob *object)
+{
+    Node *first;
+
+    first = newnode(object);
+    first->next = list->first;
+    list->first = first;
+    list->length++;
+}
+
+/* Return the first item in the list. */
+Zob *
+peekitem(List *list)
+{
+    return list->first->object;
+}
+
 /* Add object to the end of list. */
 void
 appitem(List *list, Zob *object)
@@ -216,26 +281,6 @@ extlist(List *list, List *ext)
         list->length++;
         ecur = ecur->next;
     }
-}
-
-void
-remfirst(List *list)
-{
-    if (list->first == NULL)
-        return;
-    if (list->first == list->last) {
-        delnode(&list->first);
-        list->first = NULL;
-        list->last = NULL;
-    }
-    else {
-        Node *second;
-
-        second = list->first->next;
-        delnode(&list->first);
-        list->first = second;
-    }
-    list->length--;
 }
 
 /* Remove item at index. */
