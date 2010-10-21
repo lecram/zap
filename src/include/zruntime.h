@@ -57,11 +57,11 @@ Zob *getincontext(Context *context, Zob *key, Zob *defval);
 void remincontext(Context *context, Zob *key);
 unsigned int readword(char **entry);
 void skip_expr(char **entry);
-Zob *eval(Dict *namespace, List *tmp, char **entry);
-Zob *nameval(Dict *namespace, char **entry);
-Zob *feval(Dict *namespace, List *tmp, char **entry);
+Zob *eval(Context *context, List *tmp, char **entry);
+Zob *nameval(Context *context, char **entry);
+Zob *feval(Context *context, List *tmp, char **entry);
 void skip_assign(char **entry);
-void assign(Dict *dict, Zob *value, char **entry);
+void assign(Context *context, Zob *value, char **entry);
 void runstatement(Context *context, List *tmp, char **entry);
 void skip_block(char **entry);
 unsigned char run_block(Context *context,

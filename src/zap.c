@@ -56,11 +56,13 @@ interactive()
     char expr[256], bin[256];
     char *expr_entry, *bin_entry;
     Zob *result;
-    Dict *namespace;
+    Context *context;
     List *tmp;
     unsigned int length;
 
-    namespace = bbuild();
+    context = newcontext();
+    context->global = bbuild();
+    context->local = newlist();
     tmp = newlist();
 
     while (1) {
@@ -72,7 +74,7 @@ interactive()
             length = cpl_expr(&expr_entry, bin);
             /* debug_bin(bin, length); */
             bin_entry = bin;
-            result = eval(namespace, tmp, &bin_entry);
+            result = eval(context, tmp, &bin_entry);
             repobj(buffer, result);
             printf("%s\n", buffer);
             emptylist(tmp);
@@ -82,7 +84,7 @@ interactive()
     }
 
     dellist(&tmp);
-    deldict(&namespace);
+    delcontext(&context);
 }
 
 int

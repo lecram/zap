@@ -227,7 +227,7 @@ skip_expr(char **entry)
 }
 
 Zob *
-eval(Dict *namespace, List *tmp, char **entry)
+eval(Context *context, List *tmp, char **entry)
 {
     Zob *obj = NULL;
     char *cursor = *entry;
@@ -306,7 +306,7 @@ eval(Dict *namespace, List *tmp, char **entry)
                 while (*cursor != '\0')
                     /* WARNING: Require reference sharing! */
                     /* Copyied append will cause memory leak! */
-                    appitem(list, eval(namespace, tmp, &cursor));
+                    appitem(list, eval(context, tmp, &cursor));
                 cursor++; /* Skip LIST_END. */
                 obj = (Zob *) list;
             }
@@ -321,8 +321,8 @@ eval(Dict *namespace, List *tmp, char **entry)
                 while (*cursor != '\0') {
                     /* WARNING: Require reference sharing! */
                     /* Copyied key setting will cause memory leak! */
-                    key = eval(namespace, tmp, &cursor);
-                    value = eval(namespace, tmp, &cursor);
+                    key = eval(context, tmp, &cursor);
+                    value = eval(context, tmp, &cursor);
                     setkey(dict, key, value);
                 }
                 cursor++; /* Skip DICT_END. */
@@ -332,12 +332,12 @@ eval(Dict *namespace, List *tmp, char **entry)
         case CALLSTART:
             /* Function Call. */
             cursor++;
-            obj = feval(namespace, tmp, &cursor);
+            obj = feval(context, tmp, &cursor);
             cursor++; /* Skip CALL_END. */
             break;
         default:
             /* Name. */
-            obj = nameval(namespace, &cursor);
+            obj = nameval(context, &cursor);
     }
     appitem(tmp, obj);
     *entry = cursor;
@@ -345,14 +345,14 @@ eval(Dict *namespace, List *tmp, char **entry)
 }
 
 Zob *
-nameval(Dict *namespace, char **entry)
+nameval(Context *context, char **entry)
 {
     Zob *obj;
     ByteArray *key;
     char *cursor = *entry;
 
     key = yarrfromstr(cursor);
-    obj = getkey(namespace, (Zob *) key, EMPTY);
+    obj = getincontext(context, (Zob *) key, EMPTY);
     delyarr(&key);
     if (obj == EMPTY) {
         raiseNameNotDefined(cursor);
@@ -364,7 +364,7 @@ nameval(Dict *namespace, char **entry)
 }
 
 Zob *
-feval(Dict *namespace, List *tmp, char **entry)
+feval(Context *context, List *tmp, char **entry)
 {
     Zob *ret;
     Func *func;
@@ -374,7 +374,7 @@ feval(Dict *namespace, List *tmp, char **entry)
 
     /* Get func. */
     key = yarrfromstr(cursor);
-    func = (Func *) getkey(namespace, (Zob *) key, EMPTY);
+    func = (Func *) getincontext(context, (Zob *) key, EMPTY);
     fname = cursor;
     if ((Zob *) func == EMPTY) {
         raiseFunctionNameNotDefined(fname);
@@ -388,7 +388,7 @@ feval(Dict *namespace, List *tmp, char **entry)
     while (*cursor != CALLEND)
         /* WARNING: Require reference sharing! */
         /* Copyied append will cause memory leak! */
-        appitem(args, eval(namespace, tmp, &cursor));
+        appitem(args, eval(context, tmp, &cursor));
     *entry = cursor;
     if (args->length != func->arity) {
         raiseArityError(args->length, func->arity, fname);
@@ -411,7 +411,7 @@ skip_assign(char **entry)
 }
 
 void
-assign(Dict *dict, Zob *value, char **entry)
+assign(Context *context, Zob *value, char **entry)
 {
     ByteArray *key;
     char *cursor = *entry;
@@ -419,7 +419,7 @@ assign(Dict *dict, Zob *value, char **entry)
     while (*cursor != '\0') {
         key = yarrfromstr(cursor);
         cursor += strlen(cursor) + 1; /* Skip NAME_END. */
-        if (setkey(dict, (Zob *) key, value) == 0)
+        if (setincontext(context, (Zob *) key, value) == 0)
             delyarr(&key);
     }
     cursor++; /* Skip ASSIGN_END. */
@@ -431,8 +431,8 @@ runstatement(Context *context, List *tmp, char **entry)
 {
     Zob *value;
 
-    value = eval(context->global, tmp, &(*entry));
-    assign(context->global, value, &(*entry));
+    value = eval(context, tmp, &(*entry));
+    assign(context, value, &(*entry));
 }
 
 void
@@ -502,7 +502,6 @@ unsigned char
 run_block(Context *context, List *tmp, char looplev, char **entry)
 {
     char *cursor = *entry;
-    Dict *namespace = context->global;
     int truth;
     unsigned char be;
 
@@ -512,8 +511,8 @@ run_block(Context *context, List *tmp, char looplev, char **entry)
 
             cursor++;
             key = yarrfromstr(cursor);
-            if (haskey(namespace, (Zob *) key))
-                remkey(namespace, (Zob *) key);
+            if (hasincontext(context, (Zob *) key))
+                remincontext(context, (Zob *) key);
             else {
                 raiseNameNotDefined(cursor);
                 exit(EXIT_FAILURE);
@@ -527,7 +526,7 @@ run_block(Context *context, List *tmp, char looplev, char **entry)
                 int ok = 0;
 
                 cursor++;
-                truth = tstobj(eval(namespace, tmp, &cursor));
+                truth = tstobj(eval(context, tmp, &cursor));
                 if (truth) {
                     be = run_block(context, tmp, looplev, &cursor);
                     if (be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
@@ -544,7 +543,7 @@ run_block(Context *context, List *tmp, char looplev, char **entry)
                         skip_block(&cursor);
                     }
                     else {
-                        truth = tstobj(eval(namespace, tmp, &cursor));
+                        truth = tstobj(eval(context, tmp, &cursor));
                         if (truth) {
                             be = run_block(context, tmp, looplev, &cursor);
                             if (be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
@@ -576,7 +575,7 @@ run_block(Context *context, List *tmp, char looplev, char **entry)
                 skip_expr(&cursor);
                 block = cursor;
                 c = cond;
-                truth = tstobj(eval(namespace, tmp, &c));
+                truth = tstobj(eval(context, tmp, &c));
                 while (truth) {
                     b = block;
                     be = run_block(context, tmp, looplev + 1, &b);
@@ -590,7 +589,7 @@ run_block(Context *context, List *tmp, char looplev, char **entry)
                     }
                     blockend = b;
                     c = cond;
-                    truth = tstobj(eval(namespace, tmp, &c));
+                    truth = tstobj(eval(context, tmp, &c));
                     if (be & BE_CONTINUE)
                         if (!truth)
                             if (be - BE_CONTINUE > 0)
@@ -623,7 +622,7 @@ run_block(Context *context, List *tmp, char looplev, char **entry)
                 highfunc = newhighfunc();
                 highfunc->func = zapfunc;
                 func = newfunc((FImp *) highfunc, arity);
-                setkey(namespace,
+                setincontext(context,
                        (Zob *) yarrfromstr(name),
                        (Zob *) func);
             }
