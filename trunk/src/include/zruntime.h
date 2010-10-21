@@ -19,24 +19,26 @@
 /* Runtime (header) */
 
 /* Bytecode Tokens */
-#define BLOCKEXIT   0xBE
-#define DELETE      0xDE
-#define BLOCK       0xB0
-#define IF          0x01
-#define ELIF        0x02
-#define ELSE        0x03
-#define WHILE       0x04
-#define DEF         0x05
-#define END         0x01
-#define BREAK       0x02
-#define CONTINUE    0x03
-#define RETURN      0x04
+#define CALLSTART   (char) 0xF0
+#define CALLEND     (char) 0xF1
+#define BLOCKEXIT   (char) 0xBE
+#define DELETE      (char) 0xDE
+#define BLOCK       (char) 0xB0
+#define IF          (char) 0x01
+#define ELIF        (char) 0x02
+#define ELSE        (char) 0x03
+#define WHILE       (char) 0x04
+#define DEF         (char) 0x05
+#define END         (char) 0x01
+#define BREAK       (char) 0x02
+#define CONTINUE    (char) 0x03
+#define RETURN      (char) 0x04
 
 /* Block Exit Flags */
-#define BE_END      0x80
-#define BE_BREAK    0x40
-#define BE_CONTINUE 0x20
-#define BE_RETURN   0x10
+#define BE_END      (char) 0x80
+#define BE_BREAK    (char) 0x40
+#define BE_CONTINUE (char) 0x20
+#define BE_RETURN   (char) 0x10
 
 typedef struct {
     Dict *universal;

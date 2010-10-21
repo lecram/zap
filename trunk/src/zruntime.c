@@ -133,11 +133,11 @@ skip_expr(char **entry)
             }
             cursor++; /* Skip DICT_END. */
             break;
-        case (char) 0xF0:
+        case CALLSTART:
             /* Function Call. */
             cursor++;
             cursor += strlen(cursor) + 1; /* Skip STRING_END. */
-            while (*cursor != (char) 0xF1)
+            while (*cursor != CALLEND)
                 skip_expr(&cursor);
             cursor++; /* Skip CALL_END. */
             break;
@@ -251,7 +251,7 @@ eval(Dict *namespace, List *tmp, char **entry)
                 obj = (Zob *) dict;
             }
             break;
-        case (char) 0xF0:
+        case CALLSTART:
             /* Function Call. */
             cursor++;
             obj = feval(namespace, tmp, &cursor);
@@ -307,7 +307,7 @@ feval(Dict *namespace, List *tmp, char **entry)
 
     /* Get arg list. */
     args = newlist();
-    while (*cursor != (char) 0xF1)
+    while (*cursor != CALLEND)
         /* WARNING: Require reference sharing! */
         /* Copyied append will cause memory leak! */
         appitem(args, eval(namespace, tmp, &cursor));
@@ -362,46 +362,46 @@ skip_block(char **entry)
 {
     char *cursor = *entry;
 
-    while (*cursor != (char) BLOCKEXIT  ||
-           *(cursor + 1) != (char) END) {
-        if (*cursor == (char) BLOCKEXIT) {
+    while (*cursor != BLOCKEXIT  ||
+           *(cursor + 1) != END) {
+        if (*cursor == BLOCKEXIT) {
             cursor++;
-            if (*cursor == (char) BREAK ||
-                *cursor == (char) CONTINUE)
+            if (*cursor == BREAK ||
+                *cursor == CONTINUE)
                 cursor += 2;
-            else if (*cursor == (char) RETURN) {
+            else if (*cursor == RETURN) {
                 cursor++;
                 skip_expr(&cursor);
             }
         }
-        else if (*cursor == (char) DELETE) {
+        else if (*cursor == DELETE) {
             cursor++;
             cursor += strlen(cursor) + 1;
         }
-        else if (*cursor == (char) BLOCK) {
+        else if (*cursor == BLOCK) {
             cursor++;
-            if (*cursor == (char) IF) {
+            if (*cursor == IF) {
                 cursor++;
                 skip_expr(&cursor);
                 skip_block(&cursor);
             }
-            while (*cursor == (char) BLOCK  &&
-                   *(cursor + 1) == (char) ELIF) {
+            while (*cursor == BLOCK  &&
+                   *(cursor + 1) == ELIF) {
                 cursor += 2;
                 skip_expr(&cursor);
                 skip_block(&cursor);
             }
-            if (*cursor == (char) BLOCK  &&
-                *(cursor + 1) == (char) ELSE) {
+            if (*cursor == BLOCK  &&
+                *(cursor + 1) == ELSE) {
                 cursor += 2;
                 skip_block(&cursor);
             }
-            else if (*cursor == (char) WHILE) {
+            else if (*cursor == WHILE) {
                 cursor++;
                 skip_expr(&cursor);
                 skip_block(&cursor);
             }
-            else if (*cursor == (char) DEF) {
+            else if (*cursor == DEF) {
                 cursor++;
                 cursor += strlen(cursor) + 1;
                 while (*cursor != '\0')
@@ -428,8 +428,8 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
     int truth;
     unsigned char be;
 
-    while (*cursor != (char) BLOCKEXIT) {
-        if (*cursor == (char) DELETE) {
+    while (*cursor != BLOCKEXIT) {
+        if (*cursor == DELETE) {
             ByteArray *key;
 
             cursor++;
@@ -443,9 +443,9 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
             delyarr(&key);
             cursor += strlen(cursor) + 1;
         }
-        else if (*cursor == (char) BLOCK) {
+        else if (*cursor == BLOCK) {
             cursor++;
-            if (*cursor == (char) IF) {
+            if (*cursor == IF) {
                 int ok = 0;
 
                 cursor++;
@@ -458,8 +458,8 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                 }
                 else
                     skip_block(&cursor);
-                while (*cursor == (char) BLOCK  &&
-                       *(cursor + 1) == (char) ELIF) {
+                while (*cursor == BLOCK  &&
+                       *(cursor + 1) == ELIF) {
                     cursor += 2;
                     if (ok) {
                         skip_expr(&cursor);
@@ -477,8 +477,8 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                             skip_block(&cursor);
                     }
                 }
-                if (*cursor == (char) BLOCK  &&
-                    *(cursor + 1) == (char) ELSE) {
+                if (*cursor == BLOCK  &&
+                    *(cursor + 1) == ELSE) {
                     cursor += 2;
                     if (ok)
                         skip_block(&cursor);
@@ -489,7 +489,7 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                     }
                 }
             }
-            else if (*cursor == (char) WHILE) {
+            else if (*cursor == WHILE) {
                 char *cond, *block, *blockend = NULL;
                 char *b, *c;
 
@@ -524,7 +524,7 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                 else
                     cursor = blockend;
             }
-            else if (*cursor == (char) DEF) {
+            else if (*cursor == DEF) {
                 /* Function definition. */
                 char *name;
                 char *zapfunc;
@@ -558,12 +558,12 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
         }
     }
     cursor++;
-    if (*cursor == (char) END) {
+    if (*cursor == END) {
         cursor++;
         *entry = cursor;
         return BE_END;
     }
-    if (*cursor == (char) BREAK) {
+    if (*cursor == BREAK) {
         char lev;
 
         cursor++;
@@ -574,7 +574,7 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
         }
         return BE_BREAK | lev;
     }
-    if (*cursor == (char) CONTINUE) {
+    if (*cursor == CONTINUE) {
         char lev;
 
         cursor++;
@@ -585,7 +585,7 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
         }
         return BE_CONTINUE | lev;
     }
-    if (*cursor == (char) RETURN) {
+    if (*cursor == RETURN) {
         /* Function Return. */
         /* NYI. */
     }
