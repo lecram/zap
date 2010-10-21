@@ -19,7 +19,7 @@
 /* Runtime */
 
 /* In This File:
- * - Space handle functions.
+ * - Context handle functions.
  * - Bytecode expression evaluation.
  * - Bytecode execution.
  */
@@ -46,27 +46,26 @@
 
 #include "zruntime.h"
 
-Space *
-newspace()
+Context *
+newcontext()
 {
-    Space *space;
+    Context *context;
 
-    space = (Space *) malloc(sizeof(Space));
-    if (space == NULL) {
-        raiseOutOfMemory("newspace");
+    context = (Context *) malloc(sizeof(Context));
+    if (context == NULL) {
+        raiseOutOfMemory("newcontext");
         exit(EXIT_FAILURE);
     }
-    return space;
+    return context;
 }
 
 void
-delspace(Space **space)
+delcontext(Context **context)
 {
-    deldict(&(*space)->universal);
-    deldict(&(*space)->global);
-    deldict(&(*space)->local);
-    free(*space);
-    *space = NULL;
+    deldict(&(*context)->global);
+    dellist(&(*context)->local);
+    free(*context);
+    *context = NULL;
 }
 
 unsigned int
@@ -349,12 +348,12 @@ assign(Dict *dict, Zob *value, char **entry)
 }
 
 void
-runstatement(Space *space, List *tmp, char **entry)
+runstatement(Context *context, List *tmp, char **entry)
 {
     Zob *value;
 
-    value = eval(space->universal, tmp, &(*entry));
-    assign(space->universal, value, &(*entry));
+    value = eval(context->global, tmp, &(*entry));
+    assign(context->global, value, &(*entry));
 }
 
 void
@@ -421,10 +420,10 @@ skip_block(char **entry)
 }
 
 unsigned char
-run_block(Space *space, List *tmp, char looplev, char **entry)
+run_block(Context *context, List *tmp, char looplev, char **entry)
 {
     char *cursor = *entry;
-    Dict *namespace = space->universal;
+    Dict *namespace = context->global;
     int truth;
     unsigned char be;
 
@@ -451,7 +450,7 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                 cursor++;
                 truth = tstobj(eval(namespace, tmp, &cursor));
                 if (truth) {
-                    be = run_block(space, tmp, looplev, &cursor);
+                    be = run_block(context, tmp, looplev, &cursor);
                     if (be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
                         return be;
                     ok = 1;
@@ -468,7 +467,7 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                     else {
                         truth = tstobj(eval(namespace, tmp, &cursor));
                         if (truth) {
-                            be = run_block(space, tmp, looplev, &cursor);
+                            be = run_block(context, tmp, looplev, &cursor);
                             if (be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
                                 return be;
                             ok = 1;
@@ -483,7 +482,7 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                     if (ok)
                         skip_block(&cursor);
                     else {
-                        be = run_block(space, tmp, looplev, &cursor);
+                        be = run_block(context, tmp, looplev, &cursor);
                         if (be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
                             return be;
                     }
@@ -501,7 +500,7 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
                 truth = tstobj(eval(namespace, tmp, &c));
                 while (truth) {
                     b = block;
-                    be = run_block(space, tmp, looplev + 1, &b);
+                    be = run_block(context, tmp, looplev + 1, &b);
                     if (be & BE_RETURN)
                         return be;
                     if (be & BE_BREAK) {
@@ -552,7 +551,7 @@ run_block(Space *space, List *tmp, char looplev, char **entry)
         }
         else {
             /* Statement. */
-            runstatement(space, tmp, &cursor);
+            runstatement(context, tmp, &cursor);
             /* Garbage Collection. */
             emptylist(tmp);
         }
