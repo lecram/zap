@@ -88,6 +88,65 @@ poplocal(Context *context)
     return retvalue;
 }
 
+int
+hasincontext(Context *context, Zob *key)
+{
+    if (context->local->length > 0) {
+        Dict *local;
+
+        local = (Dict *) peekitem(context->local);
+        if (haskey(local, key))
+            return 1;
+    }
+    if (haskey(context->global, key))
+        return 1;
+    return 0;
+}
+
+int
+setincontext(Context *context, Zob *key, Zob *value)
+{
+    if (context->local->length > 0) {
+        Dict *local;
+
+        local = (Dict *) peekitem(context->local);
+        return setkey(local, key, value);
+    }
+    return setkey(context->global, key, value);
+}
+
+Zob *
+getincontext(Context *context, Zob *key, Zob *defval)
+{
+    Zob *value = EMPTY;
+
+    if (context->local->length > 0) {
+        Dict *local;
+
+        local = (Dict *) peekitem(context->local);
+        value = getkey(local, key, EMPTY);
+    }
+    if (value == EMPTY)
+        value = getkey(context->global, key, EMPTY);
+    if (value == EMPTY)
+        value = defval;
+    return value;
+}
+
+/* This function assumes (hasincontext(context, key) != 0). */
+void
+remincontext(Context *context, Zob *key)
+{
+    if (context->local->length > 0) {
+        Dict *local;
+
+        local = (Dict *) peekitem(context->local);
+        if (haskey(local, key))
+            remkey(local, key);
+    }
+    remkey(context->global, key);
+}
+
 unsigned int
 readword(char **entry)
 {
