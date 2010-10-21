@@ -41,13 +41,14 @@
 #define BE_RETURN   (char) 0x10
 
 typedef struct {
-    Dict *universal;
+    /* Global namespace. */
     Dict *global;
-    Dict *local;
-} Space;
+    /* A stack of local namespaces. */
+    List *local;
+} Context;
 
-Space *newspace();
-void delspace(Space **space);
+Context *newcontext();
+void delcontext(Context **context);
 unsigned int readword(char **entry);
 void skip_expr(char **entry);
 Zob *eval(Dict *namespace, List *tmp, char **entry);
@@ -55,6 +56,9 @@ Zob *nameval(Dict *namespace, char **entry);
 Zob *feval(Dict *namespace, List *tmp, char **entry);
 void skip_assign(char **entry);
 void assign(Dict *dict, Zob *value, char **entry);
-void runstatement(Space *space, List *tmp, char **entry);
+void runstatement(Context *context, List *tmp, char **entry);
 void skip_block(char **entry);
-unsigned char run_block(Space *space, List *tmp, char looplev, char **entry);
+unsigned char run_block(Context *context,
+                        List *tmp,
+                        char looplev,
+                        char **entry);

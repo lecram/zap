@@ -91,7 +91,7 @@ run_mod(char *binname)
     FILE *fzbc;
     int size;
     char *szbc, *entry;
-    Space *space;
+    Context *context;
     List *tmp = newlist();
 
     fzbc = fopen(binname, "rb");
@@ -115,16 +115,15 @@ run_mod(char *binname)
     }
     fclose(fzbc);
 
-    space = newspace();
-    space->universal = bbuild();
-    space->global = newdict();
-    space->local = newdict();
+    context = newcontext();
+    context->global = bbuild();
+    context->local = newlist();
 
     entry = szbc;
-    run_block(space, tmp, 0, &entry);
+    run_block(context, tmp, 0, &entry);
 
     dellist(&tmp);
-    delspace(&space);
+    delcontext(&context);
     free(szbc);
     szbc = NULL;
 
