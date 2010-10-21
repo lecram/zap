@@ -394,7 +394,14 @@ feval(Context *context, List *tmp, char **entry)
         raiseArityError(args->length, func->arity, fname);
         exit(EXIT_FAILURE);
     }
-    ret = callimp(func->fimp, args);
+    if (*(func->fimp)) {
+        /* Call zap function. */
+        ret = EMPTY;
+    }
+    else {
+        /* Call C function. */
+        ret = ((LowFunc *) func->fimp)->func(args);
+    }
     dellist(&args);
     return ret;
 }

@@ -123,20 +123,6 @@ cmpfunc(Func *func, Func *other)
         return 1;
 }
 
-Zob *
-callimp(FImp *high, List *args)
-{
-    if (*high) {
-        /* Call zap function. */
-        /* NYI */
-        return EMPTY;
-    }
-    else {
-        /* Call C function. */
-        return ((LowFunc *) high)->func(args);
-    }
-}
-
 unsigned int
 repfunc(char *buffer, Func *func)
 {

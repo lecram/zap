@@ -50,5 +50,4 @@ void delfunc(Func **func);
 Func *cpyfunc(Func *func);
 int tstfunc(Func *func);
 int cmpfunc(Func *func, Func *other);
-Zob *callimp(FImp *high, List *args);
 unsigned int repfunc(char *buffer, Func *func);
