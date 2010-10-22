@@ -229,6 +229,7 @@ cpl_mod(char *srcname)
                 fwrite("\xBE\x04", 1, 2, fbin);
                 expr_entry = (char *) stt + 6;
                 skip_space(&expr_entry);
+                showquoted(line, quoted);
                 length = cpl_expr(&expr_entry, bin);
                 fwrite(bin, 1, length, fbin);
                 continue;
