@@ -95,10 +95,15 @@ remtail(char *str)
     if (tail != NULL)
         *tail = '\0';
     /* Remove trailing whitespaces. */
-    tail = str + strlen(str) - 1;
-    while (isspace(*tail))
-        tail--;
-    *(tail + 1) = '\0';
+    if (strlen(str) > 0) {
+        tail = str + strlen(str) - 1;
+        if (isspace(*tail)) {
+            do {
+                tail--;
+            } while (isspace(*tail) && tail >= str);
+            *(tail + 1) = '\0';
+        }
+    }
 }
 
 int
