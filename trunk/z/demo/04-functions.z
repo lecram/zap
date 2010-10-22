@@ -1,0 +1,45 @@
+# Functions.
+
+# Defining a function.
+def inc(x):
+    return +(x, 1)
+
+# Calling a function.
+print(repr(inc(6))) # -> 7
+print("\n")
+
+# A function is a first-class object.
+
+# It can be bound to another name.
+incr := inc
+print(repr(inc(incr(6)))) # -> 8
+print("\n")
+
+# It can be passed as argument to a function.
+print(repr(incr)) # -> <1-ary zap function>
+print("\n")
+
+# It can be returned from a function.
+def incre():
+    return inc
+
+increm := incre()
+print(repr(increm(8))) # -> 9
+print("\n")
+
+# A function can be defined inside another function.
+def add4(x):
+    def add2(y):
+        return +(y, 2)
+    return add2(add2(x))
+
+print(repr(add4(6))) # -> 10
+print("\n")
+
+# A function can be redefined.
+oldprint := print
+def print(s):
+    return +(oldprint(s), oldprint(", World!"))
+
+print("Hello") # -> Hello, World!
+oldprint("\n")
