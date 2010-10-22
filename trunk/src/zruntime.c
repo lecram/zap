@@ -85,6 +85,7 @@ poplocal(Context *context)
     retkey = yarrfromstr("_ret_");
     retvalue = getkey(poped, (Zob *) retkey, EMPTY);
     delyarr(&retkey);
+    deldict(&poped);
     return retvalue;
 }
 
