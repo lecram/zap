@@ -630,6 +630,7 @@ run_block(Context *context, List *tmp, char looplev, char **entry)
                 unsigned char arity = 0;
                 Func *func;
                 HighFunc *highfunc;
+                ByteArray *key;
 
                 cursor++;
                 name = cursor;
@@ -644,9 +645,9 @@ run_block(Context *context, List *tmp, char looplev, char **entry)
                 highfunc = newhighfunc();
                 highfunc->func = zapfunc;
                 func = newfunc((FImp *) highfunc, arity);
-                setincontext(context,
-                       (Zob *) yarrfromstr(name),
-                       (Zob *) func);
+                key = yarrfromstr(name);
+                if (setincontext(context, (Zob *) key, (Zob *) func) == 0)
+                    delyarr(&key);
             }
         }
         else {
