@@ -395,8 +395,22 @@ feval(Context *context, List *tmp, char **entry)
         exit(EXIT_FAILURE);
     }
     if (*(func->fimp)) {
+        char *zapfunc;
+        Node *item;
+
         /* Call zap function. */
-        ret = EMPTY;
+        pushlocal(context);
+        zapfunc = ((HighFunc *) func->fimp)->func;
+        item = args->first;
+        while (*zapfunc != '\0') {
+            key = yarrfromstr(zapfunc);
+            setincontext(context, (Zob *) key, item->object);
+            zapfunc += strlen(zapfunc) + 1;
+            item = item->next;
+        }
+        zapfunc++;
+        run_block(context, tmp, 0, &zapfunc);
+        ret = poplocal(context);
     }
     else {
         /* Call C function. */
@@ -670,8 +684,15 @@ run_block(Context *context, List *tmp, char looplev, char **entry)
         return BE_CONTINUE | lev;
     }
     if (*cursor == RETURN) {
+        ByteArray *key;
+        Zob *ret;
+
         /* Function Return. */
-        /* NYI. */
+        cursor++;
+        key = yarrfromstr("_ret_");
+        ret = eval(context, tmp, &cursor);
+        setincontext(context, (Zob *) key, ret);
+        return 0;
     }
     return 0;
 }
