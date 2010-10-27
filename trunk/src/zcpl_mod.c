@@ -110,7 +110,7 @@ int
 cpl_mod(char *srcname)
 {
     FILE *fsrc, *fbin;
-    char *binname, *expr_entry, *def;
+    char *binname, *expr_entry, *def, *ext;
     char *colon, *assign, *stt;
     char line[256], quoted[256], bin[256];
     unsigned int length, linum;
@@ -121,15 +121,19 @@ cpl_mod(char *srcname)
         raiseOpenFileError(srcname);
         return 0;
     }
-    binname = (char *) malloc(strlen(srcname) + 4);
+    binname = (char *) malloc(strlen(srcname) + 5);
     if (binname == NULL) {
         raiseOutOfMemory("cpl_mod");
         fclose(fsrc);
         return 0;
     }
     strcpy(binname, srcname);
-    strcat(binname, "bc_");
+    ext = strrchr(binname, '.');
+    if (ext != NULL)
+        *ext = '\0';
+    strcat(binname, ".zbc");
     fbin = fopen(binname, "wb");
+    ext = NULL;
     if (fbin == NULL) {
         raiseOpenFileError(binname);
         fclose(fsrc);

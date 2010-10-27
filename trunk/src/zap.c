@@ -141,21 +141,24 @@ main(int argc, char *argv[])
     if (argc == 2) {
         ext = strrchr(argv[1], '.');
         if (ext != NULL) {
-            if (strcmp(ext, ".z") == 0)
+            if (strcmp(ext, ".zp") == 0)
                 compile = 1;
         }
         if (compile) {
             if (cpl_mod(argv[1])) {
-                binname = (char *) malloc(strlen(argv[1]) + 4);
+                binname = (char *) malloc(strlen(argv[1]) + 5);
                 if (binname == NULL) {
                     raiseOutOfMemory("main");
                     return 0;
                 }
                 strcpy(binname, argv[1]);
-                strcat(binname, "bc_");
+                ext = strrchr(binname, '.');
+                if (ext != NULL)
+                    *ext = '\0';
+                strcat(binname, ".zbc");
                 run_mod(binname);
                 free(binname);
-                binname = NULL;
+                binname = ext = NULL;
             }
         }
         else
