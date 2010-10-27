@@ -333,7 +333,10 @@ cpl_mod(char *srcname)
     }
     fclose(fsrc);
     /* Block End. */
-    fwrite("\xBE\x01", 1, 2, fbin);
+    while (identlevel >= 0) {
+        fwrite("\xBE\x01", 1, 2, fbin);
+        identlevel--;
+    }
     fclose(fbin);
     free(binname);
     binname = NULL;
