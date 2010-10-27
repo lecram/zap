@@ -8,7 +8,7 @@ You will need to [Build build zap] from sources in order to run zap programs on 
 
 = Hello World =
 
-A zap script is a source code file with instructions for execution by the zap interpreter. As a simple example, let's create a file called "hello.z" containing the following text:
+A zap script is a source code file with instructions for execution by the zap interpreter. As a simple example, let's create a file called "hello.zp" containing the following text:
 
 {{{
 print("Hello, world!\n")
@@ -16,21 +16,12 @@ print("Hello, world!\n")
 
 This script invokes the `print()` function, causing the interpreter to show a message on the console. In this example, the message is specified by a string literal. The characters `\n` at the end of the string indicate a line break.
 
-== Compiling and Running ==
+== Running ==
 
-To run this program we must first compile the file "hello.z" using the compiler "compile.py":
-
-{{{
-% python compile.py hello.z
-Compiling "hello.z"...
-OK.
-%
-}}}
-
-This operation will generate a file "hello.zbc" which can then be executed by the zap interpreter:
+To run this program we just need to pass the file "hello.zp" to the zap interpreter:
 
 {{{
-% zap hello.zbc
+% zap hello.zp
 Hello, world!
 %
 }}}
