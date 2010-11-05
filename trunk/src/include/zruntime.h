@@ -42,29 +42,31 @@
 
 typedef struct {
     /* Global namespace. */
-    Dict *global;
+    ZDict *global;
     /* A stack of local namespaces. */
-    List *local;
-} Context;
+    ZList *local;
+} ZContext;
 
-Context *newcontext();
-void delcontext(Context **context);
-void pushlocal(Context *context);
-Zob *poplocal(Context *context);
-int hasincontext(Context *context, Zob *key);
-int setincontext(Context *context, Zob *key, Zob *value);
-Zob *getincontext(Context *context, Zob *key, Zob *defval);
-void remincontext(Context *context, Zob *key);
-unsigned int readword(char **entry);
-void skip_expr(char **entry);
-Zob *eval(Context *context, List *tmp, char **entry);
-Zob *nameval(Context *context, char **entry);
-Zob *feval(Context *context, List *tmp, char **entry);
-void skip_assign(char **entry);
-void assign(Context *context, Zob *value, char **entry);
-void runstatement(Context *context, List *tmp, char **entry);
-void skip_block(char **entry);
-unsigned char run_block(Context *context,
-                        List *tmp,
-                        char looplev,
-                        char **entry);
+ZError znewcontext(ZContext **zcontext);
+void zdelcontext(ZContext **zcontext);
+ZError zpushlocal(ZContext *zcontext);
+ZError zpoplocal(ZContext *zcontext, Zob **ret);
+ZError zsetincontext(ZContext *zcontext, Zob *key, Zob *value);
+int zgetincontext(ZContext *zcontext, Zob *key, Zob **pvalue);
+int zremincontext(ZContext *zcontext, Zob *key);
+int zhasincontext(ZContext *zcontext, Zob *key);
+ZDict *zcwdict(ZContext *zcontext);
+unsigned int zreadword(char **entry);
+void zskip_expr(char **entry);
+ZError zeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pzob);
+ZError znameval(ZContext *zcontext, char **entry, Zob **pzob);
+ZError zfeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pret);
+void zskip_assign(char **entry);
+ZError zassign(ZContext *zcontext, Zob *value, char **entry);
+ZError zrunstatement(ZContext *zcontext, ZList *tmp, char **entry);
+void zskip_block(char **entry);
+ZError zrun_block(ZContext *zcontext,
+                  ZList *tmp,
+                  char looplev,
+                  char **entry,
+                  unsigned char *be);

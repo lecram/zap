@@ -23,6 +23,7 @@
 #include <ctype.h>
 
 #include "ztypes.h"
+#include "zerr.h"
 
 #include "zbyte.h"
 #include "zbignum.h"
@@ -187,18 +188,18 @@ unsigned int
 cpl_bignum(char **expr, char *bin)
 {
     char *end;
-    BigNum *bignum;
+    ZBigNum *zbignum;
     int i, n;
     unsigned int w, total, wordlen;
 
     end = strchr(*expr, '!');
     *end = '\0';
-    bignum = bnumfromstr(*expr);
-    wordlen = bignum->length / WL;
-    if (bignum->length % WL)
+    zbnumfromstr(&zbignum, *expr);
+    wordlen = zbignum->length / WL;
+    if (zbignum->length % WL)
         wordlen++;
     for (n = 0; n < wordlen; n++) {
-        for (i = WL / 8, w = bignum->words[n]; i > 0; i--, w /= 256)
+        for (i = WL / 8, w = zbignum->words[n]; i > 0; i--, w /= 256)
             bin[i + (n + 1) * WL / 8] = (char) w % 256;
     }
     bin[0] = T_BNUM;
@@ -206,7 +207,7 @@ cpl_bignum(char **expr, char *bin)
         bin[i] = (char) w % 256;
     *end = '!';
     total = (1 + wordlen) * WL / 8 + 1;
-    delbnum(&bignum);
+    zdelbnum(&zbignum);
     *expr = end + 1;
     return total;
 }
@@ -295,7 +296,7 @@ cpl_expr(char **expr, char *bin)
         case '{':
             return cpl_dict(expr, bin);
         default:
-            /* None | Bool | Byte | Func | Name */
+            /* ZNone | ZBool | ZByte | ZFunc | Name */
             {
                 int si;
                 char *c;
@@ -328,7 +329,7 @@ cpl_expr(char **expr, char *bin)
                     return 2U;
                 }
                 else {
-                    /* Func | Name */
+                    /* ZFunc | Name */
                     char *c = *expr;
                     unsigned int length = 0;
 

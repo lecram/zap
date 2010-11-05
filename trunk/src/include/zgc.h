@@ -23,5 +23,5 @@ typedef struct {
     unsigned char refc;
 } RefC;
 
-void increfc(Zob *object);
-void decrefc(Zob *object);
+void zincrefc(Zob *object);
+void zdecrefc(Zob *object);

@@ -38,7 +38,7 @@
 #include "zap.h"
 
 void
-debug_bin(char *bin, unsigned int length)
+zdebug_bin(char *bin, unsigned int length)
 {
     unsigned int i;
     unsigned char *c;
@@ -46,24 +46,33 @@ debug_bin(char *bin, unsigned int length)
     c = (unsigned char *) bin;
     for (i = 0U; i < length; i++, c++)
         printf("0x%02X ", *c);
-    printf("\n");
+    puts("");
 }
 
-void
-interactive()
+ZError
+zinteractive()
 {
     char buffer[1024];
     char expr[256], bin[256];
     char *expr_entry, *bin_entry;
     Zob *result;
-    Context *context;
-    List *tmp;
+    ZContext *zcontext;
+    ZList *tmp;
     unsigned int length;
+    ZError err;
 
-    context = newcontext();
-    context->global = bbuild();
-    context->local = newlist();
-    tmp = newlist();
+    err = znewcontext(&zcontext);
+    if (err != ZE_OK)
+        return err;
+    err = zbuild(&zcontext->global);
+    if (err != ZE_OK)
+        return err;
+    err = znewlist(&zcontext->local);
+    if (err != ZE_OK)
+        return err;
+    err = znewlist(&tmp);
+    if (err != ZE_OK)
+        return err;
 
     while (1) {
         printf("> ");
@@ -72,62 +81,100 @@ interactive()
         if (strcmp(expr, "exit\n") != 0) {
             expr_entry = expr;
             length = cpl_expr(&expr_entry, bin);
-            /* debug_bin(bin, length); */
+            /* zdebug_bin(bin, length); */
             bin_entry = bin;
-            result = eval(context, tmp, &bin_entry);
-            repobj(buffer, result);
+            err = zeval(zcontext, tmp, &bin_entry, &result);
+            if (err != ZE_OK)
+                return err;
+            zrepobj(buffer, result);
             printf("%s\n", buffer);
-            emptylist(tmp);
+            zlempty(tmp);
         }
         else
             break;
     }
 
-    dellist(&tmp);
-    delcontext(&context);
+    zdellist(&tmp);
+    zdelcontext(&zcontext);
+    return ZE_OK;
 }
 
-int
-run_mod(char *binname)
+ZError
+zrun_mod(char *binname)
 {
     FILE *fzbc;
     int size;
     char *szbc, *entry;
-    Context *context;
-    List *tmp = newlist();
+    ZContext *zcontext;
+    ZList *tmp;
+    unsigned char be;
+    ZError err;
 
+    err = znewlist(&tmp);
+    if (err != ZE_OK)
+        return err;
     fzbc = fopen(binname, "rb");
     if (fzbc == NULL) {
-        raiseOpenFileError(binname);
-        exit(EXIT_FAILURE);
+        zdellist(&tmp);
+        return ZE_OPEN_FILE_ERROR;
     }
     fseek(fzbc, 0L, SEEK_END);
     size = ftell(fzbc);
     fseek(fzbc, 0L, SEEK_SET);
     szbc = (char *) malloc(size * sizeof(char));
     if (szbc == NULL) {
+        zdellist(&tmp);
         fclose(fzbc);
-        raiseOutOfMemory("run_mod");
-        exit(EXIT_FAILURE);
+        return ZE_OUT_OF_MEMORY;
     }
     if (fread(szbc, size, 1, fzbc) == 0) {
+        zdellist(&tmp);
         fclose(fzbc);
-        raiseOpenFileError(binname);
-        exit(EXIT_FAILURE);
+        free(szbc);
+        szbc = NULL;
+        return ZE_OPEN_FILE_ERROR;
     }
     fclose(fzbc);
 
-    context = newcontext();
-    context->global = bbuild();
-    context->local = newlist();
+    err = znewcontext(&zcontext);
+    if (err != ZE_OK) {
+        zdellist(&tmp);
+        free(szbc);
+        szbc = NULL;
+        return err;
+    }
+    err = zbuild(&zcontext->global);
+    if (err != ZE_OK) {
+        zdellist(&tmp);
+        free(szbc);
+        szbc = NULL;
+        zdelcontext(&zcontext);
+        return err;
+    }
+    err = znewlist(&zcontext->local);
+    if (err != ZE_OK) {
+        zdellist(&tmp);
+        free(szbc);
+        szbc = NULL;
+        zdelcontext(&zcontext);
+        return err;
+    }
 
     entry = szbc;
-    run_block(context, tmp, 0, &entry);
+    be = 0;
+    err = zrun_block(zcontext, tmp, 0, &entry, &be);
+    if (err != ZE_OK) {
+        zdellist(&tmp);
+        free(szbc);
+        szbc = NULL;
+        zdelcontext(&zcontext);
+        return err;
+    }
 
-    dellist(&tmp);
-    delcontext(&context);
+    zdellist(&tmp);
     free(szbc);
     szbc = NULL;
+    zdelcontext(&zcontext);
 
     return 0;
 }
@@ -137,6 +184,7 @@ main(int argc, char *argv[])
 {
     char *binname, *ext;
     int compile = 0;
+    ZError err = ZE_OK;
 
     if (argc == 2) {
         ext = strrchr(argv[1], '.');
@@ -149,28 +197,59 @@ main(int argc, char *argv[])
                 binname = (char *) malloc(strlen(argv[1]) + 5);
                 if (binname == NULL) {
                     raiseOutOfMemory("main");
-                    return 0;
+                    return EXIT_FAILURE;
                 }
                 strcpy(binname, argv[1]);
                 ext = strrchr(binname, '.');
                 if (ext != NULL)
                     *ext = '\0';
                 strcat(binname, ".zbc");
-                run_mod(binname);
+                err = zrun_mod(binname);
                 free(binname);
                 binname = ext = NULL;
             }
         }
         else
-            run_mod(argv[1]);
+            err = zrun_mod(argv[1]);
     }
     else {
-        printf("<< zap interpreter >>\n");
+        puts("<< zap interpreter >>");
         if (argc == 1) {
-            printf("\nInteractive mode.\n\n");
-            interactive();
+            puts("\nInteractive mode.\n");
+            err = zinteractive();
         }
     }
 
-    return 0;
+    switch (err) {
+        case ZE_OK:
+            return EXIT_SUCCESS;
+        case ZE_OUT_OF_MEMORY:
+            puts("ZE_OUT_OF_MEMORY");
+            return EXIT_FAILURE;
+        case ZE_INDEX_OUT_OF_RANGE:
+            puts("ZE_INDEX_OUT_OF_RANGE");
+            return EXIT_FAILURE;
+        case ZE_NAME_NOT_DEFINED:
+            puts("ZE_NAME_NOT_DEFINED");
+            return EXIT_FAILURE;
+        case ZE_FUNCTION_NAME_NOT_DEFINED:
+            puts("ZE_FUNCTION_NAME_NOT_DEFINED");
+            return EXIT_FAILURE;
+        case ZE_ARITY_ERROR:
+            puts("ZE_ARITY_ERROR");
+            return EXIT_FAILURE;
+        case ZE_BREAK_WITHOUT_LOOP:
+            puts("ZE_BREAK_WITHOUT_LOOP");
+            return EXIT_FAILURE;
+        case ZE_CONTINUE_WITHOUT_LOOP:
+            puts("ZE_CONTINUE_WITHOUT_LOOP");
+            return EXIT_FAILURE;
+        case ZE_UNKNOWN_TYPE_NUMBER:
+            puts("ZE_UNKNOWN_TYPE_NUMBER");
+            return EXIT_FAILURE;
+        case ZE_OPEN_FILE_ERROR:
+            puts("ZE_OPEN_FILE_ERROR");
+            return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }

@@ -16,7 +16,7 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Bool Type */
+/* ZBool Type */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,65 +26,82 @@
 
 #include "zbool.h"
 
-Bool *
-newbool()
+/* Create a new ZBool in 'zbool'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+znewbool(ZBool **zbool)
 {
-    Bool *bool;
-
-    bool = (Bool *) malloc(sizeof(Bool));
-    if (bool == NULL) {
-        raiseOutOfMemory("newbool");
-        exit(EXIT_FAILURE);
-    }
-    bool->type = T_BOOL;
-    bool->refc = 0;
-    return bool;
+    *zbool = (ZBool *) malloc(sizeof(ZBool));
+    if (*zbool == NULL)
+        return ZE_OUT_OF_MEMORY;
+    (*zbool)->type = T_BOOL;
+    (*zbool)->refc = 0;
+    return ZE_OK;
 }
 
+/* Remove 'zdict' from memory. */
 void
-delbool(Bool **bool)
+zdelbool(ZBool **zbool)
 {
-    free(*bool);
-    *bool = NULL;
+    free(*zbool);
+    *zbool = NULL;
 }
 
-Bool *
-cpybool(Bool *bool)
+/* Create a new copy of 'source' in 'dest'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zcpybool(ZBool *source, ZBool **dest)
 {
-    Bool *copy;
+    ZError err;
 
-    copy = newbool();
-    copy->value = bool->value;
-    return copy;
+    err = znewbool(dest);
+    if (err != ZE_OK)
+        return err;
+    (*dest)->value = source->value;
+    return ZE_OK;
 }
 
+/* Test the truth value of 'zbool'.
+ * Return 'zbool->value'.
+ */
 int
-tstbool(Bool *bool)
+ztstbool(ZBool *zbool)
 {
-    return bool->value;
+    return (int) zbool->value;
 }
 
+/* Compare 'zbool' and 'other'.
+ * If they are equal, return zero.
+ * Otherwise, return nonzero.
+ */
 int
-cmpbool(Bool *bool, Bool *other)
+zcmpbool(ZBool *zbool, ZBool *other)
 {
     if (other->value) {
-        if (bool->value)
+        if (zbool->value)
             return 0;
         else
             return 1;
     }
     else {
-        if (!bool->value)
+        if (!zbool->value)
             return 0;
         else
             return 1;
     }
 }
 
+/* Print the textual representation of 'zbool' on 'buffer'.
+ * Return the number of bytes writen.
+ */
 unsigned int
-repbool(char *buffer, Bool *bool)
+zrepbool(char *buffer, ZBool *zbool)
 {
-    if (bool->value)
+    if (zbool->value)
         return sprintf(buffer, "TRUE");
     else
         return sprintf(buffer, "FALSE");

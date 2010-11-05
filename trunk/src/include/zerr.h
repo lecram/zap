@@ -18,6 +18,19 @@
 
 /* Errors (header) */
 
+typedef enum {
+    ZE_OK,
+    ZE_OUT_OF_MEMORY,
+    ZE_INDEX_OUT_OF_RANGE,
+    ZE_NAME_NOT_DEFINED,
+    ZE_FUNCTION_NAME_NOT_DEFINED,
+    ZE_ARITY_ERROR,
+    ZE_BREAK_WITHOUT_LOOP,
+    ZE_CONTINUE_WITHOUT_LOOP,
+    ZE_UNKNOWN_TYPE_NUMBER,
+    ZE_OPEN_FILE_ERROR
+} ZError;
+
 void raise(char *msg);
 void raisecpl(char *msg, char *srcname, unsigned int linum);
 void raiseOutOfMemory(const char *caller);

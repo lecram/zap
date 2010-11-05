@@ -22,6 +22,8 @@
  * They should not be called from anywhere in the API.
  */
 
-void regfunc(Dict *namespace, Zob *(*cfunc)(List *args),
-             char *name, unsigned char arity);
-Dict *bbuild();
+ZError regfunc(ZDict *namespace,
+               ZError (*func)(ZList *args, Zob **ret),
+               char *name,
+               unsigned char arity);
+ZError zbuild(ZDict **builtins);

@@ -16,7 +16,7 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Func Type */
+/* ZFunc Type */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -28,106 +28,126 @@
 #include "zlist.h"
 #include "zfunc.h"
 
-LowFunc *
-newlowfunc()
+/* Create a new ZLowFunc in 'zlowfunc'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+znewlowfunc(ZLowFunc **zlowfunc)
 {
-    LowFunc *lowfunc;
-
-    lowfunc = (LowFunc *) malloc(sizeof(LowFunc));
-    if (lowfunc == NULL) {
-        raiseOutOfMemory("newlowfunc");
-        exit(EXIT_FAILURE);
-    }
-    lowfunc->high = 0;
-    return lowfunc;
+    *zlowfunc = (ZLowFunc *) malloc(sizeof(ZLowFunc));
+    if (*zlowfunc == NULL)
+        return ZE_OUT_OF_MEMORY;
+    (*zlowfunc)->high = 0;
+    return ZE_OK;
 }
 
+/* Remove 'zlowfunc' from memory. */
 void
-dellowfunc(LowFunc **lowfunc)
+zdellowfunc(ZLowFunc **zlowfunc)
 {
-    free(*lowfunc);
-    *lowfunc = NULL;
+    free(*zlowfunc);
+    *zlowfunc = NULL;
 }
 
-HighFunc *
-newhighfunc()
+/* Create a new ZLowFunc in 'zlowfunc'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+znewhighfunc(ZHighFunc **zhighfunc)
 {
-    HighFunc *highfunc;
-
-    highfunc = (HighFunc *) malloc(sizeof(HighFunc));
-    if (highfunc == NULL) {
-        raiseOutOfMemory("newhighfunc");
-        exit(EXIT_FAILURE);
-    }
-    highfunc->high = 1;
-    return highfunc;
+    *zhighfunc = (ZHighFunc *) malloc(sizeof(ZHighFunc));
+    if (*zhighfunc == NULL)
+        return ZE_OUT_OF_MEMORY;
+    (*zhighfunc)->high = 1;
+    return ZE_OK;
 }
 
+/* Remove 'zhighfunc' from memory. */
 void
-delhighfunc(HighFunc **highfunc)
+zdelhighfunc(ZHighFunc **zhighfunc)
 {
-    free(*highfunc);
-    *highfunc = NULL;
+    free(*zhighfunc);
+    *zhighfunc = NULL;
 }
 
-Func *
-newfunc(FImp *fimp, unsigned char arity)
+/* Create a new ZFunc in 'zfunc'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+znewfunc(ZFunc **zfunc, FImp *fimp, unsigned char arity)
 {
-    Func *func;
-
-    func = (Func *) malloc(sizeof(Func));
-    if (func == NULL) {
-        raiseOutOfMemory("newfunc");
-        exit(EXIT_FAILURE);
-    }
-    func->type = T_FUNC;
-    func->refc = 0;
-    func->fimp = fimp;
-    func->arity = arity;
-    return func;
+    *zfunc = (ZFunc *) malloc(sizeof(ZFunc));
+    if (*zfunc == NULL)
+        return ZE_OUT_OF_MEMORY;
+    (*zfunc)->type = T_FUNC;
+    (*zfunc)->refc = 0;
+    (*zfunc)->fimp = fimp;
+    (*zfunc)->arity = arity;
+    return ZE_OK;
 }
 
+/* Remove 'zfunc' from memory. */
 void
-delfunc(Func **func)
+zdelfunc(ZFunc **zfunc)
 {
-    free((*func)->fimp);
-    (*func)->fimp = NULL;
-    free(*func);
-    *func = NULL;
+    free((*zfunc)->fimp);
+    (*zfunc)->fimp = NULL;
+    free(*zfunc);
+    *zfunc = NULL;
 }
 
-Func *
-cpyfunc(Func *func)
+/* Create a new copy of 'source' in 'dest'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zcpyfunc(ZFunc *source, ZFunc **dest)
 {
-    Func *copy;
+    ZError err;
 
-    copy = newfunc(func->fimp, func->arity);
-    return copy;
+    err = znewfunc(dest, source->fimp, source->arity);
+    if (err != ZE_OK)
+        return err;
+    return ZE_OK;
 }
 
+/* Test the truth value of 'zfunc'.
+ * If 'zfunc' do not has an implementation, return zero.
+ * Otherwise, return nonzero.
+ */
 int
-tstfunc(Func *func)
+ztstfunc(ZFunc *zfunc)
 {
-    if (func->fimp != NULL)
+    if (zfunc->fimp != NULL)
         return 1;
     else
         return 0;
 }
 
+/* Compare 'zfunc' and 'other'.
+ * If they are equal (have the same implementation), return zero.
+ * Otherwise, return nonzero.
+ */
 int
-cmpfunc(Func *func, Func *other)
+zcmpfunc(ZFunc *zfunc, ZFunc *other)
 {
-    if (other->fimp == func->fimp)
+    if (other->fimp == zfunc->fimp)
         return 0;
     else
         return 1;
 }
 
+/* Print the textual representation of 'zfunc' on 'buffer'.
+ * Return the number of bytes writen.
+ */
 unsigned int
-repfunc(char *buffer, Func *func)
+zrepfunc(char *buffer, ZFunc *zfunc)
 {
-    if (*func->fimp)
-        return sprintf(buffer, "<%i-ary zap function>", func->arity);
+    if (*zfunc->fimp)
+        return sprintf(buffer, "<%i-ary zap function>", zfunc->arity);
     else
-        return sprintf(buffer, "<%i-ary C function>", func->arity);
+        return sprintf(buffer, "<%i-ary C function>", zfunc->arity);
 }

@@ -18,9 +18,9 @@
 
 /* Object (header) */
 
-void delobj(Zob **object);
-Zob *cpyobj(Zob *object);
-int tstobj(Zob *object);
-int cmpobj(Zob *object, Zob *other);
-unsigned int repobj(char *buffer, Zob *object);
-Zob *typename(Zob *object);
+void zdelobj(Zob **zob);
+ZError zcpyobj(Zob *source, Zob **dest);
+int ztstobj(Zob *zob);
+int zcmpobj(Zob *zob, Zob *other);
+unsigned int zrepobj(char *buffer, Zob *zob);
+ZError ztypename(Zob *zob, Zob **name);

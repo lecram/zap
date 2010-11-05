@@ -16,7 +16,7 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* List Type */
+/* ZList Type */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -29,307 +29,130 @@
 
 #include "zobject.h"
 
-/* The object in list shares reference
- *  with the object passed as argument!
+/* Create a new ZNode in 'znode', referencing 'zob'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
  */
-Node *
-newnode(Zob *object)
+ZError
+znewnode(Zob *zob, ZNode **znode)
 {
-    Node *node;
-
-    node = (Node *) malloc(sizeof(Node));
-    if (node == NULL) {
-        raiseOutOfMemory("newnode");
-        exit(EXIT_FAILURE);
-    }
-    node->object = object;
-    increfc(object);
-    node->next = NULL; /* Security. */
-    return node;
+    *znode = (ZNode *) malloc(sizeof(ZNode));
+    if (*znode == NULL)
+        return ZE_OUT_OF_MEMORY;
+    (*znode)->object = zob;
+    zincrefc(zob);
+    (*znode)->next = NULL; /* Security. */
+    return ZE_OK;
 }
 
+/* Remove 'znode' from memory, unbinding its object. */
 void
-delnode(Node **node)
+zdelnode(ZNode **znode)
 {
-    decrefc((*node)->object);
-    free(*node);
-    *node = NULL;
+    zdecrefc((*znode)->object);
+    free(*znode);
+    *znode = NULL;
 }
 
-List *
-newlist()
-{
-    List *list;
-
-    list = (List *) malloc(sizeof(List));
-    if (list == NULL) {
-        raiseOutOfMemory("newlist");
-        exit(EXIT_FAILURE);
-    }
-    list->type = T_LIST;
-    list->length = 0;
-    list->first = NULL;
-    list->last = NULL;
-    list->refc = 0;
-    return list;
-}
-
-void
-dellist(List **list)
-{
-    while ((*list)->length > 0)
-        remfirst(*list);
-    free(*list);
-    *list = NULL;
-}
-
-/* Remove all items in list.
- * Used by temp lists to minimize
- *  malloc() & free() calls.
+/* Create a new ZList in 'zlist'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
  */
-void
-emptylist(List *list)
+ZError
+znewlist(ZList **zlist)
 {
-    while (list->length > 0)
-        remfirst(list);
+    *zlist = (ZList *) malloc(sizeof(ZList));
+    if (*zlist == NULL)
+        return ZE_OUT_OF_MEMORY;
+    (*zlist)->type = T_LIST;
+    (*zlist)->length = 0;
+    (*zlist)->first = NULL;
+    (*zlist)->last = NULL;
+    (*zlist)->refc = 0;
+    return ZE_OK;
 }
 
-/* Items are duplicated in memory,
- *  i.e.,  items in new list do not
- *  share reference with items
- *  in original list.
- */
-List *
-cpylist(List *list)
+/* Remove 'zlist' from memory. */
+void
+zdellist(ZList **zlist)
 {
-    List *copy;
-    Node *old = list->first;
-    Node *new;
+    while ((*zlist)->length > 0)
+        zlremfirst(*zlist);
+    free(*zlist);
+    *zlist = NULL;
+}
 
-    copy = newlist();
-    copy->length = list->length;
+/* Create a new copy of 'source' in 'dest'.
+ * Items are duplicated in memory, i.e.,
+ * items in 'dest' do not share reference with items in 'source'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zcpylist(ZList *source, ZList **dest)
+{
+    ZNode *old = source->first;
+    ZNode *new;
+    Zob *newzob;
+    ZError err;
+
+    err = znewlist(dest);
+    if (err != ZE_OK)
+        return err;
+    (*dest)->length = source->length;
     if (old->next == NULL)
-        return copy;
-    new = newnode(cpyobj(old->object));
-    copy->first = new;
+        return ZE_OK;
+    err = zcpyobj(old->object, &newzob);
+    if (err != ZE_OK)
+        return err;
+    err = znewnode(newzob, &new);
+    if (err != ZE_OK)
+        return err;
+    (*dest)->first = new;
     old = old->next;
     while (old != NULL) {
-        new->next = newnode(cpyobj(old->object));
+        err = zcpyobj(old->object, &newzob);
+        if (err != ZE_OK)
+            return err;
+        err = znewnode(newzob, &new->next);
+        if (err != ZE_OK)
+            return err;
         new = new->next;
         old = old->next;
     }
-    copy->last = new;
+    (*dest)->last = new;
     new->next = NULL;
-    return copy;
+    return ZE_OK;
 }
 
-void
-remfirst(List *list)
-{
-    if (list->first == NULL)
-        return;
-    if (list->first == list->last) {
-        delnode(&list->first);
-        list->first = NULL;
-        list->last = NULL;
-    }
-    else {
-        Node *second;
-
-        second = list->first->next;
-        delnode(&list->first);
-        list->first = second;
-    }
-    list->length--;
-}
-
-/* Return the first item in the list and remove it. */
-Zob *
-popitem(List *list)
-{
-    Zob *item;
-
-    if (list->first == NULL)
-        return EMPTY;
-    item = list->first->object;
-    increfc(item);
-    if (list->first == list->last) {
-        delnode(&list->first);
-        list->first = NULL;
-        list->last = NULL;
-    }
-    else {
-        Node *second;
-
-        second = list->first->next;
-        delnode(&list->first);
-        list->first = second;
-    }
-    list->length--;
-    return item;
-}
-
-/* Insert an object in front of the list. */
-void
-pushitem(List *list, Zob *object)
-{
-    Node *first;
-
-    first = newnode(object);
-    first->next = list->first;
-    list->first = first;
-    list->length++;
-}
-
-/* Return the first item in the list. */
-Zob *
-peekitem(List *list)
-{
-    return list->first->object;
-}
-
-/* Add object to the end of list. */
-void
-appitem(List *list, Zob *object)
-{
-    Node *item;
-
-    item = newnode(object);
-    item->next = NULL;
-    if (list->first == NULL)
-        list->first = item;
-    else
-        list->last->next = item;
-    list->last = item;
-    list->length++;
-}
-
-/* Set object at index.
- * The old object is deleted.
+/* Test the truth value of 'zlist'.
+ * If 'zlist' is empty, return zero.
+ * Otherwise, return nonzero.
  */
-void
-setitem(List *list, int index, Zob *object)
-{
-    if (index < 0)
-        index += list->length;
-    if (index < 0 || index >= list->length) {
-        raiseIndexOutOfRange("setitem", index, list->length);
-        exit(EXIT_FAILURE);
-    }
-    else {
-        int curidx = 0;
-        Node *cur = list->first;
-
-        while (curidx < index) {
-            cur = cur->next;
-            curidx++;
-        }
-        decrefc(cur->object);
-        cur->object = object;
-    }
-}
-
-/* Insert object in index.
- * If index == length, append object;
- */
-void
-insitem(List *list, int index, Zob *object)
-{
-    if (index < 0)
-        index += list->length;
-    if (index < 0 || index > list->length) {
-        raiseIndexOutOfRange("insitem", index, list->length);
-        exit(EXIT_FAILURE);
-    }
-    else if (index == list->length)
-        appitem(list, object);
-    else {
-        int curidx = 0;
-        Node *prev = list->first, *next;
-
-        while (curidx < index - 1) {
-            prev = prev->next;
-            curidx++;
-        }
-        next = prev->next;
-        prev->next = newnode(object);
-        prev->next->next = next;
-    }
-    list->length++;
-}
-
-/* WARNING: The function extlist is deprecated.
- * This function was build under "copy police".
- * Should be rewrited under "share police".
- */
-
-/* Concatenates list + ext and save result to list.
- * The same pointer can be passed to both args to double a list.
- * (The local vars count and length prevents an infinity loop
- * when doubling a list)
- */
-void
-extlist(List *list, List *ext)
-{
-    unsigned int count;
-    unsigned int length = ext->length;
-    Node *ecur = ext->first;
-
-    for (count = 0; count < length; count++) {
-        list->last->next = newnode(ecur->object);
-        list->last = list->last->next;
-        list->length++;
-        ecur = ecur->next;
-    }
-}
-
-/* Remove item at index. */
-void
-remitem(List *list, int index)
-{
-    if (index < 0)
-        index += list->length;
-    if (index < 0 || index >= list->length) {
-        raiseIndexOutOfRange("remitem", index, list->length);
-        exit(EXIT_FAILURE);
-    }
-    if (index == 0)
-        remfirst(list);
-    else {
-        int curidx = 0;
-        Node *prev = list->first, *next;
-
-        while (curidx < index - 1) {
-            prev = prev->next;
-            curidx++;
-        }
-        next = prev->next->next;
-        delnode(&prev->next);
-        prev->next = next;
-    }
-    list->length--;
-}
-
 int
-tstlist(List *list)
+ztstlist(ZList *zlist)
 {
-    if (list->length)
+    if (zlist->length)
         return 1;
     else
         return 0;
 }
 
+/* Compare 'zlist' and 'other'.
+ * If they are equal, return zero.
+ * Otherwise, return nonzero.
+ */
 int
-cmplist(List *list, List *other)
+zcmplist(ZList *zlist, ZList *other)
 {
-    Node *item, *oitem;
+    ZNode *item, *oitem;
 
-    if (list->length != other->length)
+    if (zlist->length != other->length)
         return 1;
-    item = list->first;
+    item = zlist->first;
     oitem = other->first;
     while (item != NULL) {
-        if (cmpobj(item->object, oitem->object))
+        if (zcmpobj(item->object, oitem->object))
             return 1;
         item = item->next;
         oitem = oitem->next;
@@ -337,28 +160,287 @@ cmplist(List *list, List *other)
     return 0;
 }
 
+/* Print the textual representation of 'zlist' on 'buffer'.
+ * Return the number of bytes writen.
+ */
 unsigned int
-replist(char *buffer, List *list)
+zreplist(char *buffer, ZList *zlist)
 {
-    if (list->first == NULL)
-        return sprintf(buffer, "<Empty List>");
+    if (zlist->first == NULL)
+        return sprintf(buffer, "<Empty ZList>");
     else {
         char nodebff[256];
-        Node *cur = list->first;
+        ZNode *cur = zlist->first;
         /* buffer length to return */
         unsigned int blen = 1;
 
         *buffer = '[';
         while (1) {
             if (cur->next == NULL) {
-                repobj(nodebff, cur->object);
+                zrepobj(nodebff, cur->object);
                 blen += sprintf(buffer + blen, "%s]", nodebff);
                 break;
             }
-            repobj(nodebff, cur->object);
+            zrepobj(nodebff, cur->object);
             blen += sprintf(buffer + blen, "%s, ", nodebff);
             cur = cur->next;
         }
         return blen;
     }
+}
+
+/* Return the number of items in 'zlist'. */
+unsigned int
+zllength(ZList *zlist)
+{
+    return zlist->length;
+}
+
+/* Insert 'zob' in front of 'zlist'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zlpush(ZList *zlist, Zob *zob)
+{
+    ZNode *first;
+    ZError err;
+
+    err = znewnode(zob, &first);
+    if (err != ZE_OK)
+        return err;
+    first->next = zlist->first;
+    zlist->first = first;
+    zlist->length++;
+    return ZE_OK;
+}
+
+/* If 'zlist' is empty, return EMPTY.
+ * Otherwise, return the first item in 'zlist'. */
+Zob *
+zlpeek(ZList *zlist)
+{
+    if (zlist->first == NULL)
+        return EMPTY;
+    return zlist->first->object;
+}
+
+/* Remove the first item from 'zlist' and return it. */
+Zob *
+zlpop(ZList *zlist)
+{
+    Zob *item;
+
+    if (zlist->first == NULL)
+        return EMPTY;
+    item = zlist->first->object;
+    zincrefc(item);
+    if (zlist->first == zlist->last) {
+        zdelnode(&zlist->first);
+        zlist->first = NULL;
+        zlist->last = NULL;
+    }
+    else {
+        ZNode *second;
+
+        second = zlist->first->next;
+        zdelnode(&zlist->first);
+        zlist->first = second;
+    }
+    zlist->length--;
+    return item;
+}
+
+/* Add 'zob' to the end of 'zlist'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zlappend(ZList *zlist, Zob *zob)
+{
+    ZNode *item;
+    ZError err;
+
+    err = znewnode(zob, &item);
+    if (err != ZE_OK)
+        return err;
+    item->next = NULL;
+    if (zlist->first == NULL)
+        zlist->first = item;
+    else
+        zlist->last->next = item;
+    zlist->last = item;
+    zlist->length++;
+    return ZE_OK;
+}
+
+/* Replace the 'index'-th item of 'zlist' by 'zob'.
+ * If 'index' is negative, use zllength('zlist') + 'index'.
+ * If 'index' is out of range, return ZE_INDEX_OUT_OF_RANGE.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zlset(ZList *zlist, int index, Zob *zob)
+{
+    if (index < 0)
+        index += zlist->length;
+    if (index < 0 || index >= zlist->length)
+        return ZE_INDEX_OUT_OF_RANGE;
+    else {
+        int curidx = 0;
+        ZNode *cur = zlist->first;
+
+        while (curidx < index) {
+            cur = cur->next;
+            curidx++;
+        }
+        zdecrefc(cur->object);
+        cur->object = zob;
+    }
+    return ZE_OK;
+}
+
+/* Insert 'zob' before 'index'-th position in 'zlist'.
+ * If 'index' == 'length', append 'zob'.
+ * If 'index' is negative, use zllength('zlist') + 'index'.
+ * If 'index' is out of range, return ZE_INDEX_OUT_OF_RANGE.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zlinsert(ZList *zlist, int index, Zob *zob)
+{
+    if (index < 0)
+        index += zlist->length;
+    if (index < 0 || index > zlist->length)
+        return ZE_INDEX_OUT_OF_RANGE;
+    else if (index == zlist->length) {
+        ZError err;
+
+        err = zlappend(zlist, zob);
+        if (err != ZE_OK)
+            return err;
+    }
+    else {
+        int curidx = 0;
+        ZNode *prev = zlist->first;
+        ZNode *next;
+        ZError err;
+
+        while (curidx < index - 1) {
+            prev = prev->next;
+            curidx++;
+        }
+        next = prev->next;
+        err = znewnode(zob, &prev->next);
+        if (err != ZE_OK)
+            return err;
+        prev->next->next = next;
+    }
+    zlist->length++;
+    return ZE_OK;
+}
+
+/* Concatenate 'other' to 'zlist'.
+ * The same pointer can be passed to both args to double 'zlist'.
+ * (The local vars 'count' and 'length' prevents an infinity loop
+ * when doubling 'zlist').
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zlextend(ZList *zlist, ZList *other)
+{
+    unsigned int count;
+    unsigned int length = other->length;
+    ZNode *ecur = other->first;
+    ZError err;
+
+    for (count = 0; count < length; count++) {
+        err = znewnode(ecur->object, &zlist->last->next);
+        if (err != ZE_OK)
+            return err;
+        zlist->last = zlist->last->next;
+        zlist->length++;
+        ecur = ecur->next;
+    }
+    return ZE_OK;
+}
+
+/* Remove 'index'-th item from 'zlist'.
+ * If 'index' is negative, use zllength('zlist') + 'index'.
+ * If 'index' is out of range, return ZE_INDEX_OUT_OF_RANGE.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zlremove(ZList *zlist, int index)
+{
+    if (index < 0)
+        index += zlist->length;
+    if (index < 0 || index >= zlist->length)
+        return ZE_INDEX_OUT_OF_RANGE;
+    if (index == 0)
+        zlremfirst(zlist);
+    else {
+        int curidx = 0;
+        ZNode *prev = zlist->first;
+        ZNode *next;
+
+        while (curidx < index - 1) {
+            prev = prev->next;
+            curidx++;
+        }
+        next = prev->next->next;
+        zdelnode(&prev->next);
+        prev->next = next;
+    }
+    zlist->length--;
+    return ZE_OK;
+}
+
+/* Remove all items from 'zlist'.
+ * Used by temp lists to minimize malloc() & free() calls.
+ */
+void
+zlempty(ZList *zlist)
+{
+    while (zlist->length > 0)
+        zlremfirst(zlist);
+}
+
+/* If 'zob' is in 'zlist', return nonzero.
+ * Otherwise, return zero.
+ */
+int
+zlhasitem(ZList *zlist, Zob *zob)
+{
+    ZNode *item = zlist->first;
+
+    while (item != NULL) {
+        if (zcmpobj(item->object, zob) == 0)
+            return 1;
+        item = item->next;
+    }
+    return 0;
+}
+
+/* Remove the first item from 'zlist'. */
+void
+zlremfirst(ZList *zlist)
+{
+    if (zlist->first == NULL)
+        return;
+    if (zlist->first == zlist->last) {
+        zdelnode(&zlist->first);
+        zlist->first = NULL;
+        zlist->last = NULL;
+    }
+    else {
+        ZNode *second;
+
+        second = zlist->first->next;
+        zdelnode(&zlist->first);
+        zlist->first = second;
+    }
+    zlist->length--;
 }
