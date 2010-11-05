@@ -16,17 +16,17 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Byte Type (header) */
+/* ZByte Type (header) */
 
 typedef struct {
     Zob type;
     unsigned char refc;
     unsigned char value;
-} Byte;
+} ZByte;
 
-Byte *newbyte();
-void delbyte(Byte **byte);
-Byte *cpybyte(Byte *byte);
-int tstbyte(Byte *byte);
-int cmpbyte(Byte *byte, Byte *other);
-unsigned int repbyte(char *buffer, Byte *byte);
+ZError znewbyte(ZByte **zbyte);
+void zdelbyte(ZByte **zbyte);
+ZError zcpybyte(ZByte *source, ZByte **dest);
+int ztstbyte(ZByte *zbyte);
+int zcmpbyte(ZByte *zbyte, ZByte *other);
+unsigned int zrepbyte(char *buffer, ZByte *zbyte);

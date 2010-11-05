@@ -16,38 +16,38 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Func Type (header) */
+/* ZFunc Type (header) */
 
 typedef int FImp;
 
 typedef struct {
     FImp high; /* 0 */
     /* Pointer to C function. */
-    Zob *(*func)(List *args);
-} LowFunc;
+    ZError (*func)(ZList *args, Zob **ret);
+} ZLowFunc;
 
 typedef struct {
     FImp high; /* 1 */
     /* Pointer to zap function. */
     char *func;
-} HighFunc;
+} ZHighFunc;
 
 typedef struct {
     Zob type; /* T_FUNC */
     unsigned char refc;
-    /* Pointer to LowFunc or HighFunc. */
+    /* Pointer to ZLowFunc or ZHighFunc. */
     FImp *fimp;
     /* Number of arguments that the function takes. */
     unsigned char arity;
-} Func;
+} ZFunc;
 
-LowFunc *newlowfunc();
-void dellowfunc(LowFunc **lowfunc);
-HighFunc *newhighfunc();
-void delhighfunc(HighFunc **highfunc);
-Func *newfunc(FImp *fimp, unsigned char arity);
-void delfunc(Func **func);
-Func *cpyfunc(Func *func);
-int tstfunc(Func *func);
-int cmpfunc(Func *func, Func *other);
-unsigned int repfunc(char *buffer, Func *func);
+ZError znewlowfunc(ZLowFunc **zlowfunc);
+void zdellowfunc(ZLowFunc **zlowfunc);
+ZError znewhighfunc(ZHighFunc **zhighfunc);
+void zdelhighfunc(ZHighFunc **zhighfunc);
+ZError znewfunc(ZFunc **zfunc, FImp *fimp, unsigned char arity);
+void zdelfunc(ZFunc **zfunc);
+ZError zcpyfunc(ZFunc *source, ZFunc **dest);
+int ztstfunc(ZFunc *zfunc);
+int zcmpfunc(ZFunc *zfunc, ZFunc *other);
+unsigned int zrepfunc(char *buffer, ZFunc *zfunc);

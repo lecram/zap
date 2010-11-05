@@ -16,17 +16,17 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Word Type (header) */
+/* ZInt Type (header) */
 
 typedef struct {
     Zob type;
     unsigned char refc;
     int value;
-} Word;
+} ZInt;
 
-Word *newword();
-void delword(Word **word);
-Word *cpyword(Word *word);
-int tstword(Word *word);
-int cmpword(Word *word, Word *other);
-unsigned int repword(char *buffer, Word *word);
+ZError znewint(ZInt **zint);
+void zdelint(ZInt **zint);
+ZError zcpyint(ZInt *source, ZInt **dest);
+int ztstint(ZInt *zint);
+int zcmpint(ZInt *zint, ZInt *other);
+unsigned int zrepint(char *buffer, ZInt *zint);

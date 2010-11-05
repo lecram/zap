@@ -19,7 +19,7 @@
 /* Runtime */
 
 /* In This File:
- * - Context handle functions.
+ * - ZContext handle functions.
  * - Bytecode expression evaluation.
  * - Bytecode execution.
  */
@@ -46,128 +46,170 @@
 
 #include "zruntime.h"
 
-Context *
-newcontext()
+/* Create a new ZContext in 'zcontext'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+znewcontext(ZContext **zcontext)
 {
-    Context *context;
+    *zcontext = (ZContext *) malloc(sizeof(ZContext));
+    if (*zcontext == NULL)
+        return ZE_OUT_OF_MEMORY;
+    return ZE_OK;
+}
 
-    context = (Context *) malloc(sizeof(Context));
-    if (context == NULL) {
-        raiseOutOfMemory("newcontext");
-        exit(EXIT_FAILURE);
+/* Remove 'zcontext' from memory. */
+void
+zdelcontext(ZContext **zcontext)
+{
+    zdeldict(&(*zcontext)->global);
+    zdellist(&(*zcontext)->local);
+    free(*zcontext);
+    *zcontext = NULL;
+}
+
+/* Push a new namespace to 'zcontext'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zpushlocal(ZContext *zcontext)
+{
+    ZDict *zdict;
+    ZError err;
+
+    err = znewdict(&zdict);
+    if (err != ZE_OK)
+        return err;
+    return zlpush(zcontext->local, (Zob *) zdict);
+}
+
+/* Pop a namespace from 'zcontext' and save its "_ret_" value in 'ret'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zpoplocal(ZContext *zcontext, Zob **ret)
+{
+    ZDict *poped;
+    ZByteArray *retkey;
+    ZError err;
+
+    poped = (ZDict *) zlpop(zcontext->local);
+    err = zyarrfromstr(&retkey, "_ret_");
+    if (err != ZE_OK)
+        return err;
+    zdget(poped, (Zob *) retkey, ret);
+    zdelyarr(&retkey);
+    zdeldict(&poped);
+    return ZE_OK;
+}
+
+/* Define or redefine 'key' in 'zcontext'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zsetincontext(ZContext *zcontext, Zob *key, Zob *value)
+{
+    if (zcontext->local->length > 0) {
+        ZDict *local;
+
+        local = (ZDict *) zlpeek(zcontext->local);
+        return zdset(local, key, value);
     }
-    return context;
+    return zdset(zcontext->global, key, value);
 }
 
-void
-delcontext(Context **context)
-{
-    deldict(&(*context)->global);
-    dellist(&(*context)->local);
-    free(*context);
-    *context = NULL;
-}
-
-void
-pushlocal(Context *context)
-{
-    pushitem(context->local, (Zob *) newdict());
-}
-
-Zob *
-poplocal(Context *context)
-{
-    Dict *poped;
-    ByteArray *retkey;
-    Zob *retvalue;
-
-    poped = (Dict *) popitem(context->local);
-    retkey = yarrfromstr("_ret_");
-    retvalue = getkey(poped, (Zob *) retkey, EMPTY);
-    delyarr(&retkey);
-    deldict(&poped);
-    return retvalue;
-}
-
+/* If 'key' is in 'zcontext', copy its value to 'value' and return nonzero.
+ * Otherwise, return zero.
+ */
 int
-hasincontext(Context *context, Zob *key)
+zgetincontext(ZContext *zcontext, Zob *key, Zob **pvalue)
 {
-    if (context->local->length > 0) {
-        Dict *local;
+    Zob *value = *pvalue;
+    int ok = 0;
 
-        local = (Dict *) peekitem(context->local);
-        if (haskey(local, key))
+    if (zcontext->local->length > 0) {
+        ZDict *local;
+
+        local = (ZDict *) zlpeek(zcontext->local);
+        ok = zdget(local, key, &value);
+    }
+    if (!ok) {
+        ok = zdget(zcontext->global, key, &value);
+    }
+    *pvalue = value;
+    if (!ok)
+        return 0;
+    return 1;
+}
+
+/* If 'key' is in 'zcontext',
+ *  remove its pair from 'zcontext' and return nonzero.
+ * Otherwise, return zero.
+ */
+int
+zremincontext(ZContext *zcontext, Zob *key)
+{
+    if (zcontext->local->length > 0) {
+        ZDict *local;
+
+        local = (ZDict *) zlpeek(zcontext->local);
+        if (zdremove(local, key) != 0)
             return 1;
     }
-    if (haskey(context->global, key))
+    return zdremove(zcontext->global, key);
+}
+
+/* If 'key' is in 'zcontext', return nonzero.
+ * Otherwise, return zero.
+ */
+int
+zhasincontext(ZContext *zcontext, Zob *key)
+{
+    if (zcontext->local->length > 0) {
+        ZDict *local;
+
+        local = (ZDict *) zlpeek(zcontext->local);
+        if (zdhaskey(local, key))
+            return 1;
+    }
+    if (zdhaskey(zcontext->global, key))
         return 1;
     return 0;
 }
 
-int
-setincontext(Context *context, Zob *key, Zob *value)
+/* Return the current namespace to write in 'zcontext'. */
+ZDict *
+zcwdict(ZContext *zcontext)
 {
-    if (context->local->length > 0) {
-        Dict *local;
-
-        local = (Dict *) peekitem(context->local);
-        return setkey(local, key, value);
-    }
-    return setkey(context->global, key, value);
-}
-
-Zob *
-getincontext(Context *context, Zob *key, Zob *defval)
-{
-    Zob *value = EMPTY;
-
-    if (context->local->length > 0) {
-        Dict *local;
-
-        local = (Dict *) peekitem(context->local);
-        value = getkey(local, key, EMPTY);
-    }
-    if (value == EMPTY)
-        value = getkey(context->global, key, EMPTY);
-    if (value == EMPTY)
-        value = defval;
-    return value;
-}
-
-/* This function assumes (hasincontext(context, key) != 0). */
-void
-remincontext(Context *context, Zob *key)
-{
-    if (context->local->length > 0) {
-        Dict *local;
-
-        local = (Dict *) peekitem(context->local);
-        if (haskey(local, key))
-            remkey(local, key);
-    }
-    remkey(context->global, key);
+    if (zcontext->local->length > 0)
+        return (ZDict *) zlpeek(zcontext->local);
+    return zcontext->global;
 }
 
 unsigned int
-readword(char **entry)
+zreadword(char **entry)
 {
-    unsigned int i, word;
+    unsigned int i, zint;
     unsigned char *cursor;
 
     cursor = (unsigned char *) *entry;
-    word = (unsigned int) *cursor;
+    zint = (unsigned int) *cursor;
     cursor++;
     for (i = 1; i < WL / 8; i++) {
-        word <<= 8;
-        word += (unsigned int) *cursor;
+        zint <<= 8;
+        zint += (unsigned int) *cursor;
         cursor++;
     }
     *entry = (char *) cursor;
-    return word;
+    return zint;
 }
 
 void
-skip_expr(char **entry)
+zskip_expr(char **entry)
 {
     char *cursor = *entry;
 
@@ -189,26 +231,30 @@ skip_expr(char **entry)
                 unsigned int length;
 
                 cursor++;
-                length = readword(&cursor);
+                length = zreadword(&cursor);
                 cursor += length;
             }
             break;
         case T_BNUM:
-            /* Currently, there is no literal BigNums. */
-            raise("There is no literal BigNums.");
-            exit(EXIT_FAILURE);
+            {
+                unsigned int length;
+
+                cursor++;
+                length = zreadword(&cursor);
+                cursor += length * WL / 8;
+            }
             break;
         case T_LIST:
             cursor++;
             while (*cursor != '\0')
-                skip_expr(&cursor);
+                zskip_expr(&cursor);
             cursor++; /* Skip LIST_END. */
             break;
         case T_DICT:
             cursor++;
             while (*cursor != '\0') {
-                skip_expr(&cursor);  /* Skip key. */
-                skip_expr(&cursor);  /* Skip value. */
+                zskip_expr(&cursor);  /* Skip key. */
+                zskip_expr(&cursor);  /* Skip value. */
             }
             cursor++; /* Skip DICT_END. */
             break;
@@ -217,7 +263,7 @@ skip_expr(char **entry)
             cursor++;
             cursor += strlen(cursor) + 1; /* Skip STRING_END. */
             while (*cursor != CALLEND)
-                skip_expr(&cursor);
+                zskip_expr(&cursor);
             cursor++; /* Skip CALL_END. */
             break;
         default:
@@ -227,202 +273,285 @@ skip_expr(char **entry)
     *entry = cursor;
 }
 
-Zob *
-eval(Context *context, List *tmp, char **entry)
+/* Evaluate bytecode expression pointed by 'entry', in 'zcontext'.
+ * Upon success, save the result on 'zob'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pzob)
 {
-    Zob *obj = NULL;
     char *cursor = *entry;
+    Zob *zob = *pzob;
+    ZError err;
 
     switch (*cursor) {
         case T_NONE:
-            obj = (Zob *) newnone();
+            err = znewnone((ZNone **) &zob);
+            if (err != ZE_OK)
+                return err;
             cursor++;
             break;
         case T_BOOL:
             {
-                Bool *bool;
+                ZBool *zbool;
 
-                bool = newbool();
+                err = znewbool(&zbool);
+                if (err != ZE_OK)
+                    return err;
                 cursor++;
-                bool->value = (int) *cursor;
+                zbool->value = (int) *cursor;
                 cursor++;
-                obj = (Zob *) bool;
+                zob = (Zob *) zbool;
             }
             break;
         case T_BYTE:
             {
-                Byte *byte;
+                ZByte *zbyte;
 
-                byte = newbyte();
+                err = znewbyte(&zbyte);
+                if (err != ZE_OK)
+                    return err;
                 cursor++;
-                byte->value = (unsigned char) *cursor;
+                zbyte->value = (unsigned char) *cursor;
                 cursor++;
-                obj = (Zob *) byte;
+                zob = (Zob *) zbyte;
             }
             break;
         case T_WORD:
             {
-                Word *word;
+                ZInt *zint;
 
-                word = newword();
+                err = znewint(&zint);
+                if (err != ZE_OK)
+                    return err;
                 cursor++;
-                word->value = readword(&cursor);
-                obj = (Zob *) word;
+                zint->value = zreadword(&cursor);
+                zob = (Zob *) zint;
             }
             break;
         case T_YARR:
             {
-                ByteArray *bytearray;
+                ZByteArray *zbytearray;
                 unsigned int length, index;
 
                 cursor++;
-                length = readword(&cursor);
-                bytearray = newyarr(length);
+                length = zreadword(&cursor);
+                err = znewyarr(&zbytearray, length);
+                if (err != ZE_OK)
+                    return err;
                 for (index = 0; index < length; index++) {
-                    bytearray->bytes[index] = *cursor;
+                    zbytearray->bytes[index] = *cursor;
                     cursor++;
                 }
-                obj = (Zob *) bytearray;
+                zob = (Zob *) zbytearray;
             }
             break;
         case T_BNUM:
             {
-                BigNum *bignum;
+                ZBigNum *zbignum;
                 unsigned int wordlen, index;
 
                 cursor++;
-                wordlen = readword(&cursor);
-                bignum = newbnum(wordlen * WL);
+                wordlen = zreadword(&cursor);
+                err = znewbnum(&zbignum, wordlen * WL);
+                if (err != ZE_OK)
+                    return err;
                 for (index = 0; index < wordlen; index++)
-                    bignum->words[index] = readword(&cursor);
-                obj = (Zob *) bignum;
+                    zbignum->words[index] = zreadword(&cursor);
+                zob = (Zob *) zbignum;
             }
             break;
         case T_LIST:
             {
-                List *list;
+                ZList *zlist;
 
-                list = newlist();
+                err = znewlist(&zlist);
+                if (err != ZE_OK)
+                    return err;
                 cursor++;
-                while (*cursor != '\0')
-                    /* WARNING: Require reference sharing! */
-                    /* Copyied append will cause memory leak! */
-                    appitem(list, eval(context, tmp, &cursor));
+                while (*cursor != '\0') {
+                    Zob *item;
+
+                    err = zeval(zcontext, tmp, &cursor, &item);
+                    if (err != ZE_OK)
+                        return err;
+                    err = zlappend(zlist, item);
+                    if (err != ZE_OK)
+                        return err;
+                }
                 cursor++; /* Skip LIST_END. */
-                obj = (Zob *) list;
+                zob = (Zob *) zlist;
             }
             break;
         case T_DICT:
             {
-                Dict *dict;
+                /* FIXME: should prevent memory leak in duplicated keys. */
+                ZDict *zdict;
                 Zob *key, *value;
+                ZError err;
 
-                dict = newdict();
+                err = znewdict(&zdict);
+                if (err != ZE_OK)
+                    return err;
                 cursor++;
                 while (*cursor != '\0') {
-                    /* WARNING: Require reference sharing! */
-                    /* Copyied key setting will cause memory leak! */
-                    key = eval(context, tmp, &cursor);
-                    value = eval(context, tmp, &cursor);
-                    setkey(dict, key, value);
+                    err = zeval(zcontext, tmp, &cursor, &key);
+                    if (err != ZE_OK)
+                        return err;
+                    err = zeval(zcontext, tmp, &cursor, &value);
+                    if (err != ZE_OK)
+                        return err;
+                    err = zdset(zdict, key, value);
+                    if (err != ZE_OK)
+                        return err;
                 }
                 cursor++; /* Skip DICT_END. */
-                obj = (Zob *) dict;
+                zob = (Zob *) zdict;
             }
             break;
         case CALLSTART:
             /* Function Call. */
             cursor++;
-            obj = feval(context, tmp, &cursor);
+            err = zfeval(zcontext, tmp, &cursor, &zob);
+            if (err != ZE_OK)
+                return err;
             cursor++; /* Skip CALL_END. */
             break;
         default:
             /* Name. */
-            obj = nameval(context, &cursor);
+            err = znameval(zcontext, &cursor, &zob);
+            if (err != ZE_OK)
+                return err;
     }
-    appitem(tmp, obj);
     *entry = cursor;
-    return obj;
+    *pzob = zob;
+    return zlappend(tmp, *pzob);
 }
 
-Zob *
-nameval(Context *context, char **entry)
+ZError
+znameval(ZContext *zcontext, char **entry, Zob **pzob)
 {
-    Zob *obj;
-    ByteArray *key;
+    ZByteArray *key;
     char *cursor = *entry;
+    Zob *zob = *pzob;
+    ZError err;
 
-    key = yarrfromstr(cursor);
-    obj = getincontext(context, (Zob *) key, EMPTY);
-    delyarr(&key);
-    if (obj == EMPTY) {
-        raiseNameNotDefined(cursor);
-        exit(EXIT_FAILURE);
+    err = zyarrfromstr(&key, cursor);
+    if (err != ZE_OK)
+        return err;
+    if (zgetincontext(zcontext, (Zob *) key, &zob) == 0) {
+        zdelyarr(&key);
+        return ZE_NAME_NOT_DEFINED;
     }
+    zdelyarr(&key);
     cursor += strlen(cursor) + 1; /* Skip STRING_END. */
     *entry = cursor;
-    return obj;
+    *pzob = zob;
+    return ZE_OK;
 }
 
-Zob *
-feval(Context *context, List *tmp, char **entry)
+ZError
+zfeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pret)
 {
-    Zob *ret;
-    Func *func;
-    List *args;
-    ByteArray *key;
+    ZFunc *zfunc;
+    ZList *args;
+    ZByteArray *key;
     char *fname, *cursor = *entry;
+    Zob *ret = *pret;
+    ZError err;
 
-    /* Get func. */
-    key = yarrfromstr(cursor);
-    func = (Func *) getincontext(context, (Zob *) key, EMPTY);
-    fname = cursor;
-    if ((Zob *) func == EMPTY) {
-        raiseFunctionNameNotDefined(fname);
-        exit(EXIT_FAILURE);
+    /* Get zfunc. */
+    err = zyarrfromstr(&key, cursor);
+    if (err != ZE_OK)
+        return err;
+    if (zgetincontext(zcontext, (Zob *) key, (Zob **) &zfunc) == 0) {
+        zdelyarr(&key);
+        return ZE_FUNCTION_NAME_NOT_DEFINED;
     }
+    fname = cursor;
     cursor += strlen(cursor) + 1; /* Skip STRING_END. */
-    delyarr(&key);
+    zdelyarr(&key);
 
     /* Get arg list. */
-    args = newlist();
-    while (*cursor != CALLEND)
-        /* WARNING: Require reference sharing! */
-        /* Copyied append will cause memory leak! */
-        appitem(args, eval(context, tmp, &cursor));
-    *entry = cursor;
-    if (args->length != func->arity) {
-        raiseArityError(args->length, func->arity, fname);
-        exit(EXIT_FAILURE);
+    err = znewlist(&args);
+    if (err != ZE_OK)
+        return err;
+    while (*cursor != CALLEND) {
+        Zob *arg;
+
+        err = zeval(zcontext, tmp, &cursor, &arg);
+        if (err != ZE_OK) {
+            zdellist(&args);
+            return err;
+        }
+        err = zlappend(args, arg);
+        if (err != ZE_OK) {
+            zdellist(&args);
+            return err;
+        }
     }
-    if (*(func->fimp)) {
+    *entry = cursor;
+    if (args->length != zfunc->arity) {
+        zdellist(&args);
+        return ZE_ARITY_ERROR;
+    }
+    if (*(zfunc->fimp)) {
         char *zapfunc;
-        Node *item;
+        ZNode *item;
+        unsigned char be;
 
         /* Call zap function. */
-        pushlocal(context);
-        zapfunc = ((HighFunc *) func->fimp)->func;
+        err = zpushlocal(zcontext);
+        if (err != ZE_OK) {
+            zdellist(&args);
+            return err;
+        }
+        zapfunc = ((ZHighFunc *) zfunc->fimp)->func;
         item = args->first;
         while (*zapfunc != '\0') {
-            key = yarrfromstr(zapfunc);
-            setincontext(context, (Zob *) key, item->object);
+            err = zyarrfromstr(&key, zapfunc);
+            if (err != ZE_OK) {
+                zdellist(&args);
+                return err;
+            }
+            err = zsetincontext(zcontext, (Zob *) key, item->object);
+            if (err != ZE_OK) {
+                zdellist(&args);
+                zdelyarr(&key);
+                return err;
+            }
             zapfunc += strlen(zapfunc) + 1;
             item = item->next;
         }
         zapfunc++;
-        run_block(context, tmp, 0, &zapfunc);
-        ret = poplocal(context);
+        be = 0;
+        err = zrun_block(zcontext, tmp, 0, &zapfunc, &be);
+        if (err != ZE_OK) {
+            zdellist(&args);
+            return err;
+        }
+        err = zpoplocal(zcontext, &ret);
+        if (err != ZE_OK) {
+            zdellist(&args);
+            return err;
+        }
     }
     else {
         /* Call C function. */
-        ret = ((LowFunc *) func->fimp)->func(args);
+        err = ((ZLowFunc *) zfunc->fimp)->func(args, &ret);
+        if (err != ZE_OK) {
+            zdellist(&args);
+            return err;
+        }
     }
-    dellist(&args);
-    return ret;
+    zdellist(&args);
+    *pret = ret;
+    return ZE_OK;
 }
 
 void
-skip_assign(char **entry)
+zskip_assign(char **entry)
 {
     char *cursor = *entry;
 
@@ -432,33 +561,47 @@ skip_assign(char **entry)
     *entry = cursor;
 }
 
-void
-assign(Context *context, Zob *value, char **entry)
+ZError
+zassign(ZContext *zcontext, Zob *value, char **entry)
 {
-    ByteArray *key;
+    ZByteArray *key;
     char *cursor = *entry;
+    unsigned int wdlen;
+    ZError err;
 
     while (*cursor != '\0') {
-        key = yarrfromstr(cursor);
+        err = zyarrfromstr(&key, cursor);
+        if (err != ZE_OK)
+            return err;
         cursor += strlen(cursor) + 1; /* Skip NAME_END. */
-        if (setincontext(context, (Zob *) key, value) == 0)
-            delyarr(&key);
+        wdlen = zdlength(zcwdict(zcontext));
+        err = zsetincontext(zcontext, (Zob *) key, value);
+        if (err != ZE_OK) {
+            zdelyarr(&key);
+            return err;
+        }
+        if (zdlength(zcwdict(zcontext)) == wdlen)
+            zdelyarr(&key);
     }
     cursor++; /* Skip ASSIGN_END. */
     *entry = cursor;
+    return ZE_OK;
 }
 
-void
-runstatement(Context *context, List *tmp, char **entry)
+ZError
+zrunstatement(ZContext *zcontext, ZList *tmp, char **entry)
 {
     Zob *value;
+    ZError err;
 
-    value = eval(context, tmp, &(*entry));
-    assign(context, value, &(*entry));
+    err = zeval(zcontext, tmp, &(*entry), &value);
+    if (err != ZE_OK)
+        return err;
+    return zassign(zcontext, value, &(*entry));
 }
 
 void
-skip_block(char **entry)
+zskip_block(char **entry)
 {
     char *cursor = *entry;
 
@@ -471,7 +614,7 @@ skip_block(char **entry)
                 cursor += 2;
             else if (*cursor == RETURN) {
                 cursor++;
-                skip_expr(&cursor);
+                zskip_expr(&cursor);
             }
         }
         else if (*cursor == DELETE) {
@@ -482,24 +625,24 @@ skip_block(char **entry)
             cursor++;
             if (*cursor == IF) {
                 cursor++;
-                skip_expr(&cursor);
-                skip_block(&cursor);
+                zskip_expr(&cursor);
+                zskip_block(&cursor);
             }
             while (*cursor == BLOCK  &&
                    *(cursor + 1) == ELIF) {
                 cursor += 2;
-                skip_expr(&cursor);
-                skip_block(&cursor);
+                zskip_expr(&cursor);
+                zskip_block(&cursor);
             }
             if (*cursor == BLOCK  &&
                 *(cursor + 1) == ELSE) {
                 cursor += 2;
-                skip_block(&cursor);
+                zskip_block(&cursor);
             }
             else if (*cursor == WHILE) {
                 cursor++;
-                skip_expr(&cursor);
-                skip_block(&cursor);
+                zskip_expr(&cursor);
+                zskip_block(&cursor);
             }
             else if (*cursor == DEF) {
                 cursor++;
@@ -507,119 +650,159 @@ skip_block(char **entry)
                 while (*cursor != '\0')
                     cursor += strlen(cursor) + 1;
                 cursor++;
-                skip_block(&cursor);
+                zskip_block(&cursor);
             }
         }
         else {
             /* Statement. */
-            skip_expr(&cursor);
-            skip_assign(&cursor);
+            zskip_expr(&cursor);
+            zskip_assign(&cursor);
         }
     }
     cursor += 2;
     *entry = cursor;
 }
 
-unsigned char
-run_block(Context *context, List *tmp, char looplev, char **entry)
+ZError
+zrun_block(ZContext *zcontext,
+          ZList *tmp,
+          char looplev,
+          char **entry,
+          unsigned char *be)
 {
     char *cursor = *entry;
     int truth;
-    unsigned char be;
+    ZError err;
 
     while (*cursor != BLOCKEXIT) {
         if (*cursor == DELETE) {
-            ByteArray *key;
+            ZByteArray *key;
 
             cursor++;
-            key = yarrfromstr(cursor);
-            if (hasincontext(context, (Zob *) key))
-                remincontext(context, (Zob *) key);
-            else {
-                raiseNameNotDefined(cursor);
-                exit(EXIT_FAILURE);
+            err = zyarrfromstr(&key, cursor);
+            if (err != ZE_OK)
+                return err;
+            if (zremincontext(zcontext, (Zob *) key) == 0) {
+                zdelyarr(&key);
+                return ZE_NAME_NOT_DEFINED;
             }
-            delyarr(&key);
+            zdelyarr(&key);
             cursor += strlen(cursor) + 1;
         }
         else if (*cursor == BLOCK) {
             cursor++;
             if (*cursor == IF) {
                 int ok = 0;
+                Zob *zob;
 
                 cursor++;
-                truth = tstobj(eval(context, tmp, &cursor));
+                err = zeval(zcontext, tmp, &cursor, &zob);
+                if (err != ZE_OK)
+                    return err;
+                truth = ztstobj(zob);
+                if (err != ZE_OK)
+                    return err;
                 if (truth) {
-                    be = run_block(context, tmp, looplev, &cursor);
-                    if (be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
-                        return be;
+                    err = zrun_block(zcontext, tmp, looplev, &cursor, be);
+                    if (err != ZE_OK)
+                        return err;
+                    if (*be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
+                        return ZE_OK;
                     ok = 1;
                 }
                 else
-                    skip_block(&cursor);
+                    zskip_block(&cursor);
                 while (*cursor == BLOCK  &&
                        *(cursor + 1) == ELIF) {
                     cursor += 2;
                     if (ok) {
-                        skip_expr(&cursor);
-                        skip_block(&cursor);
+                        zskip_expr(&cursor);
+                        zskip_block(&cursor);
                     }
                     else {
-                        truth = tstobj(eval(context, tmp, &cursor));
+                        err = zeval(zcontext, tmp, &cursor, &zob);
+                        if (err != ZE_OK)
+                            return err;
+                        truth = ztstobj(zob);
+                        if (err != ZE_OK)
+                            return err;
                         if (truth) {
-                            be = run_block(context, tmp, looplev, &cursor);
-                            if (be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
-                                return be;
+                            err = zrun_block(zcontext, tmp, looplev,
+                                             &cursor, be);
+                            if (err != ZE_OK)
+                                return err;
+                            if (*be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
+                                return ZE_OK;
                             ok = 1;
                         }
                         else
-                            skip_block(&cursor);
+                            zskip_block(&cursor);
                     }
                 }
                 if (*cursor == BLOCK  &&
                     *(cursor + 1) == ELSE) {
                     cursor += 2;
                     if (ok)
-                        skip_block(&cursor);
+                        zskip_block(&cursor);
                     else {
-                        be = run_block(context, tmp, looplev, &cursor);
-                        if (be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
-                            return be;
+                        err = zrun_block(zcontext, tmp, looplev,
+                                         &cursor, be);
+                        if (err != ZE_OK)
+                            return err;
+                        if (*be & (BE_BREAK | BE_CONTINUE | BE_RETURN))
+                            return ZE_OK;
                     }
                 }
             }
             else if (*cursor == WHILE) {
                 char *cond, *block, *blockend = NULL;
                 char *b, *c;
+                Zob *zob;
 
                 cursor++;
                 cond = cursor;
-                skip_expr(&cursor);
+                zskip_expr(&cursor);
                 block = cursor;
                 c = cond;
-                truth = tstobj(eval(context, tmp, &c));
+                err = zeval(zcontext, tmp, &c, &zob);
+                if (err != ZE_OK)
+                    return err;
+                truth = ztstobj(zob);
+                if (err != ZE_OK)
+                    return err;
                 while (truth) {
                     b = block;
-                    be = run_block(context, tmp, looplev + 1, &b);
-                    if (be & BE_RETURN)
-                        return be;
-                    if (be & BE_BREAK) {
-                        if (be - BE_BREAK > 0)
+                    err = zrun_block(zcontext, tmp, looplev + 1, &b, be);
+                    if (err != ZE_OK)
+                        return err;
+                    if (*be & BE_RETURN)
+                        return ZE_OK;
+                    if (*be & BE_BREAK) {
+                        if (*be - BE_BREAK > 0) {
                             /* Propagate. */
-                            return be - 1;
+                            (*be)--;
+                            return ZE_OK;
+                        }
                         break;
                     }
                     blockend = b;
                     c = cond;
-                    truth = tstobj(eval(context, tmp, &c));
-                    if (be & BE_CONTINUE)
+                    err = zeval(zcontext, tmp, &c, &zob);
+                    if (err != ZE_OK)
+                        return err;
+                    truth = ztstobj(zob);
+                    if (err != ZE_OK)
+                        return err;
+                    if (*be & BE_CONTINUE)
                         if (!truth)
-                            if (be - BE_CONTINUE > 0)
+                            if (*be - BE_CONTINUE > 0) {
                                 /* Propagate. */
-                                return be - 1;
+                                (*be)--;
+                                return ZE_OK;
+                            }
                 }
                 if (blockend == NULL)
-                    skip_block(&cursor);
+                    zskip_block(&cursor);
                 else
                     cursor = blockend;
             }
@@ -628,9 +811,10 @@ run_block(Context *context, List *tmp, char looplev, char **entry)
                 char *name;
                 char *zapfunc;
                 unsigned char arity = 0;
-                Func *func;
-                HighFunc *highfunc;
-                ByteArray *key;
+                unsigned int wdlen;
+                ZFunc *zfunc;
+                ZHighFunc *zhighfunc;
+                ZByteArray *key;
 
                 cursor++;
                 name = cursor;
@@ -641,60 +825,76 @@ run_block(Context *context, List *tmp, char looplev, char **entry)
                     cursor += strlen(cursor) + 1;
                 }
                 cursor++;
-                skip_block(&cursor);
-                highfunc = newhighfunc();
-                highfunc->func = zapfunc;
-                func = newfunc((FImp *) highfunc, arity);
-                key = yarrfromstr(name);
-                if (setincontext(context, (Zob *) key, (Zob *) func) == 0)
-                    delyarr(&key);
+                zskip_block(&cursor);
+                err = znewhighfunc(&zhighfunc);
+                if (err != ZE_OK)
+                    return err;
+                zhighfunc->func = zapfunc;
+                err = znewfunc(&zfunc, (FImp *) zhighfunc, arity);
+                if (err != ZE_OK)
+                    return err;
+                err = zyarrfromstr(&key, name);
+                if (err != ZE_OK)
+                    return err;
+                wdlen = zdlength(zcwdict(zcontext));
+                err = zsetincontext(zcontext, (Zob *) key, (Zob *) zfunc);
+                if (err != ZE_OK)
+                    return err;
+                if (zdlength(zcwdict(zcontext)) == wdlen)
+                    zdelyarr(&key);
             }
         }
         else {
             /* Statement. */
-            runstatement(context, tmp, &cursor);
+            err = zrunstatement(zcontext, tmp, &cursor);
+            if (err != ZE_OK)
+                return err;
             /* Garbage Collection. */
-            emptylist(tmp);
+            zlempty(tmp);
         }
     }
     cursor++;
     if (*cursor == END) {
         cursor++;
         *entry = cursor;
-        return BE_END;
+        *be = BE_END;
+        return ZE_OK;
     }
     if (*cursor == BREAK) {
         char lev;
 
         cursor++;
         lev = *cursor;
-        if (lev >= looplev) {
-            raise("Break without loop.");
-            exit(EXIT_FAILURE);
-        }
-        return BE_BREAK | lev;
+        if (lev >= looplev)
+            return ZE_BREAK_WITHOUT_LOOP;
+        *be = BE_BREAK | lev;
+        return ZE_OK;
     }
     if (*cursor == CONTINUE) {
         char lev;
 
         cursor++;
         lev = *cursor;
-        if (lev >= looplev) {
-            raise("Continue without loop.");
-            exit(EXIT_FAILURE);
-        }
-        return BE_CONTINUE | lev;
+        if (lev >= looplev)
+            return ZE_CONTINUE_WITHOUT_LOOP;
+        *be = BE_CONTINUE | lev;
+        return ZE_OK;
     }
     if (*cursor == RETURN) {
-        ByteArray *key;
+        ZByteArray *key;
         Zob *ret;
 
         /* Function Return. */
         cursor++;
-        key = yarrfromstr("_ret_");
-        ret = eval(context, tmp, &cursor);
-        setincontext(context, (Zob *) key, ret);
-        return 0;
+        err = zyarrfromstr(&key, "_ret_");
+        if (err != ZE_OK)
+            return err;
+        err = zeval(zcontext, tmp, &cursor, &ret);
+        if (err != ZE_OK)
+            return err;
+        zsetincontext(zcontext, (Zob *) key, ret);
+        *be = 0;
+        return ZE_OK;
     }
-    return 0;
+    return ZE_OK;
 }

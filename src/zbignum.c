@@ -16,10 +16,10 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* BigNum Type */
+/* ZBigNum Type */
 
-/* A BigNum object stores a number on an array of words (unsigned int).
- * The words are stored in little-endian: least significant word first.
+/* A ZBigNum object stores a number on an array of words (unsigned int).
+ * The words are stored in little-endian: least significant zint first.
  * Bits inside words are in big-endian: most significant bit first.
  */
 
@@ -33,22 +33,22 @@
 #include "zbyte.h"
 #include "zbignum.h"
 
-/* Divides str by two in place.
- * Return previous last character in str.
- * First character in str should not be '0'.
+/* Divide 's' by two in place.
+ * Return previous last character in 's'.
+ * First character in 's' should not be '0'.
  */
 char
-halfstr(char *str)
+zhalfstr(char *s)
 {
     char curchar = '0', nextchar;
     char outchar, lastchar = '0';
     int index = -1, nonzero = 0, back = 0;
 
     while (curchar != '\0') {
-        nextchar = *(str + index + 1);
+        nextchar = *(s + index + 1);
         outchar = (nextchar - '0') >> 1;
         outchar += 5 * (curchar & 1) + '0';
-        *(str + index + 1 - back) = outchar;
+        *(s + index + 1 - back) = outchar;
         if (outchar == '0' && nonzero == 0)
             back++;
         else nonzero = 1;
@@ -58,258 +58,306 @@ halfstr(char *str)
         index++;
     }
     if (index == back) {
-        *str = '0';
-        *(str + 1) = 0;
+        *s = '0';
+        *(s + 1) = 0;
     }
     else
-        *(str + index - back) = 0;
+        *(s + index - back) = 0;
     return lastchar;
 }
 
-unsigned int
-strbitlen(char *str)
+/* Copy the number of bits of the number in 's' to 'bitlen'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zstrbitlen(char *s, unsigned int *bitlen)
 {
-    unsigned int bitlen = 0;
     unsigned int strlength;
     char *tmpstr;
 
-    strlength = strlen(str);
+    strlength = strlen(s);
     tmpstr = (char *) malloc(strlength + 1);
-    if (tmpstr == NULL) {
-        raiseOutOfMemory("strbitlen");
-        exit(EXIT_FAILURE);
-    }
-    memcpy(tmpstr, str, strlength + 1);
+    if (tmpstr == NULL)
+        return ZE_OUT_OF_MEMORY;
+    memcpy(tmpstr, s, strlength + 1);
+    *bitlen = 0;
     while (*tmpstr != '0') {
-        halfstr(tmpstr);
-        bitlen++;
+        zhalfstr(tmpstr);
+        (*bitlen)++;
     }
     free(tmpstr);
     tmpstr = NULL;
-    return bitlen;
+    return ZE_OK;
 }
 
-BigNum *
-newbnum(unsigned int length)
+/* Create a new ZBigNum in 'zdict'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+znewbnum(ZBigNum **zbignum, unsigned int length)
 {
-    BigNum *bignum;
     unsigned int *array;
     unsigned int wordlen;
 
     if (length < 32)
         length = 32;
-    bignum = (BigNum *) malloc(sizeof(BigNum));
-    if (bignum == NULL) {
-        raiseOutOfMemory("newbnum");
-        exit(EXIT_FAILURE);
-    }
+    *zbignum = (ZBigNum *) malloc(sizeof(ZBigNum));
+    if (*zbignum == NULL)
+        return ZE_OUT_OF_MEMORY;
     wordlen = length / WL;
     if (length % WL)
         wordlen++;
     array = (unsigned int *) calloc(wordlen, sizeof(unsigned int));
-    if (array == NULL) {
-        raiseOutOfMemory("newbnum");
-        exit(EXIT_FAILURE);
-    }
-    bignum->type = T_BNUM;
-    bignum->length = length;
-    bignum->words = array;
-    bignum->refc = 0;
-    return bignum;
+    if (array == NULL)
+        return ZE_OUT_OF_MEMORY;
+    (*zbignum)->type = T_BNUM;
+    (*zbignum)->length = length;
+    (*zbignum)->words = array;
+    (*zbignum)->refc = 0;
+    return ZE_OK;
 }
 
-BigNum *
-bnumfromstr(char *str)
+/* Create a new ZBigNum in 'zbignum'.
+ * Convert 's' to a number and store it in 'zbignum'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zbnumfromstr(ZBigNum **zbignum, char *s)
 {
-    BigNum *bignum;
     unsigned int length;
     int index = 0;
     char lastchar;
+    ZError err;
 
-    length = strbitlen(str);
-    bignum = newbnum(length);
+    err = zstrbitlen(s, &length);
+    if (err != ZE_OK)
+        return err;
+    err = znewbnum(zbignum, length);
+    if (err != ZE_OK)
+        return err;
     while (length > 0) {
-        lastchar = halfstr(str);
+        lastchar = zhalfstr(s);
         if (lastchar % 2)
-            bignum->words[index / WL] |= 1 << (index % WL);
+            (*zbignum)->words[index / WL] |= 1 << (index % WL);
         index++;
         length--;
     }
-    return bignum;
+    return ZE_OK;
 }
 
+/* Remove 'zbignum' from memory. */
 void
-delbnum(BigNum **bignum)
+zdelbnum(ZBigNum **zbignum)
 {
-    free((*bignum)->words);
-    (*bignum)->words = NULL;
-    free(*bignum);
-    *bignum = NULL;
+    free((*zbignum)->words);
+    (*zbignum)->words = NULL;
+    free(*zbignum);
+    *zbignum = NULL;
 }
 
-BigNum *
-cpybnum(BigNum *bignum)
+/* Create a new copy of 'source' in 'dest'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zcpybnum(ZBigNum *source, ZBigNum **dest)
 {
     int index;
     unsigned int wordlen;
-    BigNum *copy;
+    ZError err;
 
-    wordlen = bignum->length / WL;
-    if (bignum->length % WL)
+    wordlen = source->length / WL;
+    if (source->length % WL)
         wordlen++;
-    copy = newbnum(bignum->length);
+    err = znewbnum(dest, source->length);
+    if (err != ZE_OK)
+        return err;
     for (index = wordlen - 1; index >=0; index--)
-        *(copy->words + index) = *(bignum->words + index);
-    return copy;
+        *((*dest)->words + index) = *(source->words + index);
+    return ZE_OK;
 }
 
-Byte *
-getbit(BigNum *bignum, int index)
-{
-    Byte *byte = newbyte();
-
-    if (index < 0)
-        index += bignum->length;
-    if (index < 0 || index >= bignum->length) {
-        raiseIndexOutOfRange("getbit", index, bignum->length);
-        exit(EXIT_FAILURE);
-    }
-    if (bignum->words[index / WL] & (1 << (index % WL))) {
-        byte->value = 1;
-        return byte;
-    }
-    byte->value = 0;
-    return byte;
-}
-
-void
-setbit(BigNum *bignum, int index)
-{
-    if (index < 0)
-        index += bignum->length;
-    if (index < 0 || index >= bignum->length) {
-        raiseIndexOutOfRange("setbit", index, bignum->length);
-        exit(EXIT_FAILURE);
-    }
-    bignum->words[index / WL] |= 1 << (index % WL);
-}
-
-void
-rstbit(BigNum *bignum, int index)
-{
-    if (index < 0)
-        index += bignum->length;
-    if (index < 0 || index >= bignum->length) {
-        raiseIndexOutOfRange("rstbit", index, bignum->length);
-        exit(EXIT_FAILURE);
-    }
-    bignum->words[index / WL] &= ~(1 << (index % WL));
-}
-
-void
-lshiftbnum(BigNum *bignum, unsigned int shift)
-{
-    int wordshift, bitshift, wordlen, index;
-
-    wordshift = shift / WL;
-    bitshift = shift % WL;
-    wordlen = bignum->length / WL;
-    if (bignum->length % WL)
-        wordlen++;
-    if (wordshift) {
-        for (index = wordlen - 1; index >= wordshift; index--)
-            bignum->words[index] = bignum->words[index - wordshift];
-        for (; index >= 0; index--)
-            bignum->words[index] = 0;
-    }
-    if (bitshift) {
-        unsigned int word;
-
-        for (index = wordlen - 1; index > wordshift; index--) {
-            bignum->words[index] <<= bitshift;
-            word = bignum->words[index - 1] >> (WL - bitshift);
-            bignum->words[index] |= word;
-        }
-        bignum->words[index] <<= bitshift;
-    }
-}
-
-void
-rshiftbnum(BigNum *bignum, unsigned int shift)
-{
-    int wordshift, bitshift, wordlen, index;
-
-    wordshift = shift / WL;
-    bitshift = shift % WL;
-    wordlen = bignum->length / WL;
-    if (bignum->length % WL)
-        wordlen++;
-    if (wordshift) {
-        for (index = 0; index < wordlen - wordshift; index++)
-            bignum->words[index] = bignum->words[index + wordshift];
-        for (; index < wordlen; index++)
-            bignum->words[index] = 0;
-    }
-    if (bitshift) {
-        unsigned int word;
-
-        for (index = 0; index < wordlen - wordshift - 1; index++) {
-            bignum->words[index] >>= bitshift;
-            word = bignum->words[index + 1] << (WL - bitshift);
-            bignum->words[index] |= word;
-        }
-        bignum->words[index] >>= bitshift;
-    }
-}
-
+/* Test the truth value of 'zbignum'.
+ * If 'zbignum' is 0, return zero.
+ * Otherwise, return nonzero.
+ */
 int
-tstbnum(BigNum *bignum)
+ztstbnum(ZBigNum *zbignum)
 {
     /* NYI. */
-    if (bignum->length)
+    if (zbignum->length)
         return 1;
     else
         return 0;
 }
 
+/* Compare 'zbignum' and 'other'.
+ * If they are equal, return zero.
+ * Otherwise, return nonzero.
+ */
 int
-cmpbnum(BigNum *bignum, BigNum *other)
+zcmpbnum(ZBigNum *zbignum, ZBigNum *other)
 {
-    if (bignum->length != other->length)
+    if (zbignum->length != other->length)
         return 1;
     else {
         int index;
         unsigned int wordlen;
         unsigned int mask;
 
-        wordlen = bignum->length / WL;
-        if (bignum->length % WL)
+        wordlen = zbignum->length / WL;
+        if (zbignum->length % WL)
             wordlen++;
         for (index = 0; index < wordlen - 1; index++)
-            if (bignum->words[index] != other->words[index])
+            if (zbignum->words[index] != other->words[index])
                 return 1;
-        mask = (1 << (bignum->length % WL)) - 1;
-        if ((bignum->words[index] & mask) != (other->words[index] & mask))
+        mask = (1 << (zbignum->length % WL)) - 1;
+        if ((zbignum->words[index] & mask) != (other->words[index] & mask))
             return 1;
         return 0;
     }
 }
 
+/* Print the textual representation of 'zbignum' on 'buffer'.
+ * Return the number of bytes writen.
+ */
+/* FIXME: should print decimal representation, not binary. */
 unsigned int
-repbnum(char *buffer, BigNum *bignum)
+zrepbnum(char *buffer, ZBigNum *zbignum)
 {
     char *tmpbff = buffer;
     int index;
 
     *tmpbff = '|';
     tmpbff++;
-    for (index = bignum->length - 1; index >= 0; index--) {
-        if (bignum->words[index / WL] & (1 << (index % WL)))
+    for (index = zbignum->length - 1; index >= 0; index--) {
+        if (zbignum->words[index / WL] & (1 << (index % WL)))
             sprintf(tmpbff++, "%u", 1);
         else
             sprintf(tmpbff++, "%u", 0);
     }
     *tmpbff++ = '|';
     *tmpbff = '\0';
-    return bignum->length + 2;
+    return zbignum->length + 2;
+}
+
+/* Return the length of 'zbignum' in bits. */
+unsigned int
+znlength(ZBigNum *zbignum)
+{
+    return zbignum->length;
+}
+
+/* Copy the 'index'-th bit of 'zbignum' to 'value'.
+ * 'value' must be preallocated with znewbyte().
+ * If 'index' is negative, use znlength('zbytearray') + 'index'.
+ * If 'index' is out of range, return ZE_INDEX_OUT_OF_RANGE.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+znget(ZBigNum *zbignum, int index, ZByte **value)
+{
+    if (index < 0)
+        index += zbignum->length;
+    if (index < 0 || index >= zbignum->length)
+        return ZE_INDEX_OUT_OF_RANGE;
+    if (zbignum->words[index / WL] & (1 << (index % WL))) {
+        (*value)->value = 1;
+        return ZE_OK;
+    }
+    (*value)->value = 0;
+    return ZE_OK;
+}
+
+/* Copy 'zbyte' to the 'index'-th bit of 'zbignum'.
+ * If 'index' is negative, use znlength('zbignum') + 'index'.
+ * If 'index' is out of range, return ZE_INDEX_OUT_OF_RANGE.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+znset(ZBigNum *zbignum, int index, ZByte *zbyte)
+{
+    if (index < 0)
+        index += zbignum->length;
+    if (index < 0 || index >= zbignum->length)
+        return ZE_INDEX_OUT_OF_RANGE;
+    zbignum->words[index / WL] |= 1 << (index % WL);
+    return ZE_OK;
+}
+
+/* Reset the 'index'-th bit of 'zbignum'.
+ * If 'index' is negative, use znlength('zbignum') + 'index'.
+ * If 'index' is out of range, return ZE_INDEX_OUT_OF_RANGE.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+znrst(ZBigNum *zbignum, int index)
+{
+    if (index < 0)
+        index += zbignum->length;
+    if (index < 0 || index >= zbignum->length)
+        return ZE_INDEX_OUT_OF_RANGE;
+    zbignum->words[index / WL] &= ~(1 << (index % WL));
+    return ZE_OK;
+}
+
+/* Shift 'zbignum' 'shift' bits to the left. */
+void
+znlshift(ZBigNum *zbignum, unsigned int shift)
+{
+    int wordshift, bitshift, wordlen, index;
+
+    wordshift = shift / WL;
+    bitshift = shift % WL;
+    wordlen = zbignum->length / WL;
+    if (zbignum->length % WL)
+        wordlen++;
+    if (wordshift) {
+        for (index = wordlen - 1; index >= wordshift; index--)
+            zbignum->words[index] = zbignum->words[index - wordshift];
+        for (; index >= 0; index--)
+            zbignum->words[index] = 0;
+    }
+    if (bitshift) {
+        unsigned int zint;
+
+        for (index = wordlen - 1; index > wordshift; index--) {
+            zbignum->words[index] <<= bitshift;
+            zint = zbignum->words[index - 1] >> (WL - bitshift);
+            zbignum->words[index] |= zint;
+        }
+        zbignum->words[index] <<= bitshift;
+    }
+}
+
+/* Shift 'zbignum' 'shift' bits to the right. */
+void
+znrshift(ZBigNum *zbignum, unsigned int shift)
+{
+    int wordshift, bitshift, wordlen, index;
+
+    wordshift = shift / WL;
+    bitshift = shift % WL;
+    wordlen = zbignum->length / WL;
+    if (zbignum->length % WL)
+        wordlen++;
+    if (wordshift) {
+        for (index = 0; index < wordlen - wordshift; index++)
+            zbignum->words[index] = zbignum->words[index + wordshift];
+        for (; index < wordlen; index++)
+            zbignum->words[index] = 0;
+    }
+    if (bitshift) {
+        unsigned int zint;
+
+        for (index = 0; index < wordlen - wordshift - 1; index++) {
+            zbignum->words[index] >>= bitshift;
+            zint = zbignum->words[index + 1] << (WL - bitshift);
+            zbignum->words[index] |= zint;
+        }
+        zbignum->words[index] >>= bitshift;
+    }
 }

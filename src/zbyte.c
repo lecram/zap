@@ -16,7 +16,7 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Byte Type */
+/* ZByte Type */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,58 +26,72 @@
 
 #include "zbyte.h"
 
-Byte *
-newbyte()
+/* Create a new ZByte in 'zbyte'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+znewbyte(ZByte **zbyte)
 {
-    Byte *byte;
-
-    byte = (Byte *) malloc(sizeof(Byte));
-    if (byte == NULL) {
-        raiseOutOfMemory("newbyte");
-        exit(EXIT_FAILURE);
-    }
-    byte->type = T_BYTE;
-    byte->refc = 0;
-    return byte;
+    *zbyte = (ZByte *) malloc(sizeof(ZByte));
+    if (*zbyte == NULL)
+        return ZE_OUT_OF_MEMORY;
+    (*zbyte)->type = T_BYTE;
+    (*zbyte)->refc = 0;
+    return ZE_OK;
 }
 
+/* Remove 'zbyte' from memory. */
 void
-delbyte(Byte **byte)
+zdelbyte(ZByte **zbyte)
 {
-    free(*byte);
-    *byte = NULL;
+    free(*zbyte);
+    *zbyte = NULL;
 }
 
-Byte *
-cpybyte(Byte *byte)
+/* Create a new copy of 'source' in 'dest'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zcpybyte(ZByte *source, ZByte **dest)
 {
-    Byte *copy;
+    ZError err;
 
-    copy = newbyte();
-    copy->value = byte->value;
-    return copy;
+    err = znewbyte(dest);
+    if (err != ZE_OK)
+        return err;
+    (*dest)->value = source->value;
+    return ZE_OK;
 }
 
+/* Test the truth value of 'zbyte'.
+ * Return 'zbyte->value'.
+ */
 int
-tstbyte(Byte *byte)
+ztstbyte(ZByte *zbyte)
 {
-    if (byte->value)
-        return 1;
-    else
-        return 0;
+    return (int) zbyte->value;
 }
 
+/* Compare 'zbyte' and 'other'.
+ * If they are equal, return zero.
+ * Otherwise, return nonzero.
+ */
 int
-cmpbyte(Byte *byte, Byte *other)
+zcmpbyte(ZByte *zbyte, ZByte *other)
 {
-    if (other->value == byte->value)
+    if (other->value == zbyte->value)
         return 0;
     else
         return 1;
 }
 
+/* Print the textual representation of 'zbyte' on 'buffer'.
+ * Return the number of bytes writen.
+ */
 unsigned int
-repbyte(char *buffer, Byte *byte)
+zrepbyte(char *buffer, ZByte *zbyte)
 {
-    return sprintf(buffer, "0x%02X", byte->value);
+    return sprintf(buffer, "0x%02X", zbyte->value);
 }

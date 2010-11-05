@@ -16,16 +16,16 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* None Type (header) */
+/* ZNone Type (header) */
 
 typedef struct {
     Zob type;
     unsigned char refc;
-} None;
+} ZNone;
 
-None *newnone();
-void delnone(None **none);
-None *cpynone(None *none);
-int tstnone(None *none);
-int cmpnone(None *none, None *other);
-unsigned int repnone(char *buffer, None *none);
+ZError znewnone(ZNone **znone);
+void zdelnone(ZNone **znone);
+ZError zcpynone(ZNone *source, ZNone **dest);
+int ztstnone(ZNone *znone);
+int zcmpnone(ZNone *znone, ZNone *other);
+unsigned int zrepnone(char *buffer, ZNone *znone);

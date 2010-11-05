@@ -16,22 +16,24 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Dict Type (header) */
+/* ZDict Type (header) */
 
 typedef struct {
     Zob type;
     unsigned char refc;
-    List *list;
-} Dict;
+    ZList *zlist;
+} ZDict;
 
-Dict *newdict();
-void deldict(Dict **dict);
-Dict *cpydict(Dict *dict);
-int haskey(Dict *dict, Zob *key);
-int setkey(Dict *dict, Zob *key, Zob *value);
-Zob *getkey(Dict *dict, Zob *key, Zob *defval);
-void remkey(Dict *dict, Zob *key);
-void update(Dict *dict, Dict *other);
-int tstdict(Dict *dict);
-int cmpdict(Dict *dict, Dict *other);
-unsigned int repdict(char *buffer, Dict *dict);
+ZError znewdict(ZDict **zdict);
+void zdeldict(ZDict **zdict);
+ZError zcpydict(ZDict *source, ZDict **dest);
+int ztstdict(ZDict *zdict);
+int zcmpdict(ZDict *zdict, ZDict *other);
+unsigned int zrepdict(char *buffer, ZDict *zdict);
+unsigned int zdlength(ZDict *zdict);
+ZError zdset(ZDict *zdict, Zob *key, Zob *value);
+int zdget(ZDict *zdict, Zob *key, Zob **value);
+ZError zdupdate(ZDict *zdict, ZDict *other);
+int zdremove(ZDict *zdict, Zob *key);
+void zdempty(ZDict *zdict);
+int zdhaskey(ZDict *zdict, Zob *key);

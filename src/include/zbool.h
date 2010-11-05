@@ -16,17 +16,17 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Bool Type (header) */
+/* ZBool Type (header) */
 
 typedef struct {
     Zob type;
     unsigned char refc;
     int value;
-} Bool;
+} ZBool;
 
-Bool *newbool();
-void delbool(Bool **bool);
-Bool *cpybool(Bool *bool);
-int tstbool(Bool *bool);
-int cmpbool(Bool *bool, Bool *other);
-unsigned int repbool(char *buffer, Bool *bool);
+ZError znewbool(ZBool **zbool);
+void zdelbool(ZBool **zbool);
+ZError zcpybool(ZBool *source, ZBool **dest);
+int ztstbool(ZBool *zbool);
+int zcmpbool(ZBool *zbool, ZBool *other);
+unsigned int zrepbool(char *buffer, ZBool *zbool);

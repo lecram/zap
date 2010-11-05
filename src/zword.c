@@ -16,7 +16,7 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Word Type */
+/* ZInt Type */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,58 +26,72 @@
 
 #include "zword.h"
 
-Word *
-newword()
+/* Create a new ZInt in 'zint'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+znewint(ZInt **zint)
 {
-    Word *word;
-
-    word = (Word *) malloc(sizeof(Word));
-    if (word == NULL) {
-        raiseOutOfMemory("newword");
-        exit(EXIT_FAILURE);
-    }
-    word->type = T_WORD;
-    word->refc = 0;
-    return word;
+    *zint = (ZInt *) malloc(sizeof(ZInt));
+    if (*zint == NULL)
+        return ZE_OUT_OF_MEMORY;
+    (*zint)->type = T_WORD;
+    (*zint)->refc = 0;
+    return ZE_OK;
 }
 
+/* Remove 'zint' from memory. */
 void
-delword(Word **word)
+zdelint(ZInt **zint)
 {
-    free(*word);
-    *word = NULL;
+    free(*zint);
+    *zint = NULL;
 }
 
-Word *
-cpyword(Word *word)
+/* Create a new copy of 'source' in 'dest'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zcpyint(ZInt *source, ZInt **dest)
 {
-    Word *copy;
+    ZError err;
 
-    copy = newword();
-    copy->value = word->value;
-    return copy;
+    err = znewint(dest);
+    if (err != ZE_OK)
+        return err;
+    (*dest)->value = source->value;
+    return ZE_OK;
 }
 
+/* Test the truth value of 'zint'.
+ * Return 'zint->value'.
+ */
 int
-tstword(Word *word)
+ztstint(ZInt *zint)
 {
-    if (word->value)
-        return 1;
-    else
-        return 0;
+    return (int) zint->value;
 }
 
+/* Compare 'zint' and 'other'.
+ * If they are equal, return zero.
+ * Otherwise, return nonzero.
+ */
 int
-cmpword(Word *word, Word *other)
+zcmpint(ZInt *zint, ZInt *other)
 {
-    if (other->value == word->value)
+    if (other->value == zint->value)
         return 0;
     else
         return 1;
 }
 
+/* Print the textual representation of 'zint' on 'buffer'.
+ * Return the number of bytes writen.
+ */
 unsigned int
-repword(char *buffer, Word *word)
+zrepint(char *buffer, ZInt *zint)
 {
-    return sprintf(buffer, "%u", word->value);
+    return sprintf(buffer, "%u", zint->value);
 }

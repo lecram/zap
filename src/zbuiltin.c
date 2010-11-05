@@ -44,111 +44,129 @@
 #include "zbuiltin.h"
 
 /* tname(o) */
-Zob *
-ztname(List *args)
+ZError
+z_tname(ZList *args, Zob **ret)
 {
-    return typename(args->first->object);
+    return ztypename(args->first->object, ret);
 }
 
 /* refc(o) */
-Zob *
-zrefc(List *args)
+ZError
+z_refc(ZList *args, Zob **ret)
 {
-    Byte *rval = newbyte();
+    ZError err;
 
-    rval->value = ((RefC *) args->first->object)->refc;
-    return (Zob *) rval;
+    err = znewbyte((ZByte **) ret);
+    if (err != ZE_OK)
+        return err;
+    ((ZByte *) *ret)->value = ((RefC *) args->first->object)->refc;
+    return ZE_OK;
 }
 
 /* print(s) */
-Zob *
-zprint(List *args)
+ZError
+z_print(ZList *args, Zob **ret)
 {
     char buffer[1024];
-    Word *rval = newword();
+    ZError err;
 
-    rval->value = repplain(buffer, (ByteArray *) args->first->object);
+    err = znewint((ZInt **) ret);
+    if (err != ZE_OK)
+        return err;
+    ((ZInt *) *ret)->value = zrepplain(buffer,
+                            (ZByteArray *) args->first->object);
     printf("%s", buffer);
-    return (Zob *) rval;
+    return ZE_OK;
 }
 
 /* repr(x) */
-Zob *
-zrepr(List *args)
+ZError
+z_repr(ZList *args, Zob **ret)
 {
     char buffer[1024];
-    ByteArray *rval;
 
-    repobj(buffer, args->first->object);
-    rval = yarrfromstr(buffer);
-    return (Zob *) rval;
+    zrepobj(buffer, args->first->object);
+    return zyarrfromstr((ZByteArray **) ret, buffer);
 }
 
 /* len(x) */
-Zob *
-zlen(List *args)
+ZError
+z_len(ZList *args, Zob **ret)
 {
-    Word *rval = newword();
     Zob *obj = args->first->object;
+    ZError err;
 
+    err = znewint((ZInt **) ret);
+    if (err != ZE_OK)
+        return err;
     switch (*obj) {
         case T_YARR:
-            rval->value = ((ByteArray *) obj)->length;
+            ((ZInt *) *ret)->value = zalength((ZByteArray *) obj);
             break;
         case T_LIST:
-            rval->value = ((List *) obj)->length;
+            ((ZInt *) *ret)->value = zllength((ZList *) obj);
             break;
         case T_DICT:
-            rval->value = ((Dict *) obj)->list->length / 2;
+            ((ZInt *) *ret)->value = zdlength((ZDict *) obj);
             break;
         default:
-            rval->value = 0;
+            ((ZInt *) *ret)->value = 0;
     }
-    return (Zob *) rval;
+    return ZE_OK;
 }
 
 /* arr(i) */
-Zob *
-zarr(List *args)
+ZError
+z_arr(ZList *args, Zob **ret)
 {
-    Zob *i, *a;
+    Zob *i;
+    ZError err;
 
     i = args->first->object;
-    a = (Zob *) newyarr(1);
-    ((ByteArray *) a)->bytes[0] = ((Byte *) i)->value;
-    return a;
+    err = znewyarr((ZByteArray **) ret, 1);
+    if (err != ZE_OK)
+        return err;
+    ((ZByteArray *) *ret)->bytes[0] = ((ZByte *) i)->value;
+    return ZE_OK;
 }
 
 /* concat(s1, s2) */
-Zob *
-zconcat(List *args)
+ZError
+z_concat(ZList *args, Zob **ret)
 {
-    Zob *s1, *s2;
+    Zob *s2;
+    ZError err;
 
-    s1 = args->first->object;
+    *ret = args->first->object;
     s2 = args->first->next->object;
-    concat((ByteArray *) s1, (ByteArray *) s2);
-    return (Zob *) s1;
+    err = zconcat((ZByteArray *) *ret, (ZByteArray *) s2);
+    return err;
 }
 
 /* get(d, k, dv) */
-Zob *
-zget(List *args)
+ZError
+z_get(ZList *args, Zob **ret)
 {
-    Zob *dict, *key, *defval;
-    Node *arg = args->first;
+    Zob *zdict, *key, *defval;
+    ZNode *arg = args->first;
+    ZError err;
 
-    dict = arg->object;
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
+    zdict = arg->object;
     key = arg->next->object;
     defval = arg->next->next->object;
-    return getkey((Dict *) dict, key, defval);
+    ((ZBool *) *ret)->value = zdget((ZDict *) zdict, key, &defval);
+    return ZE_OK;
 }
 
 /* +(a, b) */
-Zob *
-zsum(List *args)
+ZError
+z_sum(ZList *args, Zob **ret)
 {
     Zob *a, *b, *c;
+    ZError err;
 
     a = args->first->object;
     b = args->first->next->object;
@@ -161,108 +179,176 @@ zsum(List *args)
         case T_BYTE:
             switch (*b) {
                 case T_BYTE:
-                    c = (Zob *) newbyte();
-                    ((Byte *) c)->value = ((Byte *) a)->value +
-                                          ((Byte *) b)->value;
-                    return c;
+                    err = znewbyte((ZByte **) ret);
+                    if (err != ZE_OK)
+                        return err;
+                    ((ZByte *) *ret)->value = ((ZByte *) a)->value +
+                                              ((ZByte *) b)->value;
+                    return ZE_OK;
                 case T_WORD:
-                    c = (Zob *) newword();
-                    ((Word *) c)->value = ((Byte *) a)->value +
-                                          ((Word *) b)->value;
-                    return c;
+                    err = znewint((ZInt **) ret);
+                    if (err != ZE_OK)
+                        return err;
+                    ((ZInt *) *ret)->value = ((ZByte *) a)->value +
+                                             ((ZInt *) b)->value;
+                    return ZE_OK;
             }
         case T_WORD:
             switch (*b) {
                 case T_WORD:
-                    c = (Zob *) newword();
-                    ((Word *) c)->value = ((Word *) a)->value +
-                                          ((Word *) b)->value;
-                    return c;
+                    err = znewint((ZInt **) ret);
+                    if (err != ZE_OK)
+                        return err;
+                    ((ZInt *) *ret)->value = ((ZInt *) a)->value +
+                                             ((ZInt *) b)->value;
+                    return ZE_OK;
             }
     }
-    return (Zob *) newnone();
+    return ZE_OK;
 }
 
 /* ==(a, b) */
-Zob *
-zeq(List *args)
+ZError
+z_eq(ZList *args, Zob **ret)
 {
     Zob *a, *b;
-    Bool *rval = newbool();
+    ZError err;
 
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
     a = args->first->object;
     b = args->first->next->object;
-    rval->value = !cmpobj(a, b);
-    return (Zob *) rval;
+    ((ZBool *) *ret)->value = !zcmpobj(a, b);
+    return ZE_OK;
 }
 
 /* <(a, b) */
-Zob *
-zlt(List *args)
+ZError
+z_lt(ZList *args, Zob **ret)
 {
     Zob *a, *b;
-    Bool *rval = newbool();
+    ZError err;
 
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
     a = args->first->object;
     b = args->first->next->object;
-    rval->value = 1;
+    ((ZBool *) *ret)->value = 1;
     switch (*a) {
         case T_BYTE:
             switch (*b) {
                 case T_BYTE:
-                    rval->value = ((Byte *) a)->value < ((Byte *) b)->value;
+                    ((ZBool *) *ret)->value = ((ZByte *) a)->value <
+                                              ((ZByte *) b)->value;
                     break;
                 case T_WORD:
-                    rval->value = ((Byte *) a)->value < ((Word *) b)->value;
+                    ((ZBool *) *ret)->value = ((ZByte *) a)->value <
+                                              ((ZInt *) b)->value;
                     break;
             }
             break;
         case T_WORD:
             switch (*b) {
                 case T_BYTE:
-                    rval->value = ((Word *) a)->value < ((Byte *) b)->value;
+                    ((ZBool *) *ret)->value = ((ZInt *) a)->value <
+                                              ((ZByte *) b)->value;
                     break;
                 case T_WORD:
-                    rval->value = ((Word *) a)->value < ((Word *) b)->value;
+                    ((ZBool *) *ret)->value = ((ZInt *) a)->value <
+                                              ((ZInt *) b)->value;
                     break;
             }
     }
-    return (Zob *) rval;
+    return ZE_OK;
 }
 
-void
-regfunc(Dict *namespace,
-        Zob *(*cfunc)(List *args),
+/* Register 'cfunc' in 'namespace'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+regfunc(ZDict *namespace,
+        ZError (*func)(ZList *args, Zob **ret),
         char *name,
         unsigned char arity)
 {
-    Func *func;
-    LowFunc *lowfunc;
+    ZFunc *zfunc;
+    ZLowFunc *zlowfunc;
+    ZByteArray *key;
+    ZError err;
 
-    lowfunc = newlowfunc();
-    lowfunc->func = cfunc;
-    func = newfunc((FImp *) lowfunc, arity);
-    setkey(namespace,
-           (Zob *) yarrfromstr(name),
-           (Zob *) func);
+    err = znewlowfunc(&zlowfunc);
+    if (err != ZE_OK)
+        return err;
+    zlowfunc->func = func;
+    err = znewfunc(&zfunc, (FImp *) zlowfunc, arity);
+    if (err != ZE_OK) {
+        zdellowfunc(&zlowfunc);
+        return err;
+    }
+    err = zyarrfromstr(&key, name);
+    if (err != ZE_OK) {
+        zdellowfunc(&zlowfunc);
+        zdelfunc(&zfunc);
+        return err;
+    }
+    err = zdset(namespace, (Zob *) key, (Zob *) zfunc);
+    if (err != ZE_OK) {
+        zdellowfunc(&zlowfunc);
+        zdelfunc(&zfunc);
+        zdelyarr(&key);
+        return err;
+    }
+    return ZE_OK;
 }
 
-Dict *
-bbuild()
+/* Create a new ZDict with builtins names in 'builtins'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zbuild(ZDict **builtins)
 {
-    Dict *builtins = newdict();
+    ZError err;
 
-    regfunc(builtins, ztname, "tname", 1);
-    regfunc(builtins, zrefc, "refc", 1);
-    regfunc(builtins, zprint, "print", 1);
-    regfunc(builtins, zrepr, "repr", 1);
-    regfunc(builtins, zlen, "len", 1);
-    regfunc(builtins, zarr, "arr", 1);
-    regfunc(builtins, zconcat, "concat", 2);
-    regfunc(builtins, zget, "get", 3);
-    regfunc(builtins, zsum, "+", 2);
-    regfunc(builtins, zeq, "==", 2);
-    regfunc(builtins, zlt, "<", 2);
+    err = znewdict(builtins);
+    if (err != ZE_OK)
+        return err;
 
-    return builtins;
+    err = regfunc(*builtins, z_tname, "tname", 1);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_refc, "refc", 1);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_print, "print", 1);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_repr, "repr", 1);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_len, "len", 1);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_arr, "arr", 1);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_concat, "concat", 2);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_get, "get", 3);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_sum, "+", 2);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_eq, "==", 2);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_lt, "<", 2);
+    if (err != ZE_OK)
+        return err;
+    return ZE_OK;
 }

@@ -16,24 +16,25 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Byte Array Type (header) */
+/* ZByte Array Type (header) */
 
 typedef struct {
     Zob type;
     unsigned char refc;
     unsigned int length;
     char *bytes;
-} ByteArray;
+} ZByteArray;
 
-ByteArray *newyarr(unsigned int length);
-ByteArray *yarrfromstr(char *s);
-void delyarr(ByteArray **bytearray);
-ByteArray *cpyyarr(ByteArray *bytearray);
-Byte *getbyteitem(ByteArray *bytearray, int index);
-void setbyteitem(ByteArray *bytearray, int index, Byte *byte);
-void concatstr(ByteArray *bytearray, char *str);
-void concat(ByteArray *bytearray, ByteArray *other);
-int tstyarr(ByteArray *bytearray);
-int cmpyarr(ByteArray *bytearray, ByteArray *other);
-unsigned int repyarr(char *buffer, ByteArray *bytearray);
-unsigned int repplain(char *buffer, ByteArray *bytearray);
+ZError znewyarr(ZByteArray **zbytearray, unsigned int length);
+ZError zyarrfromstr(ZByteArray **zbytearray, char *s);
+void zdelyarr(ZByteArray **zbytearray);
+ZError zcpyyarr(ZByteArray *source, ZByteArray **dest);
+int ztstyarr(ZByteArray *zbytearray);
+int zcmpyarr(ZByteArray *zbytearray, ZByteArray *other);
+unsigned int zrepyarr(char *buffer, ZByteArray *zbytearray);
+unsigned int zrepplain(char *buffer, ZByteArray *zbytearray);
+unsigned int zalength(ZByteArray *zbytearray);
+ZError zaget(ZByteArray *zbytearray, int index, ZByte **value);
+ZError zaset(ZByteArray *zbytearray, int index, ZByte *zbyte);
+ZError zconcatstr(ZByteArray *zbytearray, char *s);
+ZError zconcat(ZByteArray *zbytearray, ZByteArray *other);

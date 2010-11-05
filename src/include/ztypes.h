@@ -18,7 +18,7 @@
 
 /* Types (header) */
 
-/* Word length */
+/* int length */
 #define WL (8 * sizeof(unsigned int))
 
 /* Type Signs */

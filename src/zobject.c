@@ -40,85 +40,86 @@
 
 #include "zobject.h"
 
+/* Remove 'zob' from memory. */
 void
-delobj(Zob **object)
+zdelobj(Zob **zob)
 {
-    switch (**object) {
+    switch (**zob) {
         case EMPTY:
             break;
         case T_NONE:
-            delnone((None **) object);
+            zdelnone((ZNone **) zob);
             break;
         case T_BOOL:
-            delbool((Bool **) object);
+            zdelbool((ZBool **) zob);
             break;
         case T_BYTE:
-            delbyte((Byte **) object);
+            zdelbyte((ZByte **) zob);
             break;
         case T_WORD:
-            delword((Word **) object);
+            zdelint((ZInt **) zob);
             break;
         case T_YARR:
-            delyarr((ByteArray **) object);
+            zdelyarr((ZByteArray **) zob);
             break;
         case T_BNUM:
-            delbnum((BigNum **) object);
+            zdelbnum((ZBigNum **) zob);
             break;
         case T_LIST:
-            dellist((List **) object);
+            zdellist((ZList **) zob);
             break;
         case T_DICT:
-            deldict((Dict **) object);
+            zdeldict((ZDict **) zob);
             break;
         case T_FUNC:
-            delfunc((Func **) object);
+            zdelfunc((ZFunc **) zob);
             break;
         default:
-            {
-                raiseUnknownTypeNumber("delobj", **object);
-                exit(EXIT_FAILURE);
-            }
+            raiseUnknownTypeNumber("zdelobj", **zob);
     }
 }
 
-Zob *
-cpyobj(Zob *object)
+/* Create a new copy of 'source' in 'dest'.
+ * If 'source' do not has a valid type number, return ZE_UNKNOWN_TYPE_NUMBER.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zcpyobj(Zob *source, Zob **dest)
 {
-    switch (*object) {
+    switch (*source) {
         case EMPTY:
             return EMPTY;
         case T_NONE:
-            return (Zob *) cpynone((None *) object);
+            return zcpynone((ZNone *) source, (ZNone **) dest);
         case T_BOOL:
-            return (Zob *) cpybool((Bool *) object);
+            return zcpybool((ZBool *) source, (ZBool **) dest);
         case T_BYTE:
-            return (Zob *) cpybyte((Byte *) object);
+            return zcpybyte((ZByte *) source, (ZByte **) dest);
         case T_WORD:
-            return (Zob *) cpyword((Word *) object);
+            return zcpyint((ZInt *) source, (ZInt **) dest);
         case T_YARR:
-            return (Zob *) cpyyarr((ByteArray *) object);
+            return zcpyyarr((ZByteArray *) source, (ZByteArray **) dest);
         case T_BNUM:
-            return (Zob *) cpybnum((BigNum *) object);
+            return zcpybnum((ZBigNum *) source, (ZBigNum **) dest);
         case T_LIST:
-            return (Zob *) cpylist((List *) object);
+            return zcpylist((ZList *) source, (ZList **) dest);
         case T_DICT:
-            return (Zob *) cpydict((Dict *) object);
+            return zcpydict((ZDict *) source, (ZDict **) dest);
         case T_FUNC:
-            return (Zob *) cpyfunc((Func *) object);
+            return zcpyfunc((ZFunc *) source, (ZFunc **) dest);
         default:
-            {
-                raiseUnknownTypeNumber("cpyobj", *object);
-                exit(EXIT_FAILURE);
-            }
+            return ZE_UNKNOWN_TYPE_NUMBER;
     }
-    return EMPTY;
+    /* Code never reached. */
+    return ZE_OK;
 }
 
 /* Truth value testing.
  * The truth value of an object is a value that
  *  qualifies its content under a boolean perspective.
- * A None object always has a FALSE truth value.
- * A Bool object has a truth value equivalent to its own value.
+ * A ZNone object always has a FALSE truth value.
+ * A ZBool object has a truth value equivalent to its own value.
  * A numeric object has a FALSE truth value if and
  *  only if its content is equivalent to 0.
  * A sequence object has a FALSE truth value if and
@@ -126,136 +127,149 @@ cpyobj(Zob *object)
  * The truth value of an object is TRUE under all other condictions.
  */
 
+/* Return the truth value of 'zob'. */
 int
-tstobj(Zob *object)
+ztstobj(Zob *zob)
 {
-    switch (*object) {
+    switch (*zob) {
         case EMPTY:
             return 0;
         case T_NONE:
-            return tstnone((None *) object);
+            return ztstnone((ZNone *) zob);
         case T_BOOL:
-            return tstbool((Bool *) object);
+            return ztstbool((ZBool *) zob);
         case T_BYTE:
-            return tstbyte((Byte *) object);
+            return ztstbyte((ZByte *) zob);
         case T_WORD:
-            return tstword((Word *) object);
+            return ztstint((ZInt *) zob);
         case T_YARR:
-            return tstyarr((ByteArray *) object);
+            return ztstyarr((ZByteArray *) zob);
         case T_BNUM:
-            return tstbnum((BigNum *) object);
+            return ztstbnum((ZBigNum *) zob);
         case T_LIST:
-            return tstlist((List *) object);
+            return ztstlist((ZList *) zob);
         case T_DICT:
-            return tstdict((Dict *) object);
+            return ztstdict((ZDict *) zob);
         case T_FUNC:
-            return tstfunc((Func *) object);
+            return ztstfunc((ZFunc *) zob);
         default:
-            {
-                raiseUnknownTypeNumber("tstobj", *object);
-                exit(EXIT_FAILURE);
-            }
+            raiseUnknownTypeNumber("ztstobj", *zob);
     }
     return 0;
 }
 
+/* Compare 'zob' and 'other'.
+ * If they are equal, return zero.
+ * Otherwise, return nonzero.
+ */
 int
-cmpobj(Zob *object, Zob *other)
+zcmpobj(Zob *zob, Zob *other)
 {
-    if (*object != *other)
+    if (*zob != *other)
         return 1;
-    switch (*object) {
+    switch (*zob) {
         case EMPTY:
             return 0;
         case T_NONE:
-            return cmpnone((None *) object, (None *) other);
+            return zcmpnone((ZNone *) zob, (ZNone *) other);
         case T_BOOL:
-            return cmpbool((Bool *) object, (Bool *) other);
+            return zcmpbool((ZBool *) zob, (ZBool *) other);
         case T_BYTE:
-            return cmpbyte((Byte *) object, (Byte *) other);
+            return zcmpbyte((ZByte *) zob, (ZByte *) other);
         case T_WORD:
-            return cmpword((Word *) object, (Word *) other);
+            return zcmpint((ZInt *) zob, (ZInt *) other);
         case T_YARR:
-            return cmpyarr((ByteArray *) object, (ByteArray *) other);
+            return zcmpyarr((ZByteArray *) zob, (ZByteArray *) other);
         case T_BNUM:
-            return cmpbnum((BigNum *) object, (BigNum *) other);
+            return zcmpbnum((ZBigNum *) zob, (ZBigNum *) other);
         case T_LIST:
-            return cmplist((List *) object, (List *) other);
+            return zcmplist((ZList *) zob, (ZList *) other);
         case T_DICT:
-            return cmpdict((Dict *) object, (Dict *) other);
+            return zcmpdict((ZDict *) zob, (ZDict *) other);
         case T_FUNC:
-            return cmpfunc((Func *) object, (Func *) other);
+            return zcmpfunc((ZFunc *) zob, (ZFunc *) other);
         default:
-            {
-                raiseUnknownTypeNumber("cmpobj", *object);
-                exit(EXIT_FAILURE);
-            }
+            raiseUnknownTypeNumber("zcmpobj", *zob);
     }
     return 1;
 }
 
+/* Print the textual representation of 'zob' on 'buffer'.
+ * Return the number of bytes writen.
+ */
 unsigned int
-repobj(char *buffer, Zob *object)
+zrepobj(char *buffer, Zob *zob)
 {
-    switch (*object) {
+    switch (*zob) {
         case EMPTY:
             return 0;
         case T_NONE:
-            return repnone(buffer, (None *) object);
+            return zrepnone(buffer, (ZNone *) zob);
         case T_BOOL:
-            return repbool(buffer, (Bool *) object);
+            return zrepbool(buffer, (ZBool *) zob);
         case T_BYTE:
-            return repbyte(buffer, (Byte *) object);
+            return zrepbyte(buffer, (ZByte *) zob);
         case T_WORD:
-            return repword(buffer, (Word *) object);
+            return zrepint(buffer, (ZInt *) zob);
         case T_YARR:
-            return repyarr(buffer, (ByteArray *) object);
+            return zrepyarr(buffer, (ZByteArray *) zob);
         case T_BNUM:
-            return repbnum(buffer, (BigNum *) object);
+            return zrepbnum(buffer, (ZBigNum *) zob);
         case T_LIST:
-            return replist(buffer, (List *) object);
+            return zreplist(buffer, (ZList *) zob);
         case T_DICT:
-            return repdict(buffer, (Dict *) object);
+            return zrepdict(buffer, (ZDict *) zob);
         case T_FUNC:
-            return repfunc(buffer, (Func *) object);
+            return zrepfunc(buffer, (ZFunc *) zob);
         default:
-            {
-                raiseUnknownTypeNumber("repobj", *object);
-                exit(EXIT_FAILURE);
-            }
+            raiseUnknownTypeNumber("zrepobj", *zob);
     }
     return 0;
 }
 
-Zob *
-typename(Zob *object)
+/* If 'zob' has a valid type number,
+ *  save its type name in 'name' and return ZE_OK.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_UNKNOWN_TYPE_NUMBER.
+ */
+ZError
+ztypename(Zob *zob, Zob **name)
 {
-    switch (*object) {
+    ZError err = ZE_OK;
+
+    switch (*zob) {
         case EMPTY:
-            return (Zob *) yarrfromstr("EMPTY");
+            err = zyarrfromstr((ZByteArray **) name, "EMPTY");
+            break;
         case T_NONE:
-            return (Zob *) yarrfromstr("None");
+            err = zyarrfromstr((ZByteArray **) name, "None");
+            break;
         case T_BOOL:
-            return (Zob *) yarrfromstr("Bool");
+            err = zyarrfromstr((ZByteArray **) name, "Bool");
+            break;
         case T_BYTE:
-            return (Zob *) yarrfromstr("Byte");
+            err = zyarrfromstr((ZByteArray **) name, "Byte");
+            break;
         case T_WORD:
-            return (Zob *) yarrfromstr("Word");
+            err = zyarrfromstr((ZByteArray **) name, "Int");
+            break;
         case T_YARR:
-            return (Zob *) yarrfromstr("ByteArray");
+            err = zyarrfromstr((ZByteArray **) name, "ByteArray");
+            break;
         case T_BNUM:
-            return (Zob *) yarrfromstr("BigNum");
+            err = zyarrfromstr((ZByteArray **) name, "BigNum");
+            break;
         case T_LIST:
-            return (Zob *) yarrfromstr("List");
+            err = zyarrfromstr((ZByteArray **) name, "List");
+            break;
         case T_DICT:
-            return (Zob *) yarrfromstr("Dict");
+            err = zyarrfromstr((ZByteArray **) name, "Dict");
+            break;
         case T_FUNC:
-            return (Zob *) yarrfromstr("Func");
+            err = zyarrfromstr((ZByteArray **) name, "Func");
+            break;
         default:
-            {
-                raiseUnknownTypeNumber("typename", *object);
-                exit(EXIT_FAILURE);
-            }
+            return ZE_UNKNOWN_TYPE_NUMBER;
     }
-    return EMPTY;
+    return err;
 }

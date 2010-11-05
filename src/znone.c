@@ -16,7 +16,7 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* None Type */
+/* ZNone Type */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,51 +26,62 @@
 
 #include "znone.h"
 
-None *
-newnone()
+/* Create a new ZNone in 'znone'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+znewnone(ZNone **znone)
 {
-    None *none;
-
-    none = (None *) malloc(sizeof(None));
-    if (none == NULL) {
-        raiseOutOfMemory("newnone");
-        exit(EXIT_FAILURE);
-    }
-    none->type = T_NONE;
-    none->refc = 0;
-    return none;
+    *znone = (ZNone *) malloc(sizeof(ZNone));
+    if (*znone == NULL)
+        return ZE_OUT_OF_MEMORY;
+    (*znone)->type = T_NONE;
+    (*znone)->refc = 0;
+    return ZE_OK;
 }
 
+/* Remove 'znone' from memory. */
 void
-delnone(None **none)
+zdelnone(ZNone **znone)
 {
-    free(*none);
-    *none = NULL;
+    free(*znone);
+    *znone = NULL;
 }
 
-None *
-cpynone(None *none)
+/* Create a new copy of 'source' in 'dest'.
+ * If there is not enough memory, return ZE_OUT_OF_MEMORY.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zcpynone(ZNone *source, ZNone **dest)
 {
-    None *copy;
-
-    copy = newnone();
-    return copy;
+    return znewnone(dest);
 }
 
+/* Test the truth value of 'znone'
+ * Always return zero.
+ */
 int
-tstnone(None *none)
+ztstnone(ZNone *znone)
 {
     return 0;
 }
 
+/* Compare 'znone' and 'other'.
+ * Always return zero.
+ */
 int
-cmpnone(None *none, None *other)
+zcmpnone(ZNone *znone, ZNone *other)
 {
     return 0;
 }
 
+/* Print the textual representation of 'znone' on 'buffer'.
+ * Return the number of bytes writen.
+ */
 unsigned int
-repnone(char *buffer, None *none)
+zrepnone(char *buffer, ZNone *znone)
 {
     return sprintf(buffer, "NONE");
 }

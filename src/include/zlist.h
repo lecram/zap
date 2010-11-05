@@ -16,36 +16,38 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* List Type (header) */
+/* ZList Type (header) */
 
-typedef struct Node {
+typedef struct ZNode {
     Zob *object;
-    struct Node *next;
-} Node;
+    struct ZNode *next;
+} ZNode;
 
 typedef struct {
     Zob type;
     unsigned char refc;
     unsigned int length;
-    Node *first;
-    Node *last;
-} List;
+    ZNode *first;
+    ZNode *last;
+} ZList;
 
-Node * newnode(Zob *object);
-void delnode(Node **node);
-List *newlist();
-void dellist(List **list);
-void emptylist(List *list);
-List *cpylist(List *list);
-void remfirst(List *list);
-Zob *popitem(List *list);
-void pushitem(List *list, Zob *object);
-Zob *peekitem(List *list);
-void appitem(List *list, Zob *object);
-void setitem(List *list, int index, Zob *object);
-void insitem(List *list, int index, Zob *object);
-void extlist(List *list, List *ext);
-void remitem(List *list, int index);
-int tstlist(List *list);
-int cmplist(List *list, List *other);
-unsigned int replist(char *buffer, List *list);
+ZError znewnode(Zob *zob, ZNode **znode);
+void zdelnode(ZNode **znode);
+ZError znewlist(ZList **zlist);
+void zdellist(ZList **zlist);
+ZError zcpylist(ZList *source, ZList **dest);
+int ztstlist(ZList *zlist);
+int zcmplist(ZList *zlist, ZList *other);
+unsigned int zreplist(char *buffer, ZList *zlist);
+unsigned int zllength(ZList *zlist);
+ZError zlpush(ZList *zlist, Zob *zob);
+Zob *zlpeek(ZList *zlist);
+Zob *zlpop(ZList *zlist);
+ZError zlappend(ZList *zlist, Zob *zob);
+ZError zlset(ZList *zlist, int index, Zob *zob);
+ZError zlinsert(ZList *zlist, int index, Zob *zob);
+ZError zlextend(ZList *zlist, ZList *other);
+ZError zlremove(ZList *zlist, int index);
+void zlempty(ZList *zlist);
+int zlhasitem(ZList *zlist, Zob *zob);
+void zlremfirst(ZList *zlist);

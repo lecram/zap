@@ -28,16 +28,16 @@
 #include "zgc.h"
 
 void
-increfc(Zob *object)
+zincrefc(Zob *object)
 {
     ((RefC *) object)->refc++;
 }
 
 void
-decrefc(Zob *object)
+zdecrefc(Zob *object)
 {
     if (((RefC *) object)->refc <= 1)
-        delobj(&object);
+        zdelobj(&object);
     else
         ((RefC *) object)->refc--;
 }

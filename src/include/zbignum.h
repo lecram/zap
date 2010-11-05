@@ -16,26 +16,27 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* BigNum Type (header) */
+/* ZBigNum Type (header) */
 
 typedef struct {
     Zob type;
     unsigned char refc;
     unsigned int length;
     unsigned int *words;
-} BigNum;
+} ZBigNum;
 
-char halfstr(char *str);
-unsigned int strbitlen(char *str);
-BigNum *newbnum();
-BigNum *bnumfromstr(char *str);
-void delbnum(BigNum **bignum);
-BigNum *cpybnum(BigNum *bignum);
-Byte *getbit(BigNum *bignum, int index);
-void setbit(BigNum *bignum, int index);
-void rstbit(BigNum *bignum, int index);
-void lshiftbnum(BigNum *bignum, unsigned int shift);
-void rshiftbnum(BigNum *bignum, unsigned int shift);
-int tstbnum(BigNum *bignum);
-int cmpbnum(BigNum *bignum, BigNum *other);
-unsigned int repbnum(char *buffer, BigNum *bignum);
+char zhalfstr(char *s);
+ZError zstrbitlen(char *s, unsigned int *bitlen);
+ZError znewbnum(ZBigNum **zbignum, unsigned int length);
+ZError zbnumfromstr(ZBigNum **zbignum, char *s);
+void zdelbnum(ZBigNum **zbignum);
+ZError zcpybnum(ZBigNum *source, ZBigNum **dest);
+int ztstbnum(ZBigNum *zbignum);
+int zcmpbnum(ZBigNum *zbignum, ZBigNum *other);
+unsigned int zrepbnum(char *buffer, ZBigNum *zbignum);
+unsigned int znlength(ZBigNum *zbignum);
+ZError znget(ZBigNum *zbignum, int index, ZByte **value);
+ZError znset(ZBigNum *zbignum, int index, ZByte *zbyte);
+ZError znrst(ZBigNum *zbignum, int index);
+void znlshift(ZBigNum *zbignum, unsigned int shift);
+void znrshift(ZBigNum *zbignum, unsigned int shift);
