@@ -65,14 +65,20 @@ zinteractive()
     if (err != ZE_OK)
         return err;
     err = zbuild(&zcontext->global);
-    if (err != ZE_OK)
+    if (err != ZE_OK) {
+        zdelcontext(&zcontext);
         return err;
+    }
     err = znewlist(&zcontext->local);
-    if (err != ZE_OK)
+    if (err != ZE_OK) {
+        zdelcontext(&zcontext);
         return err;
+    }
     err = znewlist(&tmp);
-    if (err != ZE_OK)
+    if (err != ZE_OK) {
+        zdelcontext(&zcontext);
         return err;
+    }
 
     while (1) {
         printf("> ");
@@ -84,8 +90,11 @@ zinteractive()
             /* zdebug_bin(bin, length); */
             bin_entry = bin;
             err = zeval(zcontext, tmp, &bin_entry, &result);
-            if (err != ZE_OK)
+            if (err != ZE_OK) {
+                zdelcontext(&zcontext);
+                zdellist(&tmp);
                 return err;
+            }
             zrepobj(buffer, result);
             printf("%s\n", buffer);
             zlempty(tmp);
