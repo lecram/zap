@@ -28,52 +28,52 @@
 #include "zerr.h"
 
 void
-raise(char *msg)
+zraise(char *msg)
 {
     printf("Error: %s\n", msg);
 }
 
 void
-raisecpl(char *msg, char *srcname, unsigned int linum)
+zraisecpl(char *msg, char *srcname, unsigned int linum)
 {
     printf("%s[%u]: Error: %s\n", srcname, linum, msg);
 }
 
 void
-raiseOutOfMemory(const char *caller)
+zraiseOutOfMemory(const char *caller)
 {
     printf("Error: Out of memory in %s().\n", caller);
 }
 
 void
-raiseUnknownTypeNumber(const char *caller, unsigned char tnum)
+zraiseUnknownTypeNumber(const char *caller, unsigned char tnum)
 {
     printf("Error: Unknown type number in %s(): %u.\n", caller, tnum);
 }
 
 void
-raiseIndexOutOfRange(const char *caller, int index, int length)
+zraiseIndexOutOfRange(const char *caller, int index, int length)
 {
     printf("Error: Index out of range in %s(): %d > %d.\n",
            caller, index, length - 1);
 }
 
 void
-raiseNameNotDefined(const char *name)
+zraiseNameNotDefined(const char *name)
 {
     printf("Error: Name \"%s\" is not defined.\n", name);
 }
 
 void
-raiseFunctionNameNotDefined(const char *fname)
+zraiseFunctionNameNotDefined(const char *fname)
 {
     printf("Error: Function name \"%s\" is not defined.\n", fname);
 }
 
 void
-raiseArityError(unsigned int passed,
-                unsigned char expected,
-                const char *fname)
+zraiseArityError(unsigned int passed,
+                 unsigned char expected,
+                 const char *fname)
 {
     printf("Error: %d argument(s) passed to %d-ary function %s().\n",
            passed,
@@ -82,7 +82,7 @@ raiseArityError(unsigned int passed,
 }
 
 void
-raiseOpenFileError(const char *name)
+zraiseOpenFileError(const char *name)
 {
     printf("Error: Cannot open file \"%s\".\n", name);
 }
