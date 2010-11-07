@@ -31,14 +31,14 @@ typedef enum {
     ZE_OPEN_FILE_ERROR
 } ZError;
 
-void raise(char *msg);
-void raisecpl(char *msg, char *srcname, unsigned int linum);
-void raiseOutOfMemory(const char *caller);
-void raiseUnknownTypeNumber(const char *caller, unsigned char tnum);
-void raiseIndexOutOfRange(const char *caller, int index, int length);
-void raiseNameNotDefined(const char *name);
-void raiseFunctionNameNotDefined(const char *fname);
-void raiseArityError(unsigned int passed,
-                     unsigned char expected,
-                     const char *fname);
-void raiseOpenFileError(const char *name);
+void zraise(char *msg);
+void zraisecpl(char *msg, char *srcname, unsigned int linum);
+void zraiseOutOfMemory(const char *caller);
+void zraiseUnknownTypeNumber(const char *caller, unsigned char tnum);
+void zraiseIndexOutOfRange(const char *caller, int index, int length);
+void zraiseNameNotDefined(const char *name);
+void zraiseFunctionNameNotDefined(const char *fname);
+void zraiseArityError(unsigned int passed,
+                      unsigned char expected,
+                      const char *fname);
+void zraiseOpenFileError(const char *name);

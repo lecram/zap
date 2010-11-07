@@ -205,7 +205,7 @@ main(int argc, char *argv[])
             if (cpl_mod(argv[1])) {
                 binname = (char *) malloc(strlen(argv[1]) + 5);
                 if (binname == NULL) {
-                    raiseOutOfMemory("main");
+                    zraiseOutOfMemory("main");
                     return EXIT_FAILURE;
                 }
                 strcpy(binname, argv[1]);

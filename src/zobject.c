@@ -75,7 +75,7 @@ zdelobj(Zob **zob)
             zdelfunc((ZFunc **) zob);
             break;
         default:
-            raiseUnknownTypeNumber("zdelobj", **zob);
+            zraiseUnknownTypeNumber("zdelobj", **zob);
     }
 }
 
@@ -153,7 +153,7 @@ ztstobj(Zob *zob)
         case T_FUNC:
             return ztstfunc((ZFunc *) zob);
         default:
-            raiseUnknownTypeNumber("ztstobj", *zob);
+            zraiseUnknownTypeNumber("ztstobj", *zob);
     }
     return 0;
 }
@@ -189,7 +189,7 @@ zcmpobj(Zob *zob, Zob *other)
         case T_FUNC:
             return zcmpfunc((ZFunc *) zob, (ZFunc *) other);
         default:
-            raiseUnknownTypeNumber("zcmpobj", *zob);
+            zraiseUnknownTypeNumber("zcmpobj", *zob);
     }
     return 1;
 }
@@ -222,7 +222,7 @@ zrepobj(char *buffer, Zob *zob)
         case T_FUNC:
             return zrepfunc(buffer, (ZFunc *) zob);
         default:
-            raiseUnknownTypeNumber("zrepobj", *zob);
+            zraiseUnknownTypeNumber("zrepobj", *zob);
     }
     return 0;
 }

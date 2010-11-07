@@ -118,12 +118,12 @@ cpl_mod(char *srcname)
 
     fsrc = fopen(srcname, "r");
     if (fsrc == NULL) {
-        raiseOpenFileError(srcname);
+        zraiseOpenFileError(srcname);
         return 0;
     }
     binname = (char *) malloc(strlen(srcname) + 5);
     if (binname == NULL) {
-        raiseOutOfMemory("cpl_mod");
+        zraiseOutOfMemory("cpl_mod");
         fclose(fsrc);
         return 0;
     }
@@ -135,7 +135,7 @@ cpl_mod(char *srcname)
     fbin = fopen(binname, "wb");
     ext = NULL;
     if (fbin == NULL) {
-        raiseOpenFileError(binname);
+        zraiseOpenFileError(binname);
         fclose(fsrc);
         free(binname);
         binname = NULL;
@@ -160,7 +160,7 @@ cpl_mod(char *srcname)
 
             level = ident / identwidth;
             if (level > identlevel) {
-                raisecpl("Incorrect identation.", srcname, linum);
+                zraisecpl("Incorrect identation.", srcname, linum);
                 break;
             }
             for (; level < identlevel; identlevel--)
@@ -170,7 +170,7 @@ cpl_mod(char *srcname)
         else if (identlevel > 0) {
             /* Define identation width. */
             if (ident == 0) {
-                raisecpl("Incorrect identation.", srcname, linum);
+                zraisecpl("Incorrect identation.", srcname, linum);
                 break;
             }
             else
