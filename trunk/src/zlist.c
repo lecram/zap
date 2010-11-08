@@ -172,7 +172,7 @@ zreplist(char *buffer, size_t size, ZList *zlist)
         char nodebff[256];
         ZNode *cur = zlist->first;
         /* buffer length to return */
-        unsigned int blen = 1;
+        int blen = 1;
 
         *buffer = '[';
         while (1) {
@@ -284,7 +284,7 @@ zlset(ZList *zlist, int index, Zob *zob)
 {
     if (index < 0)
         index += zlist->length;
-    if (index < 0 || index >= zlist->length)
+    if (index < 0 || index >= (int) zlist->length)
         return ZE_INDEX_OUT_OF_RANGE;
     else {
         int curidx = 0;
@@ -312,9 +312,9 @@ zlinsert(ZList *zlist, int index, Zob *zob)
 {
     if (index < 0)
         index += zlist->length;
-    if (index < 0 || index > zlist->length)
+    if (index < 0 || index > (int) zlist->length)
         return ZE_INDEX_OUT_OF_RANGE;
-    else if (index == zlist->length) {
+    else if (index == (int) zlist->length) {
         ZError err;
 
         err = zlappend(zlist, zob);
@@ -377,7 +377,7 @@ zlremove(ZList *zlist, int index)
 {
     if (index < 0)
         index += zlist->length;
-    if (index < 0 || index >= zlist->length)
+    if (index < 0 || index >= (int) zlist->length)
         return ZE_INDEX_OUT_OF_RANGE;
     if (index == 0)
         zlremfirst(zlist);
