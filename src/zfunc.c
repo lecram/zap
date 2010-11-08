@@ -143,11 +143,17 @@ zcmpfunc(ZFunc *zfunc, ZFunc *other)
 /* Print the textual representation of 'zfunc' on 'buffer'.
  * Return the number of bytes writen.
  */
-unsigned int
-zrepfunc(char *buffer, ZFunc *zfunc)
+int
+zrepfunc(char *buffer, size_t size, ZFunc *zfunc)
 {
     if (*zfunc->fimp)
-        return sprintf(buffer, "<%i-ary zap function>", zfunc->arity);
+        return snprintf(buffer,
+                        size,
+                        "<%i-ary zap function>",
+                        zfunc->arity);
     else
-        return sprintf(buffer, "<%i-ary C function>", zfunc->arity);
+        return snprintf(buffer,
+                        size,
+                        "<%i-ary C function>",
+                        zfunc->arity);
 }

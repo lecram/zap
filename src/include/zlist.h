@@ -38,7 +38,7 @@ void zdellist(ZList **zlist);
 ZError zcpylist(ZList *source, ZList **dest);
 int ztstlist(ZList *zlist);
 int zcmplist(ZList *zlist, ZList *other);
-unsigned int zreplist(char *buffer, ZList *zlist);
+int zreplist(char *buffer, size_t size, ZList *zlist);
 unsigned int zllength(ZList *zlist);
 ZError zlpush(ZList *zlist, Zob *zob);
 Zob *zlpeek(ZList *zlist);

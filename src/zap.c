@@ -95,7 +95,7 @@ zinteractive()
                 zdellist(&tmp);
                 return err;
             }
-            zrepobj(buffer, result);
+            zrepobj(buffer, 1024, result);
             printf("%s\n", buffer);
             zlempty(tmp);
         }
@@ -136,7 +136,7 @@ zrun_mod(char *binname)
         fclose(fzbc);
         return ZE_OUT_OF_MEMORY;
     }
-    if (fread(szbc, size, 1, fzbc) == 0) {
+    if (fread(szbc, (size_t) size, 1, fzbc) == 0) {
         zdellist(&tmp);
         fclose(fzbc);
         free(szbc);

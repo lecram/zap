@@ -22,5 +22,5 @@ void zdelobj(Zob **zob);
 ZError zcpyobj(Zob *source, Zob **dest);
 int ztstobj(Zob *zob);
 int zcmpobj(Zob *zob, Zob *other);
-unsigned int zrepobj(char *buffer, Zob *zob);
+int zrepobj(char *buffer, size_t size, Zob *zob);
 ZError ztypename(Zob *zob, Zob **name);

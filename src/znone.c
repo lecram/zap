@@ -80,8 +80,8 @@ zcmpnone(ZNone *znone, ZNone *other)
 /* Print the textual representation of 'znone' on 'buffer'.
  * Return the number of bytes writen.
  */
-unsigned int
-zrepnone(char *buffer, ZNone *znone)
+int
+zrepnone(char *buffer, size_t size, ZNone *znone)
 {
-    return sprintf(buffer, "NONE");
+    return snprintf(buffer, size, "NONE");
 }

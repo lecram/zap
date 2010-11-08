@@ -90,8 +90,8 @@ zcmpint(ZInt *zint, ZInt *other)
 /* Print the textual representation of 'zint' on 'buffer'.
  * Return the number of bytes writen.
  */
-unsigned int
-zrepint(char *buffer, ZInt *zint)
+int
+zrepint(char *buffer, size_t size, ZInt *zint)
 {
-    return sprintf(buffer, "%u", zint->value);
+    return snprintf(buffer, size, "%d", zint->value);
 }

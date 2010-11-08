@@ -197,30 +197,30 @@ zcmpobj(Zob *zob, Zob *other)
 /* Print the textual representation of 'zob' on 'buffer'.
  * Return the number of bytes writen.
  */
-unsigned int
-zrepobj(char *buffer, Zob *zob)
+int
+zrepobj(char *buffer, size_t size, Zob *zob)
 {
     switch (*zob) {
         case EMPTY:
             return 0;
         case T_NONE:
-            return zrepnone(buffer, (ZNone *) zob);
+            return zrepnone(buffer, size, (ZNone *) zob);
         case T_BOOL:
-            return zrepbool(buffer, (ZBool *) zob);
+            return zrepbool(buffer, size, (ZBool *) zob);
         case T_BYTE:
-            return zrepbyte(buffer, (ZByte *) zob);
+            return zrepbyte(buffer, size, (ZByte *) zob);
         case T_WORD:
-            return zrepint(buffer, (ZInt *) zob);
+            return zrepint(buffer, size, (ZInt *) zob);
         case T_YARR:
-            return zrepyarr(buffer, (ZByteArray *) zob);
+            return zrepyarr(buffer, size, (ZByteArray *) zob);
         case T_BNUM:
-            return zrepbnum(buffer, (ZBigNum *) zob);
+            return zrepbnum(buffer, size, (ZBigNum *) zob);
         case T_LIST:
-            return zreplist(buffer, (ZList *) zob);
+            return zreplist(buffer, size, (ZList *) zob);
         case T_DICT:
-            return zrepdict(buffer, (ZDict *) zob);
+            return zrepdict(buffer, size, (ZDict *) zob);
         case T_FUNC:
-            return zrepfunc(buffer, (ZFunc *) zob);
+            return zrepfunc(buffer, size, (ZFunc *) zob);
         default:
             zraiseUnknownTypeNumber("zrepobj", *zob);
     }

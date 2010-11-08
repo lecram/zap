@@ -33,7 +33,7 @@ void zdelbnum(ZBigNum **zbignum);
 ZError zcpybnum(ZBigNum *source, ZBigNum **dest);
 int ztstbnum(ZBigNum *zbignum);
 int zcmpbnum(ZBigNum *zbignum, ZBigNum *other);
-unsigned int zrepbnum(char *buffer, ZBigNum *zbignum);
+int zrepbnum(char *buffer, size_t size, ZBigNum *zbignum);
 unsigned int znlength(ZBigNum *zbignum);
 ZError znget(ZBigNum *zbignum, int index, ZByte **value);
 ZError znset(ZBigNum *zbignum, int index, ZByte *zbyte);

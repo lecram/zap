@@ -29,4 +29,4 @@ void zdelbool(ZBool **zbool);
 ZError zcpybool(ZBool *source, ZBool **dest);
 int ztstbool(ZBool *zbool);
 int zcmpbool(ZBool *zbool, ZBool *other);
-unsigned int zrepbool(char *buffer, ZBool *zbool);
+int zrepbool(char *buffer, size_t size, ZBool *zbool);

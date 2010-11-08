@@ -98,11 +98,11 @@ zcmpbool(ZBool *zbool, ZBool *other)
 /* Print the textual representation of 'zbool' on 'buffer'.
  * Return the number of bytes writen.
  */
-unsigned int
-zrepbool(char *buffer, ZBool *zbool)
+int
+zrepbool(char *buffer, size_t size, ZBool *zbool)
 {
     if (zbool->value)
-        return sprintf(buffer, "TRUE");
+        return snprintf(buffer, size, "TRUE");
     else
-        return sprintf(buffer, "FALSE");
+        return snprintf(buffer, size, "FALSE");
 }

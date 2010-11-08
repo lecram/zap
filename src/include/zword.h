@@ -29,4 +29,4 @@ void zdelint(ZInt **zint);
 ZError zcpyint(ZInt *source, ZInt **dest);
 int ztstint(ZInt *zint);
 int zcmpint(ZInt *zint, ZInt *other);
-unsigned int zrepint(char *buffer, ZInt *zint);
+int zrepint(char *buffer, size_t size, ZInt *zint);
