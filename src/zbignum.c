@@ -73,7 +73,7 @@ zhalfstr(char *s)
 ZError
 zstrbitlen(char *s, unsigned int *bitlen)
 {
-    unsigned int strlength;
+    size_t strlength;
     char *tmpstr;
 
     strlength = strlen(s);
@@ -83,7 +83,7 @@ zstrbitlen(char *s, unsigned int *bitlen)
     memcpy(tmpstr, s, strlength + 1);
     *bitlen = 0;
     while (*tmpstr != '0') {
-        zhalfstr(tmpstr);
+        (void) zhalfstr(tmpstr);
         (*bitlen)++;
     }
     free(tmpstr);
@@ -99,17 +99,17 @@ ZError
 znewbnum(ZBigNum **zbignum, unsigned int length)
 {
     unsigned int *array;
-    unsigned int wordlen;
+    int wordlen;
 
     if (length < 32)
         length = 32;
     *zbignum = (ZBigNum *) malloc(sizeof(ZBigNum));
     if (*zbignum == NULL)
         return ZE_OUT_OF_MEMORY;
-    wordlen = length / WL;
+    wordlen = (int) (length / WL);
     if (length % WL)
         wordlen++;
-    array = (unsigned int *) calloc(wordlen, sizeof(unsigned int));
+    array = (unsigned int *) calloc((size_t) wordlen, sizeof(unsigned int));
     if (array == NULL)
         return ZE_OUT_OF_MEMORY;
     (*zbignum)->type = T_BNUM;
@@ -165,11 +165,10 @@ zdelbnum(ZBigNum **zbignum)
 ZError
 zcpybnum(ZBigNum *source, ZBigNum **dest)
 {
-    int index;
-    unsigned int wordlen;
+    int index, wordlen;
     ZError err;
 
-    wordlen = source->length / WL;
+    wordlen = (int) (source->length / WL);
     if (source->length % WL)
         wordlen++;
     err = znewbnum(dest, source->length);
@@ -204,11 +203,10 @@ zcmpbnum(ZBigNum *zbignum, ZBigNum *other)
     if (zbignum->length != other->length)
         return 1;
     else {
-        int index;
-        unsigned int wordlen;
+        int index, wordlen;
         unsigned int mask;
 
-        wordlen = zbignum->length / WL;
+        wordlen = (int) (zbignum->length / WL);
         if (zbignum->length % WL)
             wordlen++;
         for (index = 0; index < wordlen - 1; index++)
@@ -233,7 +231,7 @@ zrepbnum(char *buffer, size_t size, ZBigNum *zbignum)
 
     *tmpbff = '|';
     tmpbff++;
-    for (index = zbignum->length - 1; index >= 0; index--) {
+    for (index = (int) zbignum->length - 1; index >= 0; index--) {
         if (zbignum->words[index / WL] & (1 << (index % WL)))
             snprintf(tmpbff++, size, "%u", 1);
         else
@@ -241,7 +239,7 @@ zrepbnum(char *buffer, size_t size, ZBigNum *zbignum)
     }
     *tmpbff++ = '|';
     *tmpbff = '\0';
-    return zbignum->length + 2;
+    return (int) zbignum->length + 2;
 }
 
 /* Return the length of 'zbignum' in bits. */
@@ -262,7 +260,7 @@ znget(ZBigNum *zbignum, int index, ZByte **value)
 {
     if (index < 0)
         index += zbignum->length;
-    if (index < 0 || index >= zbignum->length)
+    if (index < 0 || index >= (int) zbignum->length)
         return ZE_INDEX_OUT_OF_RANGE;
     if (zbignum->words[index / WL] & (1 << (index % WL))) {
         (*value)->value = 1;
@@ -282,7 +280,7 @@ znset(ZBigNum *zbignum, int index, ZByte *zbyte)
 {
     if (index < 0)
         index += zbignum->length;
-    if (index < 0 || index >= zbignum->length)
+    if (index < 0 || index >= (int) zbignum->length)
         return ZE_INDEX_OUT_OF_RANGE;
     zbignum->words[index / WL] |= 1 << (index % WL);
     return ZE_OK;
@@ -298,7 +296,7 @@ znrst(ZBigNum *zbignum, int index)
 {
     if (index < 0)
         index += zbignum->length;
-    if (index < 0 || index >= zbignum->length)
+    if (index < 0 || index >= (int) zbignum->length)
         return ZE_INDEX_OUT_OF_RANGE;
     zbignum->words[index / WL] &= ~(1 << (index % WL));
     return ZE_OK;
@@ -310,9 +308,9 @@ znlshift(ZBigNum *zbignum, unsigned int shift)
 {
     int wordshift, bitshift, wordlen, index;
 
-    wordshift = shift / WL;
-    bitshift = shift % WL;
-    wordlen = zbignum->length / WL;
+    wordshift = (int) (shift / WL);
+    bitshift = (int) (shift % WL);
+    wordlen = (int) (zbignum->length / WL);
     if (zbignum->length % WL)
         wordlen++;
     if (wordshift) {
@@ -339,9 +337,9 @@ znrshift(ZBigNum *zbignum, unsigned int shift)
 {
     int wordshift, bitshift, wordlen, index;
 
-    wordshift = shift / WL;
-    bitshift = shift % WL;
-    wordlen = zbignum->length / WL;
+    wordshift = (int) (shift / WL);
+    bitshift = (int) (shift % WL);
+    wordlen = (int) (zbignum->length / WL);
     if (zbignum->length % WL)
         wordlen++;
     if (wordshift) {
