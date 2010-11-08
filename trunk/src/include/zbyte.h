@@ -29,4 +29,4 @@ void zdelbyte(ZByte **zbyte);
 ZError zcpybyte(ZByte *source, ZByte **dest);
 int ztstbyte(ZByte *zbyte);
 int zcmpbyte(ZByte *zbyte, ZByte *other);
-unsigned int zrepbyte(char *buffer, ZByte *zbyte);
+int zrepbyte(char *buffer, size_t size, ZByte *zbyte);

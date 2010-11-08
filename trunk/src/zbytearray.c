@@ -142,8 +142,8 @@ zcmpyarr(ZByteArray *zbytearray, ZByteArray *other)
 /* Print the textual representation of 'zbytearray' on 'buffer'.
  * Return the number of bytes writen.
  */
-unsigned int
-zrepyarr(char *buffer, ZByteArray *zbytearray)
+int
+zrepyarr(char *buffer, size_t size, ZByteArray *zbytearray)
 {
     char *tmpbff = buffer, character;
     int index, blen = 0;
@@ -152,13 +152,14 @@ zrepyarr(char *buffer, ZByteArray *zbytearray)
     for (index = 0; index < zbytearray->length; index++) {
         character = zbytearray->bytes[index];
         if ((character < 32 && character != '\n') || (character < 0))
-            blen += sprintf(tmpbff + blen, "?");
+            blen += snprintf(tmpbff + blen, size, "?");
         else
-            blen += sprintf(tmpbff + blen,
-                            "%c",
-                            character);
+            blen += snprintf(tmpbff + blen,
+                             size,
+                             "%c",
+                             character);
     }
-    blen += sprintf(tmpbff + blen, "\"");
+    blen += snprintf(tmpbff + blen, size, "\"");
     return blen;
 }
 
@@ -166,8 +167,8 @@ zrepyarr(char *buffer, ZByteArray *zbytearray)
  * Do not include quotes.
  * Return the number of bytes writen.
  */
-unsigned int
-zrepplain(char *buffer, ZByteArray *zbytearray)
+int
+zrepplain(char *buffer, size_t size, ZByteArray *zbytearray)
 {
     char *tmpbff = buffer, character;
     int index, blen = 0;
@@ -175,11 +176,12 @@ zrepplain(char *buffer, ZByteArray *zbytearray)
     for (index = 0; index < zbytearray->length; index++) {
         character = zbytearray->bytes[index];
         if ((character < 32 && character != '\n') || (character < 0))
-            blen += sprintf(tmpbff + blen, "?");
+            blen += snprintf(tmpbff + blen, size, "?");
         else
-            blen += sprintf(tmpbff + blen,
-                            "%c",
-                            character);
+            blen += snprintf(tmpbff + blen,
+                             size,
+                             "%c",
+                             character);
     }
     return blen;
 }

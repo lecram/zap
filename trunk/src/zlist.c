@@ -163,11 +163,11 @@ zcmplist(ZList *zlist, ZList *other)
 /* Print the textual representation of 'zlist' on 'buffer'.
  * Return the number of bytes writen.
  */
-unsigned int
-zreplist(char *buffer, ZList *zlist)
+int
+zreplist(char *buffer, size_t size, ZList *zlist)
 {
     if (zlist->first == NULL)
-        return sprintf(buffer, "<Empty ZList>");
+        return snprintf(buffer, size, "<Empty ZList>");
     else {
         char nodebff[256];
         ZNode *cur = zlist->first;
@@ -177,12 +177,12 @@ zreplist(char *buffer, ZList *zlist)
         *buffer = '[';
         while (1) {
             if (cur->next == NULL) {
-                zrepobj(nodebff, cur->object);
-                blen += sprintf(buffer + blen, "%s]", nodebff);
+                zrepobj(nodebff, 256, cur->object);
+                blen += snprintf(buffer + blen, size, "%s]", nodebff);
                 break;
             }
-            zrepobj(nodebff, cur->object);
-            blen += sprintf(buffer + blen, "%s, ", nodebff);
+            zrepobj(nodebff, 256, cur->object);
+            blen += snprintf(buffer + blen, size, "%s, ", nodebff);
             cur = cur->next;
         }
         return blen;

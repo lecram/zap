@@ -28,4 +28,4 @@ void zdelnone(ZNone **znone);
 ZError zcpynone(ZNone *source, ZNone **dest);
 int ztstnone(ZNone *znone);
 int zcmpnone(ZNone *znone, ZNone *other);
-unsigned int zrepnone(char *buffer, ZNone *znone);
+int zrepnone(char *buffer, size_t size, ZNone *znone);

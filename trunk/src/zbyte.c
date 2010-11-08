@@ -90,8 +90,8 @@ zcmpbyte(ZByte *zbyte, ZByte *other)
 /* Print the textual representation of 'zbyte' on 'buffer'.
  * Return the number of bytes writen.
  */
-unsigned int
-zrepbyte(char *buffer, ZByte *zbyte)
+int
+zrepbyte(char *buffer, size_t size, ZByte *zbyte)
 {
-    return sprintf(buffer, "0x%02X", zbyte->value);
+    return snprintf(buffer, size, "0x%02X", zbyte->value);
 }

@@ -50,4 +50,4 @@ void zdelfunc(ZFunc **zfunc);
 ZError zcpyfunc(ZFunc *source, ZFunc **dest);
 int ztstfunc(ZFunc *zfunc);
 int zcmpfunc(ZFunc *zfunc, ZFunc *other);
-unsigned int zrepfunc(char *buffer, ZFunc *zfunc);
+int zrepfunc(char *buffer, size_t size, ZFunc *zfunc);

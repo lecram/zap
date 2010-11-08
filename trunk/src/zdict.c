@@ -109,11 +109,11 @@ zcmpdict(ZDict *zdict, ZDict *other)
 /* Print the textual representation of 'zdict' on 'buffer'.
  * Return the number of bytes writen.
  */
-unsigned int
-zrepdict(char *buffer, ZDict *zdict)
+int
+zrepdict(char *buffer, size_t size, ZDict *zdict)
 {
     if (zdict->zlist->first == NULL)
-        return sprintf(buffer, "<Empty ZDict>");
+        return snprintf(buffer, size, "<Empty ZDict>");
     else {
         char nodebff[256];
         ZNode *cur = zdict->zlist->first;
@@ -123,16 +123,28 @@ zrepdict(char *buffer, ZDict *zdict)
         *buffer = '{';
         while (1) {
             if (cur->next->next == NULL) {
-                zrepobj(nodebff, cur->object);
-                blen += sprintf(buffer + blen, "%s: ", nodebff);
-                zrepobj(nodebff, cur->next->object);
-                blen += sprintf(buffer + blen, "%s}", nodebff);
+                zrepobj(nodebff, 256, cur->object);
+                blen += snprintf(buffer + blen,
+                                 size,
+                                 "%s: ",
+                                 nodebff);
+                zrepobj(nodebff, 256, cur->next->object);
+                blen += snprintf(buffer + blen,
+                                 size,
+                                 "%s}",
+                                 nodebff);
                 break;
             }
-            zrepobj(nodebff, cur->object);
-            blen += sprintf(buffer + blen, "%s: ", nodebff);
-            zrepobj(nodebff, cur->next->object);
-            blen += sprintf(buffer + blen, "%s, ", nodebff);
+            zrepobj(nodebff, 256, cur->object);
+            blen += snprintf(buffer + blen,
+                             size,
+                             "%s: ",
+                             nodebff);
+            zrepobj(nodebff, 256, cur->next->object);
+            blen += snprintf(buffer + blen,
+                             size,
+                             "%s, ",
+                             nodebff);
             cur = cur->next->next;
         }
         return blen;

@@ -20,6 +20,8 @@
 
 /* Garbage collection is done by simple reference counting. */
 
+#include <stddef.h>
+
 #include "ztypes.h"
 #include "zerr.h"
 

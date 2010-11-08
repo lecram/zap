@@ -74,7 +74,8 @@ z_print(ZList *args, Zob **ret)
     if (err != ZE_OK)
         return err;
     ((ZInt *) *ret)->value = zrepplain(buffer,
-                            (ZByteArray *) args->first->object);
+                                       1024,
+                             (ZByteArray *) args->first->object);
     printf("%s", buffer);
     return ZE_OK;
 }
@@ -85,7 +86,7 @@ z_repr(ZList *args, Zob **ret)
 {
     char buffer[1024];
 
-    zrepobj(buffer, args->first->object);
+    zrepobj(buffer, 1024, args->first->object);
     return zyarrfromstr((ZByteArray **) ret, buffer);
 }
 

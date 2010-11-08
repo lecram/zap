@@ -29,7 +29,7 @@ void zdeldict(ZDict **zdict);
 ZError zcpydict(ZDict *source, ZDict **dest);
 int ztstdict(ZDict *zdict);
 int zcmpdict(ZDict *zdict, ZDict *other);
-unsigned int zrepdict(char *buffer, ZDict *zdict);
+int zrepdict(char *buffer, size_t size, ZDict *zdict);
 unsigned int zdlength(ZDict *zdict);
 ZError zdset(ZDict *zdict, Zob *key, Zob *value);
 int zdget(ZDict *zdict, Zob *key, Zob **value);

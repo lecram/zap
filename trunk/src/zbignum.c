@@ -225,8 +225,8 @@ zcmpbnum(ZBigNum *zbignum, ZBigNum *other)
  * Return the number of bytes writen.
  */
 /* FIXME: should print decimal representation, not binary. */
-unsigned int
-zrepbnum(char *buffer, ZBigNum *zbignum)
+int
+zrepbnum(char *buffer, size_t size, ZBigNum *zbignum)
 {
     char *tmpbff = buffer;
     int index;
@@ -235,9 +235,9 @@ zrepbnum(char *buffer, ZBigNum *zbignum)
     tmpbff++;
     for (index = zbignum->length - 1; index >= 0; index--) {
         if (zbignum->words[index / WL] & (1 << (index % WL)))
-            sprintf(tmpbff++, "%u", 1);
+            snprintf(tmpbff++, size, "%u", 1);
         else
-            sprintf(tmpbff++, "%u", 0);
+            snprintf(tmpbff++, size, "%u", 0);
     }
     *tmpbff++ = '|';
     *tmpbff = '\0';
