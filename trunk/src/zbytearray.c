@@ -35,15 +35,15 @@
 ZError
 znewyarr(ZByteArray **zbytearray, unsigned int length)
 {
-    char *array;
+    unsigned char *array;
 
     *zbytearray = (ZByteArray *) malloc(sizeof(ZByteArray));
     if (*zbytearray == NULL)
         return ZE_OUT_OF_MEMORY;
     if (length > 0)
-        array = (char *) malloc(length * sizeof(char));
+        array = (unsigned char *) malloc(length * sizeof(char));
     else
-        array = (char *) malloc(1);
+        array = (unsigned char *) malloc(1);
     if (array == NULL)
         return ZE_OUT_OF_MEMORY;
     (*zbytearray)->type = T_YARR;
@@ -61,19 +61,19 @@ znewyarr(ZByteArray **zbytearray, unsigned int length)
 ZError
 zyarrfromstr(ZByteArray **zbytearray, char *s)
 {
-    char *array;
-    unsigned int length;
+    unsigned char *array;
+    size_t length;
 
     length = strlen(s);
     *zbytearray = (ZByteArray *) malloc(sizeof(ZByteArray));
     if (*zbytearray == NULL)
         return ZE_OUT_OF_MEMORY;
-    array = (char *) malloc((length + 1) * sizeof(char));
+    array = (unsigned char *) malloc((length + 1) * sizeof(char));
     if (array == NULL)
         return ZE_OUT_OF_MEMORY;
-    strcpy(array, s);
+    strcpy((char *) array, s);
     (*zbytearray)->type = T_YARR;
-    (*zbytearray)->length = length;
+    (*zbytearray)->length = (unsigned int) length;
     (*zbytearray)->bytes = array;
     (*zbytearray)->refc = 0;
     return ZE_OK;
@@ -102,7 +102,7 @@ zcpyyarr(ZByteArray *source, ZByteArray **dest)
     err = znewyarr(dest, source->length);
     if (err != ZE_OK)
         return err;
-    for (index = source->length - 1; index >=0; index--)
+    for (index = (int) source->length - 1; index >=0; index--)
         *((*dest)->bytes + index) = *(source->bytes + index);
     return ZE_OK;
 }
@@ -132,7 +132,7 @@ zcmpyarr(ZByteArray *zbytearray, ZByteArray *other)
     else {
         int index;
 
-        for (index = 0; index < zbytearray->length; index++)
+        for (index = 0; index < (int) zbytearray->length; index++)
             if (zbytearray->bytes[index] != other->bytes[index])
                 return 1;
         return 0;
@@ -145,11 +145,12 @@ zcmpyarr(ZByteArray *zbytearray, ZByteArray *other)
 int
 zrepyarr(char *buffer, size_t size, ZByteArray *zbytearray)
 {
-    char *tmpbff = buffer, character;
+    char *tmpbff = buffer;
+    unsigned char character;
     int index, blen = 0;
 
     *tmpbff++ = '"';
-    for (index = 0; index < zbytearray->length; index++) {
+    for (index = 0; index < (int) zbytearray->length; index++) {
         character = zbytearray->bytes[index];
         if ((character < 32 && character != '\n') || (character < 0))
             blen += snprintf(tmpbff + blen, size, "?");
@@ -170,10 +171,11 @@ zrepyarr(char *buffer, size_t size, ZByteArray *zbytearray)
 int
 zrepplain(char *buffer, size_t size, ZByteArray *zbytearray)
 {
-    char *tmpbff = buffer, character;
+    char *tmpbff = buffer;
+    unsigned char character;
     int index, blen = 0;
 
-    for (index = 0; index < zbytearray->length; index++) {
+    for (index = 0; index < (int) zbytearray->length; index++) {
         character = zbytearray->bytes[index];
         if ((character < 32 && character != '\n') || (character < 0))
             blen += snprintf(tmpbff + blen, size, "?");
@@ -204,7 +206,7 @@ zaget(ZByteArray *zbytearray, int index, ZByte **value)
 {
     if (index < 0)
         index += zbytearray->length;
-    if (index < 0 || index >= zbytearray->length)
+    if (index < 0 || index >= (int) zbytearray->length)
         return ZE_INDEX_OUT_OF_RANGE;
     (*value)->value = zbytearray->bytes[index];
     return ZE_OK;
@@ -220,7 +222,7 @@ zaset(ZByteArray *zbytearray, int index, ZByte *zbyte)
 {
     if (index < 0)
         index += zbytearray->length;
-    if (index < 0 || index >= zbytearray->length)
+    if (index < 0 || index >= (int) zbytearray->length)
         return ZE_INDEX_OUT_OF_RANGE;
     zbytearray->bytes[index] = zbyte->value;
     return ZE_OK;
@@ -233,7 +235,7 @@ zaset(ZByteArray *zbytearray, int index, ZByte *zbyte)
 ZError
 zconcatstr(ZByteArray *zbytearray, char *s)
 {
-    int length;
+    size_t length;
 
     length = strlen(s);
     if (length == 0)
@@ -243,7 +245,7 @@ zconcatstr(ZByteArray *zbytearray, char *s)
     if (zbytearray->bytes == NULL)
         return ZE_OUT_OF_MEMORY;
     memcpy(zbytearray->bytes + zbytearray->length, s, length);
-    zbytearray->length += length;
+    zbytearray->length += (unsigned int) length;
     return ZE_OK;
 }
 
