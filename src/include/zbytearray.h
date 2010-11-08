@@ -22,7 +22,7 @@ typedef struct {
     Zob type;
     unsigned char refc;
     unsigned int length;
-    char *bytes;
+    unsigned char *bytes;
 } ZByteArray;
 
 ZError znewyarr(ZByteArray **zbytearray, unsigned int length);
