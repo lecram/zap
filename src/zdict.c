@@ -118,7 +118,7 @@ zrepdict(char *buffer, size_t size, ZDict *zdict)
         char nodebff[256];
         ZNode *cur = zdict->zlist->first;
         /* buffer length to return */
-        unsigned int blen = 1;
+        int blen = 1;
 
         *buffer = '{';
         while (1) {
@@ -250,8 +250,8 @@ zdremove(ZDict *zdict, Zob *key)
     item = zdict->zlist->first;
     while (item != NULL) {
         if (!zcmpobj(item->object, key)) {
-            zlremove(zdict->zlist, index);
-            zlremove(zdict->zlist, index);
+            (void) zlremove(zdict->zlist, index);
+            (void) zlremove(zdict->zlist, index);
             return 1;
         }
         item = item->next->next;
