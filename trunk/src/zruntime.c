@@ -287,7 +287,7 @@ zeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pzob)
 
     switch (*cursor) {
         case T_NONE:
-            err = znewnone((ZNone **) &zob);
+            err = znewnone((ZNone **) pzob);
             if (err != ZE_OK)
                 return err;
             cursor++;
@@ -454,7 +454,7 @@ znameval(ZContext *zcontext, char **entry, Zob **pzob)
 ZError
 zfeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pret)
 {
-    ZFunc *zfunc;
+    Zob *zfunc;
     ZList *args;
     ZByteArray *key;
     char *fname, *cursor = *entry;
@@ -465,7 +465,7 @@ zfeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pret)
     err = zyarrfromstr(&key, cursor);
     if (err != ZE_OK)
         return err;
-    if (zgetincontext(zcontext, (Zob *) key, (Zob **) &zfunc) == 0) {
+    if (zgetincontext(zcontext, (Zob *) key, &zfunc) == 0) {
         zdelyarr(&key);
         return ZE_FUNCTION_NAME_NOT_DEFINED;
     }
@@ -492,11 +492,11 @@ zfeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pret)
         }
     }
     *entry = cursor;
-    if (args->length != zfunc->arity) {
+    if (args->length != ((ZFunc *) zfunc)->arity) {
         zdellist(&args);
         return ZE_ARITY_ERROR;
     }
-    if (*(zfunc->fimp)) {
+    if (*(((ZFunc *) zfunc)->fimp)) {
         char *zapfunc;
         ZNode *item;
         unsigned char be;
@@ -507,7 +507,7 @@ zfeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pret)
             zdellist(&args);
             return err;
         }
-        zapfunc = ((ZHighFunc *) zfunc->fimp)->func;
+        zapfunc = ((ZHighFunc *) ((ZFunc *) zfunc)->fimp)->func;
         item = args->first;
         while (*zapfunc != '\0') {
             err = zyarrfromstr(&key, zapfunc);
@@ -539,7 +539,7 @@ zfeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pret)
     }
     else {
         /* Call C function. */
-        err = ((ZLowFunc *) zfunc->fimp)->func(args, &ret);
+        err = ((ZLowFunc *) ((ZFunc *) zfunc)->fimp)->func(args, &ret);
         if (err != ZE_OK) {
             zdellist(&args);
             return err;
