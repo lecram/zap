@@ -146,12 +146,12 @@ int
 zrepyarr(char *buffer, size_t size, ZByteArray *zbytearray)
 {
     char *tmpbff = buffer;
-    unsigned char character;
+    char character;
     int index, blen = 0;
 
     *tmpbff++ = '"';
     for (index = 0; index < (int) zbytearray->length; index++) {
-        character = zbytearray->bytes[index];
+        character = (char) zbytearray->bytes[index];
         if ((character < 32 && character != '\n') || (character < 0))
             blen += snprintf(tmpbff + blen, size, "?");
         else
@@ -172,11 +172,11 @@ int
 zrepplain(char *buffer, size_t size, ZByteArray *zbytearray)
 {
     char *tmpbff = buffer;
-    unsigned char character;
+    char character;
     int index, blen = 0;
 
     for (index = 0; index < (int) zbytearray->length; index++) {
-        character = zbytearray->bytes[index];
+        character = (char) zbytearray->bytes[index];
         if ((character < 32 && character != '\n') || (character < 0))
             blen += snprintf(tmpbff + blen, size, "?");
         else
