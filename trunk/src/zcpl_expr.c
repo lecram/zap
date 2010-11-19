@@ -71,48 +71,41 @@ cpl_word(char **expr, char *bin)
     return (unsigned int) WL / 8 + 1;
 }
 
+char *
+escape_char(char e)
+{
+    switch (e) {
+        case 'a':
+            return "\a";
+        case 'b':
+            return "\b";
+        case 't':
+            return "\t";
+        case 'n':
+            return "\n";
+        case 'v':
+            return "\v";
+        case 'f':
+            return "\f";
+        case 'r':
+            return "\r";
+        case '\"':
+            return "\"";
+        case '\'':
+            return "\'";
+        case '\\':
+            return "\\";
+        default:
+            return "\?";
+    }
+}
+
 unsigned int
 cpl_asciibyte(char **expr, char *bin)
 {
-    char o;
-
     bin[0] = T_BYTE;
     if (*(*expr + 1) == '\\') {
-        switch (*(*expr + 2)) {
-            case 'a':
-                o = '\a';
-                break;
-            case 'b':
-                o = '\b';
-                break;
-            case 't':
-                o = '\t';
-                break;
-            case 'n':
-                o = '\n';
-                break;
-            case 'v':
-                o = '\v';
-                break;
-            case 'f':
-                o = '\f';
-                break;
-            case 'r':
-                o = '\r';
-                break;
-            case '\"':
-                o = '\"';
-                break;
-            case '\'':
-                o = '\'';
-                break;
-            case '\\':
-                o = '\\';
-                break;
-            default:
-                o = '\?';
-        }
-        bin[1] = o;
+        bin[1] = *escape_char(*(*expr + 2));
         *expr += 4;
     }
     else {
@@ -133,40 +126,7 @@ cpl_bytearray(char **expr, char *bin)
     c++;
     while (*c != '"') {
         if (*c == '\\') {
-            switch (*(c + 1)) {
-                case 'a':
-                    o = "\a";
-                    break;
-                case 'b':
-                    o = "\b";
-                    break;
-                case 't':
-                    o = "\t";
-                    break;
-                case 'n':
-                    o = "\n";
-                    break;
-                case 'v':
-                    o = "\v";
-                    break;
-                case 'f':
-                    o = "\f";
-                    break;
-                case 'r':
-                    o = "\r";
-                    break;
-                case '\"':
-                    o = "\"";
-                    break;
-                case '\'':
-                    o = "\'";
-                    break;
-                case '\\':
-                    o = "\\";
-                    break;
-                default:
-                    o = "\?";
-            }
+            o = escape_char(*(c + 1));
             strcpy(bin + length + WL / 8 + 1, o);
             length += strlen(o);
             c += 2;
