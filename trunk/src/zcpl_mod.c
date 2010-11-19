@@ -86,6 +86,47 @@ showquoted(char *str, char *quoted)
 }
 
 void
+hidekeyed(char *str, char *keyed)
+{
+    int keying = 0;
+
+    while (*str != '\0') {
+        if (keying) {
+            if (*str == '}')
+                keying = 0;
+            else {
+                *keyed = *str;
+                *str = ' ';
+                keyed++;
+            }
+        }
+        else if (*str == '{')
+            keying = 1;
+        str++;
+    }
+}
+
+void
+showkeyed(char *str, char *keyed)
+{
+    int keying = 0;
+
+    while (*str != '\0') {
+        if (keying) {
+            if (*str == '}')
+                keying = 0;
+            else {
+                *str = *keyed;
+                keyed++;
+            }
+        }
+        else if (*str == '{')
+            keying = 1;
+        str++;
+    }
+}
+
+void
 remtail(char *str)
 {
     char *tail;
@@ -112,7 +153,7 @@ cpl_mod(char *srcname)
     FILE *fsrc, *fbin;
     char *binname, *expr_entry, *def, *ext;
     char *colon, *assign, *stt;
-    char line[256], quoted[256], bin[256];
+    char line[256], quoted[256], keyed[256], bin[256];
     unsigned int length, linum;
     int identlevel, identwidth, ident;
 
@@ -239,7 +280,9 @@ cpl_mod(char *srcname)
                 continue;
             }
         }
+        hidekeyed(line, keyed);
         colon = strrchr(stt, ':');
+        showkeyed(line, keyed);
         showquoted(line, quoted);
         if (colon == NULL)
             expr_entry = stt;
