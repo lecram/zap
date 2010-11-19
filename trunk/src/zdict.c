@@ -113,7 +113,7 @@ int
 zrepdict(char *buffer, size_t size, ZDict *zdict)
 {
     if (zdict->zlist->first == NULL)
-        return snprintf(buffer, size, "<Empty ZDict>");
+        return snprintf(buffer, size, "<Empty Dict>");
     else {
         char nodebff[256];
         ZNode *cur = zdict->zlist->first;

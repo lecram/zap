@@ -167,7 +167,7 @@ int
 zreplist(char *buffer, size_t size, ZList *zlist)
 {
     if (zlist->first == NULL)
-        return snprintf(buffer, size, "<Empty ZList>");
+        return snprintf(buffer, size, "<Empty List>");
     else {
         char nodebff[256];
         ZNode *cur = zlist->first;
