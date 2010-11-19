@@ -18,6 +18,7 @@
 
 /* Expression Compiler */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -199,7 +200,31 @@ cpl_list(char **expr, char *bin)
 unsigned int
 cpl_dict(char **expr, char *bin)
 {
-    return 0U;
+    unsigned int length, total = 2;
+
+    bin[0] = T_DICT;
+    bin++;
+    if (*(*expr + 1) != '}') {
+        while (**expr != '}') {
+            (*expr)++;
+            skip_space(expr);
+            length = cpl_expr(expr, bin);
+            skip_space(expr);
+            bin += length;
+            total += length;
+            (*expr)++; /* ':' */
+            skip_space(expr);
+            length = cpl_expr(expr, bin);
+            skip_space(expr);
+            bin += length;
+            total += length;
+        }
+    }
+    else
+        (*expr)++;
+    (*expr)++;
+    *bin = '\x00';
+    return total;
 }
 
 unsigned int
