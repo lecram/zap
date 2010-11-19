@@ -15,4 +15,4 @@ string := "Texto."
 # List
 list := [0xFF, 1234, "Blah", [0, 1, 0x02]]
 # Dict
-dict := {"width": 50, "heigth": 100}
+dict := {"width": 50, "height": 100}
