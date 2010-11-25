@@ -36,7 +36,6 @@
 #include "zcpl_expr.h"
 
 /* TODO:
- * -cpl_dict().
  * -Overflow check in cpl_word().
  * -Hex char (\xhh) in cpl_asciibyte() and cpl_bytearray().
  */
