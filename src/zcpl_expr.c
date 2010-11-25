@@ -261,16 +261,6 @@ cpl_func(char **expr, char *bin)
 unsigned int
 cpl_expr(char **expr, char *bin)
 {
-    if (isdigit(**expr) && strncmp(*expr, "0x", 2) != 0) {
-            char *d = *expr;
-
-            while (isdigit(*d))
-                d++;
-            if (*d == '!')
-                return cpl_bignum(expr, bin);
-            else
-                return cpl_word(expr, bin);
-        }
     switch (**expr) {
         case '\'':
             return cpl_asciibyte(expr, bin);
@@ -281,7 +271,7 @@ cpl_expr(char **expr, char *bin)
         case '{':
             return cpl_dict(expr, bin);
         default:
-            /* ZNone | ZBool | ZByte | ZFunc | Name */
+            /* None | Bool | Byte | BigNum | Word | Func | Name */
             {
                 int si;
                 char *c;
@@ -313,8 +303,20 @@ cpl_expr(char **expr, char *bin)
                     bin[1] = c;
                     return 2U;
                 }
+                else if (isdigit(**expr) || (**expr == '-' && isdigit(*(*expr + 1)))) {
+                    char *d = *expr;
+
+                    if (*d == '-')
+                        d++;
+                    while (isdigit(*d))
+                        d++;
+                    if (*d == '!')
+                        return cpl_bignum(expr, bin);
+                    else
+                        return cpl_word(expr, bin);
+                }
                 else {
-                    /* ZFunc | Name */
+                    /* Func | Name */
                     char *c = *expr;
                     unsigned int length = 0;
 
