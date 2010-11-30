@@ -57,18 +57,70 @@ skip_space(char **str)
 }
 
 unsigned int
+write_uvlv(unsigned int n, signed char vlv[])
+{
+    unsigned int q, r, i, j, k;
+    signed char t;
+
+    i = 0;
+    q = n / 128;
+    r = n % 128;
+    vlv[0] = r;
+    while (q != 0) {
+        i++;
+        n = q;
+        q = n / 128;
+        r = (n % 128) | 128;
+        vlv[i] = r;
+    }
+    for (j = 0; j < (i + 1) / 2; j++) {
+        k = i - j;
+        t = vlv[j];
+        vlv[j] = vlv[k];
+        vlv[k] = t;
+    }
+    return i + 1;
+}
+
+unsigned int
+write_svlv(int n, signed char vlv[])
+{
+    int q, r, an;
+    unsigned int i, j, k;
+    signed char t;
+
+    i = 0;
+    an = n;
+    an *= (n < 0) ? -1 : 1;
+    q = an / 128;
+    r = an % 128;
+    vlv[0] = r;
+    while (q != 0) {
+        i++;
+        an = q;
+        q = an / 128;
+        r = (an % 128) | 128;
+        vlv[i] = r;
+    }
+    i++;
+    vlv[i] = (n < 0) ? -1 : 1;
+    for (j = 0; j < (i + 1) / 2; j++) {
+        k = i - j;
+        t = vlv[j];
+        vlv[j] = vlv[k];
+        vlv[k] = t;
+    }
+    return i + 1;
+}
+
+unsigned int
 cpl_word(char **expr, char *bin)
 {
-    unsigned int w;
     int i;
 
-    w = (unsigned int) strtol(*expr, expr, 0);
+    i = (int) strtol(*expr, expr, 0);
     bin[0] = T_WORD;
-    for (i = WL / 8; i > 0; i--) {
-        bin[i] = (char) w % 256;
-        w /= 256;
-    }
-    return (unsigned int) WL / 8 + 1;
+    return write_svlv(i, (signed char *) bin + 1) + 1;
 }
 
 char *
