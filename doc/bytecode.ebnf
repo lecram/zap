@@ -27,7 +27,7 @@ Literal = None | Bool | Byte | Word | ByteArray | BigNum | List | Dict.
 None      = "0x01".
 Bool      = "0x02" (FALSE | TRUE).
 Byte      = "0x03" Int8.
-Word      = "0x04" Int32.
+Word      = "0x04" SVLV.
 ByteArray = "0x05" Int32 {Int8}.
 BigNum    = "0x06" Int32 {Int32}.
 List      = "0x07" {Expression} "0x00".
@@ -38,6 +38,9 @@ TRUE  = "0x01".
 
 Int8  = "0x00-0xFF".
 Int32 = "0x00-0xFF" "0x00-0xFF" "0x00-0xFF" "0x00-0xFF".
+
+UVLV = {"0x80-0xFF"} "0x00-0x7F".
+SVLV = "0x00-0xFF" UVLV.
 
 FunctionCall = "0xF0" Name {Expression} "0xF1".
 

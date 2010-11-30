@@ -208,6 +208,65 @@ zreadword(char **entry)
     return zint;
 }
 
+unsigned int
+zread_uvlv(char **entry)
+{
+    unsigned int n;
+    signed char *cursor = (signed char *) *entry;
+
+    n = (unsigned int) (*cursor & 127);
+    while (*cursor < 0) {
+        n <<= 7;
+        cursor++;
+        n += (unsigned int) (*cursor & 127);
+    }
+    cursor++;
+    *entry = (char *) cursor;
+    return n;
+}
+
+int
+zread_svlv(char **entry)
+{
+    int n, s;
+    signed char *cursor = (signed char *) *entry;
+
+    s = (*cursor < 0) ? -1 : 1;
+    cursor++;
+    n = (int) (*cursor & 127);
+    while (*cursor < 0) {
+        n <<= 7;
+        cursor++;
+        n += (int) (*cursor & 127);
+    }
+    cursor++;
+    *entry = (char *) cursor;
+    return n * s;
+}
+
+void
+zskip_uvlv(char **entry)
+{
+    char *cursor = *entry;
+
+    while (*cursor < 0)
+        cursor++;
+    cursor++;
+    *entry = cursor;
+}
+
+void
+zskip_svlv(char **entry)
+{
+    char *cursor = *entry;
+
+    cursor++; /* Sign. */
+    while (*cursor < 0)
+        cursor++;
+    cursor++;
+    *entry = cursor;
+}
+
 void
 zskip_expr(char **entry)
 {
@@ -224,7 +283,8 @@ zskip_expr(char **entry)
             cursor += 2;
             break;
         case T_WORD:
-            cursor += 5;
+            cursor++;
+            zskip_svlv(&cursor);
             break;
         case T_YARR:
             {
@@ -326,7 +386,7 @@ zeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pzob)
                 if (err != ZE_OK)
                     return err;
                 cursor++;
-                zint->value = zreadword(&cursor);
+                zint->value = zread_svlv(&cursor);
                 zob = (Zob *) zint;
             }
             break;
