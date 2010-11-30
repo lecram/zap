@@ -31,7 +31,7 @@
 #include "znone.h"
 #include "zbool.h"
 #include "zbyte.h"
-#include "zword.h"
+#include "zint.h"
 #include "zbytearray.h"
 #include "zbignum.h"
 #include "zlist.h"
@@ -56,7 +56,7 @@ zdelobj(Zob **zob)
         case T_BYTE:
             zdelbyte((ZByte **) zob);
             break;
-        case T_WORD:
+        case T_INT:
             zdelint((ZInt **) zob);
             break;
         case T_YARR:
@@ -96,7 +96,7 @@ zcpyobj(Zob *source, Zob **dest)
             return zcpybool((ZBool *) source, (ZBool **) dest);
         case T_BYTE:
             return zcpybyte((ZByte *) source, (ZByte **) dest);
-        case T_WORD:
+        case T_INT:
             return zcpyint((ZInt *) source, (ZInt **) dest);
         case T_YARR:
             return zcpyyarr((ZByteArray *) source, (ZByteArray **) dest);
@@ -140,7 +140,7 @@ ztstobj(Zob *zob)
             return ztstbool((ZBool *) zob);
         case T_BYTE:
             return ztstbyte((ZByte *) zob);
-        case T_WORD:
+        case T_INT:
             return ztstint((ZInt *) zob);
         case T_YARR:
             return ztstyarr((ZByteArray *) zob);
@@ -176,7 +176,7 @@ zcmpobj(Zob *zob, Zob *other)
             return zcmpbool((ZBool *) zob, (ZBool *) other);
         case T_BYTE:
             return zcmpbyte((ZByte *) zob, (ZByte *) other);
-        case T_WORD:
+        case T_INT:
             return zcmpint((ZInt *) zob, (ZInt *) other);
         case T_YARR:
             return zcmpyarr((ZByteArray *) zob, (ZByteArray *) other);
@@ -209,7 +209,7 @@ zrepobj(char *buffer, size_t size, Zob *zob)
             return zrepbool(buffer, size, (ZBool *) zob);
         case T_BYTE:
             return zrepbyte(buffer, size, (ZByte *) zob);
-        case T_WORD:
+        case T_INT:
             return zrepint(buffer, size, (ZInt *) zob);
         case T_YARR:
             return zrepyarr(buffer, size, (ZByteArray *) zob);
@@ -250,7 +250,7 @@ ztypename(Zob *zob, Zob **name)
         case T_BYTE:
             err = zyarrfromstr((ZByteArray **) name, "Byte");
             break;
-        case T_WORD:
+        case T_INT:
             err = zyarrfromstr((ZByteArray **) name, "Int");
             break;
         case T_YARR:

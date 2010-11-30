@@ -36,7 +36,7 @@
 #include "zcpl_expr.h"
 
 /* TODO:
- * -Overflow check in cpl_word().
+ * -Overflow check in cpl_int().
  * -Hex char (\xhh) in cpl_asciibyte() and cpl_bytearray().
  */
 
@@ -114,12 +114,12 @@ write_svlv(int n, signed char vlv[])
 }
 
 unsigned int
-cpl_word(char **expr, char *bin)
+cpl_int(char **expr, char *bin)
 {
     int i;
 
     i = (int) strtol(*expr, expr, 0);
-    bin[0] = T_WORD;
+    bin[0] = T_INT;
     return write_svlv(i, (signed char *) bin + 1) + 1;
 }
 
@@ -364,7 +364,7 @@ cpl_expr(char **expr, char *bin)
                     if (*d == '!')
                         return cpl_bignum(expr, bin);
                     else
-                        return cpl_word(expr, bin);
+                        return cpl_int(expr, bin);
                 }
                 else {
                     /* Func | Name */

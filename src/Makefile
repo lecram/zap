@@ -28,13 +28,13 @@ endif
 I = include/
 
 objects = ztypes.o zerr.o zgc.o znone.o zbool.o zbyte.o \
-          zword.o zbytearray.o zbignum.o zlist.o zdict.o \
+          zint.o zbytearray.o zbignum.o zlist.o zdict.o \
           zfunc.o zobject.o zruntime.o zbuiltin.o zcpl_expr.o \
 		  zcpl_mod.o zap.o
 
 base = $(I)ztypes.h $(I)zerr.h $(I)zgc.h
 
-types = $(I)znone.h $(I)zbool.h $(I)zbyte.h $(I)zword.h $(I)zbytearray.h \
+types = $(I)znone.h $(I)zbool.h $(I)zbyte.h $(I)zint.h $(I)zbytearray.h \
         $(I)zbignum.h $(I)zlist.h $(I)zdict.h $(I)zfunc.h
 
 
@@ -64,8 +64,8 @@ zbool.o : zbool.c $(I)ztypes.h $(I)zerr.h $(I)zbool.h
 zbyte.o : zbyte.c $(I)ztypes.h $(I)zerr.h $(I)zbyte.h
 	$(CC) -c $(CFLAGS) zbyte.c
 
-zword.o : zword.c $(I)ztypes.h $(I)zerr.h $(I)zword.h
-	$(CC) -c $(CFLAGS) zword.c
+zint.o : zint.c $(I)ztypes.h $(I)zerr.h $(I)zint.h
+	$(CC) -c $(CFLAGS) zint.c
 
 zbytearray.o : zbytearray.c $(I)ztypes.h $(I)zerr.h \
                $(I)zbyte.h $(I)zbytearray.h

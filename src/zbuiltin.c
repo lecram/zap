@@ -32,7 +32,7 @@
 #include "znone.h"
 #include "zbool.h"
 #include "zbyte.h"
-#include "zword.h"
+#include "zint.h"
 #include "zbytearray.h"
 #include "zbignum.h"
 #include "zlist.h"
@@ -186,7 +186,7 @@ z_sum(ZList *args, Zob **ret)
                     ((ZByte *) *ret)->value = ((ZByte *) a)->value +
                                               ((ZByte *) b)->value;
                     return ZE_OK;
-                case T_WORD:
+                case T_INT:
                     err = znewint((ZInt **) ret);
                     if (err != ZE_OK)
                         return err;
@@ -194,9 +194,9 @@ z_sum(ZList *args, Zob **ret)
                                              ((ZInt *) b)->value;
                     return ZE_OK;
             }
-        case T_WORD:
+        case T_INT:
             switch (*b) {
-                case T_WORD:
+                case T_INT:
                     err = znewint((ZInt **) ret);
                     if (err != ZE_OK)
                         return err;
@@ -244,19 +244,19 @@ z_lt(ZList *args, Zob **ret)
                     ((ZBool *) *ret)->value = ((ZByte *) a)->value <
                                               ((ZByte *) b)->value;
                     break;
-                case T_WORD:
+                case T_INT:
                     ((ZBool *) *ret)->value = ((ZByte *) a)->value <
                                               ((ZInt *) b)->value;
                     break;
             }
             break;
-        case T_WORD:
+        case T_INT:
             switch (*b) {
                 case T_BYTE:
                     ((ZBool *) *ret)->value = ((ZInt *) a)->value <
                                               ((ZByte *) b)->value;
                     break;
-                case T_WORD:
+                case T_INT:
                     ((ZBool *) *ret)->value = ((ZInt *) a)->value <
                                               ((ZInt *) b)->value;
                     break;
