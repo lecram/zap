@@ -24,7 +24,7 @@
 #include "ztypes.h"
 #include "zerr.h"
 
-#include "zword.h"
+#include "zint.h"
 
 /* Create a new ZInt in 'zint'.
  * If there is not enough memory, return ZE_OUT_OF_MEMORY.
@@ -36,7 +36,7 @@ znewint(ZInt **zint)
     *zint = (ZInt *) malloc(sizeof(ZInt));
     if (*zint == NULL)
         return ZE_OUT_OF_MEMORY;
-    (*zint)->type = T_WORD;
+    (*zint)->type = T_INT;
     (*zint)->refc = 0;
     return ZE_OK;
 }

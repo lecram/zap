@@ -22,7 +22,7 @@ int is_separator(char c);
 void skip_space(char **str);
 unsigned int write_uvlv(unsigned int n, signed char vlv[]);
 unsigned int write_svlv(int n, signed char vlv[]);
-unsigned int cpl_word(char **expr, char *bin);
+unsigned int cpl_int(char **expr, char *bin);
 char *escape_char(char e);
 unsigned int cpl_asciibyte(char **expr, char *bin);
 unsigned int cpl_bytearray(char **expr, char *bin);

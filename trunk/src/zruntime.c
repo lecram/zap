@@ -35,7 +35,7 @@
 #include "znone.h"
 #include "zbool.h"
 #include "zbyte.h"
-#include "zword.h"
+#include "zint.h"
 #include "zbytearray.h"
 #include "zbignum.h"
 #include "zlist.h"
@@ -282,7 +282,7 @@ zskip_expr(char **entry)
         case T_BYTE:
             cursor += 2;
             break;
-        case T_WORD:
+        case T_INT:
             cursor++;
             zskip_svlv(&cursor);
             break;
@@ -378,7 +378,7 @@ zeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pzob)
                 zob = (Zob *) zbyte;
             }
             break;
-        case T_WORD:
+        case T_INT:
             {
                 ZInt *zint;
 
