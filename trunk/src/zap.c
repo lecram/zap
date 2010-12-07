@@ -229,36 +229,5 @@ main(int argc, char *argv[])
         }
     }
 
-    switch (err) {
-        case ZE_OK:
-            return EXIT_SUCCESS;
-        case ZE_OUT_OF_MEMORY:
-            puts("ZE_OUT_OF_MEMORY");
-            return EXIT_FAILURE;
-        case ZE_INDEX_OUT_OF_RANGE:
-            puts("ZE_INDEX_OUT_OF_RANGE");
-            return EXIT_FAILURE;
-        case ZE_NAME_NOT_DEFINED:
-            puts("ZE_NAME_NOT_DEFINED");
-            return EXIT_FAILURE;
-        case ZE_FUNCTION_NAME_NOT_DEFINED:
-            puts("ZE_FUNCTION_NAME_NOT_DEFINED");
-            return EXIT_FAILURE;
-        case ZE_ARITY_ERROR:
-            puts("ZE_ARITY_ERROR");
-            return EXIT_FAILURE;
-        case ZE_BREAK_WITHOUT_LOOP:
-            puts("ZE_BREAK_WITHOUT_LOOP");
-            return EXIT_FAILURE;
-        case ZE_CONTINUE_WITHOUT_LOOP:
-            puts("ZE_CONTINUE_WITHOUT_LOOP");
-            return EXIT_FAILURE;
-        case ZE_UNKNOWN_TYPE_NUMBER:
-            puts("ZE_UNKNOWN_TYPE_NUMBER");
-            return EXIT_FAILURE;
-        case ZE_OPEN_FILE_ERROR:
-            puts("ZE_OPEN_FILE_ERROR");
-            return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
+    return zraiseerr(err);
 }
