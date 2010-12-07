@@ -265,12 +265,12 @@ z_lt(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* Register 'func' in 'namespace'.
+/* Register 'func' in 'dict'.
  * If there is not enough memory, return ZE_OUT_OF_MEMORY.
  * Otherwise, return ZE_OK.
  */
 ZError
-regfunc(ZDict *namespace,
+regfunc(ZDict *dict,
         ZError (*func)(ZList *args, Zob **ret),
         char *name,
         unsigned char arity)
@@ -295,7 +295,7 @@ regfunc(ZDict *namespace,
         zdelfunc(&zfunc);
         return err;
     }
-    err = zdset(namespace, (Zob *) key, (Zob *) zfunc);
+    err = zdset(dict, (Zob *) key, (Zob *) zfunc);
     if (err != ZE_OK) {
         zdellowfunc(&zlowfunc);
         zdelfunc(&zfunc);
