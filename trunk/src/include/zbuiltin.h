@@ -22,7 +22,7 @@
  * They should not be called from anywhere in the API.
  */
 
-ZError regfunc(ZDict *namespace,
+ZError regfunc(ZDict *dict,
                ZError (*func)(ZList *args, Zob **ret),
                char *name,
                unsigned char arity);
