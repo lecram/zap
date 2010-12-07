@@ -225,7 +225,10 @@ main(int argc, char *argv[])
         puts("<< zap interpreter >>");
         if (argc == 1) {
             puts("\nInteractive mode.\n");
-            err = zinteractive();
+            do {
+                err = zinteractive();
+                (void) zraiseerr(err);
+            } while (err != ZE_OK);
         }
     }
 
