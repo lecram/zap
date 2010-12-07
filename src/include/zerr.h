@@ -28,7 +28,8 @@ typedef enum {
     ZE_BREAK_WITHOUT_LOOP,
     ZE_CONTINUE_WITHOUT_LOOP,
     ZE_UNKNOWN_TYPE_NUMBER,
-    ZE_OPEN_FILE_ERROR
+    ZE_OPEN_FILE_ERROR,
+    ZE_INVALID_ARGUMENT
 } ZError;
 
 void zraise(char *msg);
@@ -42,3 +43,4 @@ void zraiseArityError(unsigned int passed,
                       unsigned char expected,
                       const char *fname);
 void zraiseOpenFileError(const char *name);
+int zraiseerr(ZError err);
