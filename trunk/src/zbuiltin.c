@@ -265,7 +265,7 @@ z_lt(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* Register 'cfunc' in 'namespace'.
+/* Register 'func' in 'namespace'.
  * If there is not enough memory, return ZE_OUT_OF_MEMORY.
  * Otherwise, return ZE_OK.
  */
