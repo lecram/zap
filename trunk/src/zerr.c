@@ -123,6 +123,9 @@ zraiseerr(ZError err)
         case ZE_INVALID_ARGUMENT:
             puts("ZE_INVALID_ARGUMENT");
             return EXIT_FAILURE;
+        case ZE_DIVISION_BY_ZERO:
+            puts("ZE_DIVISION_BY_ZERO");
+            return EXIT_FAILURE;
         default:
             puts("Unexpected error.");
             return EXIT_FAILURE;

@@ -29,7 +29,8 @@ typedef enum {
     ZE_CONTINUE_WITHOUT_LOOP,
     ZE_UNKNOWN_TYPE_NUMBER,
     ZE_OPEN_FILE_ERROR,
-    ZE_INVALID_ARGUMENT
+    ZE_INVALID_ARGUMENT,
+    ZE_DIVISION_BY_ZERO
 } ZError;
 
 void zraise(char *msg);

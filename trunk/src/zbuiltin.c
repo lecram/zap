@@ -43,6 +43,13 @@
 
 #include "zbuiltin.h"
 
+/* $(o) */
+ZError
+z_copy(ZList *args, Zob **ret)
+{
+    return zcpyobj(args->first->object, ret);
+}
+
 /* tname(o) */
 ZError
 z_tname(ZList *args, Zob **ret)
@@ -144,6 +151,99 @@ z_concat(ZList *args, Zob **ret)
     return err;
 }
 
+/* push(list, item) */
+ZError
+z_push(ZList *args, Zob **ret)
+{
+    Zob *zlist, *item;
+
+    zlist = args->first->object;
+    if (*zlist != T_LIST)
+        return ZE_INVALID_ARGUMENT;
+    item = args->first->next->object;
+    *ret = zlist;
+    return zlpush((ZList *) zlist, item);
+}
+
+/* peek(list, item) */
+ZError
+z_peek(ZList *args, Zob **ret)
+{
+    Zob *zlist;
+
+    zlist = args->first->object;
+    if (*zlist != T_LIST)
+        return ZE_INVALID_ARGUMENT;
+    *ret = zlpeek((ZList *) zlist);
+    if (**ret == EMPTY)
+        return ZE_INDEX_OUT_OF_RANGE;
+    else
+        return ZE_OK;
+}
+
+/* pop(list, item) */
+ZError
+z_pop(ZList *args, Zob **ret)
+{
+    Zob *zlist;
+
+    zlist = args->first->object;
+    if (*zlist != T_LIST)
+        return ZE_INVALID_ARGUMENT;
+    *ret = zlpop((ZList *) zlist);
+    if (**ret == EMPTY)
+        return ZE_INDEX_OUT_OF_RANGE;
+    else
+        return ZE_OK;
+}
+
+/* append(list, item) */
+ZError
+z_append(ZList *args, Zob **ret)
+{
+    Zob *zlist, *item;
+
+    zlist = args->first->object;
+    if (*zlist != T_LIST)
+        return ZE_INVALID_ARGUMENT;
+    item = args->first->next->object;
+    *ret = zlist;
+    return zlappend((ZList *) zlist, item);
+}
+
+/* set(list, index, item) */
+/* set(dict, key, value) */
+ZError
+z_set(ZList *args, Zob **ret)
+{
+    *ret = args->first->object;
+    switch (**ret) {
+        case T_LIST:
+            {
+                ZList *zlist;
+                ZInt *index;
+                Zob *item;
+
+                zlist = (ZList *) args->first->object;
+                index = (ZInt *) args->first->next->object;
+                item = args->first->next->next->object;
+                return zlset(zlist, index->value, item);
+            }
+        case T_DICT:
+            {
+                ZDict *zdict;
+                Zob *key, *value;
+
+                zdict = (ZDict *) args->first->object;
+                key = args->first->next->object;
+                value = args->first->next->next->object;
+                return zdset(zdict, key, value);
+            }
+        default:
+            return ZE_INVALID_ARGUMENT;
+    }
+}
+
 /* get(d, k, dv) */
 ZError
 z_get(ZList *args, Zob **ret)
@@ -152,13 +252,13 @@ z_get(ZList *args, Zob **ret)
     ZNode *arg = args->first;
     ZError err;
 
-    err = znewbool((ZBool **) ret);
-    if (err != ZE_OK)
-        return err;
     zdict = arg->object;
     key = arg->next->object;
     defval = arg->next->next->object;
-    ((ZBool *) *ret)->value = zdget((ZDict *) zdict, key, &defval);
+    err = zcpyobj(defval, ret);
+    if (err != ZE_OK)
+        return err;
+    (void) zdget((ZDict *) zdict, key, ret);
     return ZE_OK;
 }
 
@@ -166,44 +266,156 @@ z_get(ZList *args, Zob **ret)
 ZError
 z_sum(ZList *args, Zob **ret)
 {
-    Zob *a, *b, *c;
+    Zob *a, *b;
     ZError err;
 
     a = args->first->object;
     b = args->first->next->object;
-    if (*a > *b) {
-        c = a;
-        a = b;
-        b = c;
-    }
+    if (*a != *b)
+        return ZE_INVALID_ARGUMENT;
     switch (*a) {
         case T_BYTE:
-            switch (*b) {
-                case T_BYTE:
-                    err = znewbyte((ZByte **) ret);
-                    if (err != ZE_OK)
-                        return err;
-                    ((ZByte *) *ret)->value = ((ZByte *) a)->value +
-                                              ((ZByte *) b)->value;
-                    return ZE_OK;
-                case T_INT:
-                    err = znewint((ZInt **) ret);
-                    if (err != ZE_OK)
-                        return err;
-                    ((ZInt *) *ret)->value = ((ZByte *) a)->value +
-                                             ((ZInt *) b)->value;
-                    return ZE_OK;
-            }
+            err = znewbyte((ZByte **) ret);
+            if (err != ZE_OK)
+                return err;
+            ((ZByte *) *ret)->value = ((ZByte *) a)->value +
+                                      ((ZByte *) b)->value;
+            return ZE_OK;
         case T_INT:
-            switch (*b) {
-                case T_INT:
-                    err = znewint((ZInt **) ret);
-                    if (err != ZE_OK)
-                        return err;
-                    ((ZInt *) *ret)->value = ((ZInt *) a)->value +
-                                             ((ZInt *) b)->value;
-                    return ZE_OK;
-            }
+            err = znewint((ZInt **) ret);
+            if (err != ZE_OK)
+                return err;
+            ((ZInt *) *ret)->value = ((ZInt *) a)->value +
+                                     ((ZInt *) b)->value;
+            return ZE_OK;
+    }
+    return ZE_OK;
+}
+
+/* -(a, b) */
+ZError
+z_sub(ZList *args, Zob **ret)
+{
+    Zob *a, *b;
+    ZError err;
+
+    a = args->first->object;
+    b = args->first->next->object;
+    if (*a != *b)
+        return ZE_INVALID_ARGUMENT;
+    switch (*a) {
+        case T_BYTE:
+            err = znewbyte((ZByte **) ret);
+            if (err != ZE_OK)
+                return err;
+            ((ZByte *) *ret)->value = ((ZByte *) a)->value -
+                                      ((ZByte *) b)->value;
+            return ZE_OK;
+        case T_INT:
+            err = znewint((ZInt **) ret);
+            if (err != ZE_OK)
+                return err;
+            ((ZInt *) *ret)->value = ((ZInt *) a)->value -
+                                     ((ZInt *) b)->value;
+            return ZE_OK;
+    }
+    return ZE_OK;
+}
+
+/* *(a, b) */
+ZError
+z_mul(ZList *args, Zob **ret)
+{
+    Zob *a, *b;
+    ZError err;
+
+    a = args->first->object;
+    b = args->first->next->object;
+    if (*a != *b)
+        return ZE_INVALID_ARGUMENT;
+    switch (*a) {
+        case T_BYTE:
+            err = znewbyte((ZByte **) ret);
+            if (err != ZE_OK)
+                return err;
+            ((ZByte *) *ret)->value = ((ZByte *) a)->value *
+                                      ((ZByte *) b)->value;
+            return ZE_OK;
+        case T_INT:
+            err = znewint((ZInt **) ret);
+            if (err != ZE_OK)
+                return err;
+            ((ZInt *) *ret)->value = ((ZInt *) a)->value *
+                                     ((ZInt *) b)->value;
+            return ZE_OK;
+    }
+    return ZE_OK;
+}
+
+/* /(a, b) */
+ZError
+z_div(ZList *args, Zob **ret)
+{
+    Zob *a, *b;
+    ZError err;
+
+    a = args->first->object;
+    b = args->first->next->object;
+    if (*a != *b)
+        return ZE_INVALID_ARGUMENT;
+    switch (*a) {
+        case T_BYTE:
+            err = znewbyte((ZByte **) ret);
+            if (err != ZE_OK)
+                return err;
+            if (((ZByte *) b)->value == 0)
+                return ZE_DIVISION_BY_ZERO;
+            ((ZByte *) *ret)->value = ((ZByte *) a)->value /
+                                      ((ZByte *) b)->value;
+            return ZE_OK;
+        case T_INT:
+            err = znewint((ZInt **) ret);
+            if (err != ZE_OK)
+                return err;
+            if (((ZInt *) b)->value == 0)
+                return ZE_DIVISION_BY_ZERO;
+            ((ZInt *) *ret)->value = ((ZInt *) a)->value /
+                                     ((ZInt *) b)->value;
+            return ZE_OK;
+    }
+    return ZE_OK;
+}
+
+/* %(a, b) */
+ZError
+z_mod(ZList *args, Zob **ret)
+{
+    Zob *a, *b;
+    ZError err;
+
+    a = args->first->object;
+    b = args->first->next->object;
+    if (*a != *b)
+        return ZE_INVALID_ARGUMENT;
+    switch (*a) {
+        case T_BYTE:
+            err = znewbyte((ZByte **) ret);
+            if (err != ZE_OK)
+                return err;
+            if (((ZByte *) b)->value == 0)
+                return ZE_DIVISION_BY_ZERO;
+            ((ZByte *) *ret)->value = ((ZByte *) a)->value %
+                                      ((ZByte *) b)->value;
+            return ZE_OK;
+        case T_INT:
+            err = znewint((ZInt **) ret);
+            if (err != ZE_OK)
+                return err;
+            if (((ZInt *) b)->value == 0)
+                return ZE_DIVISION_BY_ZERO;
+            ((ZInt *) *ret)->value = ((ZInt *) a)->value %
+                                     ((ZInt *) b)->value;
+            return ZE_OK;
     }
     return ZE_OK;
 }
@@ -224,9 +436,9 @@ z_eq(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* <(a, b) */
+/* !=(a, b) */
 ZError
-z_lt(ZList *args, Zob **ret)
+z_neq(ZList *args, Zob **ret)
 {
     Zob *a, *b;
     ZError err;
@@ -236,31 +448,118 @@ z_lt(ZList *args, Zob **ret)
         return err;
     a = args->first->object;
     b = args->first->next->object;
+    ((ZBool *) *ret)->value = zcmpobj(a, b);
+    return ZE_OK;
+}
+
+/* <(a, b) */
+ZError
+z_lt(ZList *args, Zob **ret)
+{
+    Zob *a, *b;
+    ZError err;
+
+    a = args->first->object;
+    b = args->first->next->object;
+    if (*a != *b)
+        return ZE_INVALID_ARGUMENT;
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
     ((ZBool *) *ret)->value = 1;
     switch (*a) {
         case T_BYTE:
-            switch (*b) {
-                case T_BYTE:
-                    ((ZBool *) *ret)->value = ((ZByte *) a)->value <
-                                              ((ZByte *) b)->value;
-                    break;
-                case T_INT:
-                    ((ZBool *) *ret)->value = ((ZByte *) a)->value <
-                                              ((ZInt *) b)->value;
-                    break;
-            }
+            ((ZBool *) *ret)->value = ((ZByte *) a)->value <
+                                      ((ZByte *) b)->value;
             break;
         case T_INT:
-            switch (*b) {
-                case T_BYTE:
-                    ((ZBool *) *ret)->value = ((ZInt *) a)->value <
-                                              ((ZByte *) b)->value;
-                    break;
-                case T_INT:
-                    ((ZBool *) *ret)->value = ((ZInt *) a)->value <
-                                              ((ZInt *) b)->value;
-                    break;
-            }
+            ((ZBool *) *ret)->value = ((ZInt *) a)->value <
+                                      ((ZInt *) b)->value;
+            break;
+    }
+    return ZE_OK;
+}
+
+/* >(a, b) */
+ZError
+z_gt(ZList *args, Zob **ret)
+{
+    Zob *a, *b;
+    ZError err;
+
+    a = args->first->object;
+    b = args->first->next->object;
+    if (*a != *b)
+        return ZE_INVALID_ARGUMENT;
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
+    ((ZBool *) *ret)->value = 1;
+    switch (*a) {
+        case T_BYTE:
+            ((ZBool *) *ret)->value = ((ZByte *) a)->value >
+                                      ((ZByte *) b)->value;
+            break;
+        case T_INT:
+            ((ZBool *) *ret)->value = ((ZInt *) a)->value >
+                                      ((ZInt *) b)->value;
+            break;
+    }
+    return ZE_OK;
+}
+
+/* <=(a, b) */
+ZError
+z_leq(ZList *args, Zob **ret)
+{
+    Zob *a, *b;
+    ZError err;
+
+    a = args->first->object;
+    b = args->first->next->object;
+    if (*a != *b)
+        return ZE_INVALID_ARGUMENT;
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
+    ((ZBool *) *ret)->value = 1;
+    switch (*a) {
+        case T_BYTE:
+            ((ZBool *) *ret)->value = ((ZByte *) a)->value <=
+                                      ((ZByte *) b)->value;
+            break;
+        case T_INT:
+            ((ZBool *) *ret)->value = ((ZInt *) a)->value <=
+                                      ((ZInt *) b)->value;
+            break;
+    }
+    return ZE_OK;
+}
+
+/* >=(a, b) */
+ZError
+z_geq(ZList *args, Zob **ret)
+{
+    Zob *a, *b;
+    ZError err;
+
+    a = args->first->object;
+    b = args->first->next->object;
+    if (*a != *b)
+        return ZE_INVALID_ARGUMENT;
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
+    ((ZBool *) *ret)->value = 1;
+    switch (*a) {
+        case T_BYTE:
+            ((ZBool *) *ret)->value = ((ZByte *) a)->value >=
+                                      ((ZByte *) b)->value;
+            break;
+        case T_INT:
+            ((ZBool *) *ret)->value = ((ZInt *) a)->value >=
+                                      ((ZInt *) b)->value;
+            break;
     }
     return ZE_OK;
 }
@@ -318,6 +617,9 @@ zbuild(ZDict **builtins)
     if (err != ZE_OK)
         return err;
 
+    err = regfunc(*builtins, z_copy, "$", 1);
+    if (err != ZE_OK)
+        return err;
     err = regfunc(*builtins, z_tname, "tname", 1);
     if (err != ZE_OK)
         return err;
@@ -339,16 +641,55 @@ zbuild(ZDict **builtins)
     err = regfunc(*builtins, z_concat, "concat", 2);
     if (err != ZE_OK)
         return err;
+    err = regfunc(*builtins, z_push, "push", 2);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_peek, "peek", 1);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_pop, "pop", 1);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_append, "append", 2);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_set, "set", 3);
+    if (err != ZE_OK)
+        return err;
     err = regfunc(*builtins, z_get, "get", 3);
     if (err != ZE_OK)
         return err;
     err = regfunc(*builtins, z_sum, "+", 2);
     if (err != ZE_OK)
         return err;
+    err = regfunc(*builtins, z_sub, "-", 2);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_mul, "*", 2);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_div, "/", 2);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_mod, "%", 2);
+    if (err != ZE_OK)
+        return err;
     err = regfunc(*builtins, z_eq, "==", 2);
     if (err != ZE_OK)
         return err;
+    err = regfunc(*builtins, z_neq, "!=", 2);
+    if (err != ZE_OK)
+        return err;
     err = regfunc(*builtins, z_lt, "<", 2);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_gt, ">", 2);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_leq, "<=", 2);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_geq, ">=", 2);
     if (err != ZE_OK)
         return err;
     return ZE_OK;
