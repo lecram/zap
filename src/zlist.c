@@ -315,13 +315,10 @@ zlinsert(ZList *zlist, int index, Zob *zob)
         index += zlist->length;
     if (index < 0 || index > (int) zlist->length)
         return ZE_INDEX_OUT_OF_RANGE;
-    else if (index == (int) zlist->length) {
-        ZError err;
-
-        err = zlappend(zlist, zob);
-        if (err != ZE_OK)
-            return err;
-    }
+    else if (index == 0)
+        return zlpush(zlist, zob);
+    else if (index == (int) zlist->length)
+        return zlappend(zlist, zob);
     else {
         int curidx = 0;
         ZNode *prev = zlist->first;
