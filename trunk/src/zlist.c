@@ -296,6 +296,7 @@ zlset(ZList *zlist, int index, Zob *zob)
         }
         zdecrefc(cur->object);
         cur->object = zob;
+        zincrefc(zob);
     }
     return ZE_OK;
 }
