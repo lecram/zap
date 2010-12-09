@@ -230,10 +230,28 @@ z_set(ZList *args, Zob **ret)
         return ZE_INVALID_ARGUMENT;
     zlist = (ZList *) *ret;
     index = args->first->next->object;
-    if (**ret != T_INT)
+    if (*index != T_INT)
         return ZE_INVALID_ARGUMENT;
     item = args->first->next->next->object;
     return zlset(zlist, ((ZInt *) index)->value, item);
+}
+
+/* ins(list, index, item) */
+ZError
+z_ins(ZList *args, Zob **ret)
+{
+    ZList *zlist;
+    Zob *index, *item;
+
+    *ret = args->first->object;
+    if (**ret != T_LIST)
+        return ZE_INVALID_ARGUMENT;
+    zlist = (ZList *) *ret;
+    index = args->first->next->object;
+    if (*index != T_INT)
+        return ZE_INVALID_ARGUMENT;
+    item = args->first->next->next->object;
+    return zlinsert(zlist, ((ZInt *) index)->value, item);
 }
 
 /* setkey(dict, key, value) */
@@ -252,7 +270,7 @@ z_setkey(ZList *args, Zob **ret)
     return zdset(zdict, key, value);
 }
 
-/* getkey(d, k, dv) */
+/* getkey(dict, key, defval) */
 ZError
 z_getkey(ZList *args, Zob **ret)
 {
@@ -663,6 +681,9 @@ zbuild(ZDict **builtins)
     if (err != ZE_OK)
         return err;
     err = regfunc(*builtins, z_set, "set", 3);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_ins, "ins", 3);
     if (err != ZE_OK)
         return err;
     err = regfunc(*builtins, z_setkey, "setkey", 3);
