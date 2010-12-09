@@ -109,13 +109,13 @@ z_len(ZList *args, Zob **ret)
         return err;
     switch (*obj) {
         case T_YARR:
-            ((ZInt *) *ret)->value = zalength((ZByteArray *) obj);
+            ((ZInt *) *ret)->value = (int) zalength((ZByteArray *) obj);
             break;
         case T_LIST:
-            ((ZInt *) *ret)->value = zllength((ZList *) obj);
+            ((ZInt *) *ret)->value = (int) zllength((ZList *) obj);
             break;
         case T_DICT:
-            ((ZInt *) *ret)->value = zdlength((ZDict *) obj);
+            ((ZInt *) *ret)->value = (int) zdlength((ZDict *) obj);
             break;
         default:
             ((ZInt *) *ret)->value = 0;

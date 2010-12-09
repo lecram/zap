@@ -75,7 +75,7 @@ zraiseArityError(unsigned int passed,
                  unsigned char expected,
                  const char *fname)
 {
-    printf("Error: %d argument(s) passed to %d-ary function %s().\n",
+    printf("Error: %u argument(s) passed to %u-ary function %s().\n",
            passed,
            expected,
            fname);
