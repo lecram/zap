@@ -193,7 +193,8 @@ zcwdict(ZContext *zcontext)
 unsigned int
 zreadword(char **entry)
 {
-    unsigned int i, zint;
+    size_t i;
+    unsigned int zint;
     unsigned char *cursor;
 
     cursor = (unsigned char *) *entry;
@@ -401,7 +402,7 @@ zeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pzob)
                 if (err != ZE_OK)
                     return err;
                 for (index = 0; index < length; index++) {
-                    zbytearray->bytes[index] = *cursor;
+                    zbytearray->bytes[index] = (unsigned char) *cursor;
                     cursor++;
                 }
                 zob = (Zob *) zbytearray;
@@ -414,7 +415,7 @@ zeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pzob)
 
                 cursor++;
                 wordlen = zreadword(&cursor);
-                err = znewbnum(&zbignum, wordlen * WL);
+                err = znewbnum(&zbignum, (unsigned int) (wordlen * WL));
                 if (err != ZE_OK)
                     return err;
                 for (index = 0; index < wordlen; index++)
@@ -927,7 +928,7 @@ zrun_block(ZContext *zcontext,
         lev = *cursor;
         if (lev >= looplev)
             return ZE_BREAK_WITHOUT_LOOP;
-        *be = BE_BREAK | lev;
+        *be = (unsigned char) BE_BREAK | lev;
         return ZE_OK;
     }
     if (*cursor == CONTINUE) {
@@ -937,7 +938,7 @@ zrun_block(ZContext *zcontext,
         lev = *cursor;
         if (lev >= looplev)
             return ZE_CONTINUE_WITHOUT_LOOP;
-        *be = BE_CONTINUE | lev;
+        *be = (unsigned char) BE_CONTINUE | lev;
         return ZE_OK;
     }
     if (*cursor == RETURN) {
@@ -952,7 +953,9 @@ zrun_block(ZContext *zcontext,
         err = zeval(zcontext, tmp, &cursor, &ret);
         if (err != ZE_OK)
             return err;
-        zsetincontext(zcontext, (Zob *) key, ret);
+        err = zsetincontext(zcontext, (Zob *) key, ret);
+        if (err != ZE_OK)
+            return err;
         *be = 0;
         return ZE_OK;
     }
