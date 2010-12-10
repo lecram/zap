@@ -236,6 +236,21 @@ z_set(ZList *args, Zob **ret)
     return zlset(zlist, ((ZInt *) index)->value, item);
 }
 
+/* get(list, index) */
+ZError
+z_get(ZList *args, Zob **ret)
+{
+    Zob *zlist, *index;
+
+    zlist = args->first->object;
+    if (*zlist != T_LIST)
+        return ZE_INVALID_ARGUMENT;
+    index = args->first->next->object;
+    if (*index != T_INT)
+        return ZE_INVALID_ARGUMENT;
+    return zlget((ZList *) zlist, ((ZInt *) index)->value, ret);
+}
+
 /* ins(list, index, item) */
 ZError
 z_ins(ZList *args, Zob **ret)
@@ -252,6 +267,57 @@ z_ins(ZList *args, Zob **ret)
         return ZE_INVALID_ARGUMENT;
     item = args->first->next->next->object;
     return zlinsert(zlist, ((ZInt *) index)->value, item);
+}
+
+/* ext(lista, listb) */
+ZError
+z_ext(ZList *args, Zob **ret)
+{
+    Zob *zlista, *zlistb;
+
+    zlista = args->first->object;
+    if (*zlista != T_LIST)
+        return ZE_INVALID_ARGUMENT;
+    zlistb = args->first->next->object;
+    if (*zlistb != T_LIST)
+        return ZE_INVALID_ARGUMENT;
+    *ret = zlista;
+    return zlextend((ZList *) zlista, (ZList *) zlistb);
+}
+
+/* rem(list, index) */
+ZError
+z_rem(ZList *args, Zob **ret)
+{
+    ZList *zlist;
+    Zob *index;
+
+    *ret = args->first->object;
+    if (**ret != T_LIST)
+        return ZE_INVALID_ARGUMENT;
+    zlist = (ZList *) *ret;
+    index = args->first->next->object;
+    if (*index != T_INT)
+        return ZE_INVALID_ARGUMENT;
+    return zlremove(zlist, ((ZInt *) index)->value);
+}
+
+/* has(list, item) */
+ZError
+z_has(ZList *args, Zob **ret)
+{
+    Zob *zlist, *item;
+    ZError err;
+
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
+    if (*args->first->object != T_LIST)
+        return ZE_INVALID_ARGUMENT;
+    zlist = args->first->object;
+    item = args->first->next->object;
+    ((ZBool *) *ret)->value = zlhasitem((ZList *) zlist, item);
+    return ZE_OK;
 }
 
 /* setkey(dict, key, value) */
@@ -683,7 +749,19 @@ zbuild(ZDict **builtins)
     err = regfunc(*builtins, z_set, "set", 3);
     if (err != ZE_OK)
         return err;
+    err = regfunc(*builtins, z_get, "get", 2);
+    if (err != ZE_OK)
+        return err;
     err = regfunc(*builtins, z_ins, "ins", 3);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_ext, "ext", 2);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_rem, "rem", 2);
+    if (err != ZE_OK)
+        return err;
+    err = regfunc(*builtins, z_has, "has", 2);
     if (err != ZE_OK)
         return err;
     err = regfunc(*builtins, z_setkey, "setkey", 3);

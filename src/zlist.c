@@ -301,6 +301,31 @@ zlset(ZList *zlist, int index, Zob *zob)
     return ZE_OK;
 }
 
+/* Copy the 'index'-th item of 'zlist' to 'zob'.
+ * If 'index' is negative, use zllength('zlist') + 'index'.
+ * If 'index' is out of range, return ZE_INDEX_OUT_OF_RANGE.
+ * Otherwise, return ZE_OK.
+ */
+ZError
+zlget(ZList *zlist, int index, Zob **zob)
+{
+    if (index < 0)
+        index += zlist->length;
+    if (index < 0 || index >= (int) zlist->length)
+        return ZE_INDEX_OUT_OF_RANGE;
+    else {
+        int curidx = 0;
+        ZNode *cur = zlist->first;
+
+        while (curidx < index) {
+            cur = cur->next;
+            curidx++;
+        }
+        *zob = cur->object;
+    }
+    return ZE_OK;
+}
+
 /* Insert 'zob' before 'index'-th position in 'zlist'.
  * If 'index' == 'length', append 'zob'.
  * If 'index' is negative, use zllength('zlist') + 'index'.

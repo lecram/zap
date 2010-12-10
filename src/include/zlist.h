@@ -45,6 +45,7 @@ Zob *zlpeek(ZList *zlist);
 Zob *zlpop(ZList *zlist);
 ZError zlappend(ZList *zlist, Zob *zob);
 ZError zlset(ZList *zlist, int index, Zob *zob);
+ZError zlget(ZList *zlist, int index, Zob **zob);
 ZError zlinsert(ZList *zlist, int index, Zob *zob);
 ZError zlextend(ZList *zlist, ZList *other);
 ZError zlremove(ZList *zlist, int index);
