@@ -704,104 +704,40 @@ regfunc(ZDict *dict,
 ZError
 zbuild(ZDict **builtins)
 {
+    ZError (*funcs[])(ZList *args, Zob **ret) =
+      {z_copy, z_tname, z_refc, z_print, z_repr,
+       z_len, z_arr, z_concat, z_push, z_peek,
+       z_pop, z_append, z_set, z_get, z_ins,
+       z_ext, z_rem, z_has, z_setkey, z_getkey,
+       z_sum, z_sub, z_mul, z_div, z_mod,
+       z_eq, z_neq, z_lt, z_gt, z_leq,
+       z_geq, NULL};
+    char *names[] = 
+      {"$", "tname", "refc", "print", "repr",
+       "len", "arr", "concat", "push", "peek",
+       "pop", "append", "set", "get", "ins",
+       "ext", "rem", "has", "setkey", "getkey",
+       "+", "-", "*", "/", "%",
+       "=", "!=", "<", ">", "<=",
+       ">="};
+    unsigned char arities[] =
+      {1, 1, 1, 1, 1,
+       1, 1, 2, 2, 1,
+       1, 2, 3, 2, 3,
+       2, 2, 2, 3, 3,
+       2, 2, 2, 2, 2,
+       2, 2, 2, 2, 2,
+       2};
+    int i;
     ZError err;
 
     err = znewdict(builtins);
     if (err != ZE_OK)
         return err;
-
-    err = regfunc(*builtins, z_copy, "$", 1);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_tname, "tname", 1);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_refc, "refc", 1);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_print, "print", 1);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_repr, "repr", 1);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_len, "len", 1);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_arr, "arr", 1);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_concat, "concat", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_push, "push", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_peek, "peek", 1);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_pop, "pop", 1);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_append, "append", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_set, "set", 3);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_get, "get", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_ins, "ins", 3);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_ext, "ext", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_rem, "rem", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_has, "has", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_setkey, "setkey", 3);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_getkey, "getkey", 3);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_sum, "+", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_sub, "-", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_mul, "*", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_div, "/", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_mod, "%", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_eq, "==", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_neq, "!=", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_lt, "<", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_gt, ">", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_leq, "<=", 2);
-    if (err != ZE_OK)
-        return err;
-    err = regfunc(*builtins, z_geq, ">=", 2);
-    if (err != ZE_OK)
-        return err;
+    for (i = 0; funcs[i] != NULL; i++) {
+        err = regfunc(*builtins, funcs[i], names[i], arities[i]);
+        if (err != ZE_OK)
+            return err;
+    }
     return ZE_OK;
 }
