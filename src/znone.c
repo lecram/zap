@@ -59,7 +59,7 @@ zcpynone(ZNone *source, ZNone **dest)
     return znewnone(dest);
 }
 
-/* Test the truth value of 'znone'
+/* Test the truth value of 'znone'.
  * Always return zero.
  */
 int
