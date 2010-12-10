@@ -513,6 +513,66 @@ z_mod(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
+/* <<(a, b) */
+ZError
+z_lshift(ZList *args, Zob **ret)
+{
+    Zob *a, *b;
+    ZError err;
+
+    a = args->first->object;
+    b = args->first->next->object;
+    if (*a != *b)
+        return ZE_INVALID_ARGUMENT;
+    switch (*a) {
+        case T_BYTE:
+            err = znewbyte((ZByte **) ret);
+            if (err != ZE_OK)
+                return err;
+            ((ZByte *) *ret)->value = ((ZByte *) a)->value <<
+                                      ((ZByte *) b)->value;
+            return ZE_OK;
+        case T_INT:
+            err = znewint((ZInt **) ret);
+            if (err != ZE_OK)
+                return err;
+            ((ZInt *) *ret)->value = ((ZInt *) a)->value <<
+                                     ((ZInt *) b)->value;
+            return ZE_OK;
+    }
+    return ZE_INVALID_ARGUMENT;
+}
+
+/* >>(a, b) */
+ZError
+z_rshift(ZList *args, Zob **ret)
+{
+    Zob *a, *b;
+    ZError err;
+
+    a = args->first->object;
+    b = args->first->next->object;
+    if (*a != *b)
+        return ZE_INVALID_ARGUMENT;
+    switch (*a) {
+        case T_BYTE:
+            err = znewbyte((ZByte **) ret);
+            if (err != ZE_OK)
+                return err;
+            ((ZByte *) *ret)->value = ((ZByte *) a)->value >>
+                                      ((ZByte *) b)->value;
+            return ZE_OK;
+        case T_INT:
+            err = znewint((ZInt **) ret);
+            if (err != ZE_OK)
+                return err;
+            ((ZInt *) *ret)->value = ((ZInt *) a)->value >>
+                                     ((ZInt *) b)->value;
+            return ZE_OK;
+    }
+    return ZE_INVALID_ARGUMENT;
+}
+
 /* ==(a, b) */
 ZError
 z_eq(ZList *args, Zob **ret)
@@ -734,6 +794,8 @@ zbuild(ZDict **builtins)
       {z_mul, "*", 2},
       {z_div, "/", 2},
       {z_mod, "%", 2},
+      {z_lshift, "<<", 2},
+      {z_rshift, ">>", 2},
       {z_eq, "==", 2},
       {z_neq, "!=", 2},
       {z_lt, "<", 2},
