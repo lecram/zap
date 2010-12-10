@@ -704,38 +704,55 @@ regfunc(ZDict *dict,
 ZError
 zbuild(ZDict **builtins)
 {
-    ZError (*funcs[])(ZList *args, Zob **ret) =
-      {z_copy, z_tname, z_refc, z_print, z_repr,
-       z_len, z_arr, z_concat, z_push, z_peek,
-       z_pop, z_append, z_set, z_get, z_ins,
-       z_ext, z_rem, z_has, z_setkey, z_getkey,
-       z_sum, z_sub, z_mul, z_div, z_mod,
-       z_eq, z_neq, z_lt, z_gt, z_leq,
-       z_geq, NULL};
-    char *names[] = 
-      {"$", "tname", "refc", "print", "repr",
-       "len", "arr", "concat", "push", "peek",
-       "pop", "append", "set", "get", "ins",
-       "ext", "rem", "has", "setkey", "getkey",
-       "+", "-", "*", "/", "%",
-       "=", "!=", "<", ">", "<=",
-       ">="};
-    unsigned char arities[] =
-      {1, 1, 1, 1, 1,
-       1, 1, 2, 2, 1,
-       1, 2, 3, 2, 3,
-       2, 2, 2, 3, 3,
-       2, 2, 2, 2, 2,
-       2, 2, 2, 2, 2,
-       2};
+    struct wrap {
+        ZError (*func)(ZList *args, Zob **ret);
+        char *name;
+        unsigned char arity;
+    } wraps[] = {
+      {z_copy, "$", 1},
+      {z_tname, "tname", 1},
+      {z_refc, "refc", 1},
+      {z_print, "print", 1},
+      {z_repr, "repr", 1},
+      {z_len, "len", 1},
+      {z_arr, "arr", 1},
+      {z_concat, "concat", 2},
+      {z_push, "push", 2},
+      {z_peek, "peek", 1},
+      {z_pop, "pop", 1},
+      {z_append, "append", 2},
+      {z_set, "set", 3},
+      {z_get, "get", 2},
+      {z_ins, "ins", 3},
+      {z_ext, "ext", 2},
+      {z_rem, "rem", 2},
+      {z_has, "has", 2},
+      {z_setkey, "setkey", 3},
+      {z_getkey, "getkey", 3},
+      {z_sum, "+", 2},
+      {z_sub, "-", 2},
+      {z_mul, "*", 2},
+      {z_div, "/", 2},
+      {z_mod, "%", 2},
+      {z_eq, "==", 2},
+      {z_neq, "!=", 2},
+      {z_lt, "<", 2},
+      {z_gt, ">", 2},
+      {z_leq, "<=", 2},
+      {z_geq, ">=", 2},
+      {NULL, "", 0}
+    };
     int i;
     ZError err;
 
     err = znewdict(builtins);
     if (err != ZE_OK)
         return err;
-    for (i = 0; funcs[i] != NULL; i++) {
-        err = regfunc(*builtins, funcs[i], names[i], arities[i]);
+    for (i = 0; wraps[i].func != NULL; i++) {
+        err = regfunc(*builtins,
+                      wraps[i].func,
+                      wraps[i].name,
+                      wraps[i].arity);
         if (err != ZE_OK)
             return err;
     }
