@@ -348,10 +348,15 @@ zeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pzob)
 
     switch (*cursor) {
         case T_NONE:
-            err = znewnone((ZNone **) pzob);
-            if (err != ZE_OK)
-                return err;
-            cursor++;
+            {
+                ZNone *znone;
+
+                err = znewnone(&znone);
+                if (err != ZE_OK)
+                    return err;
+                cursor++;
+                zob = (Zob *) znone;
+            }
             break;
         case T_BOOL:
             {
