@@ -200,6 +200,10 @@ cpl_mod(char *srcname)
             int level;
 
             level = ident / identwidth;
+            if (ident % identwidth != 0) {
+                zraisecpl("Incorrect identation.", srcname, linum);
+                break;
+            }
             if (level > identlevel) {
                 zraisecpl("Incorrect identation.", srcname, linum);
                 break;
