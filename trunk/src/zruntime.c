@@ -100,7 +100,14 @@ zpoplocal(ZContext *zcontext, Zob **ret)
     err = zyarrfromstr(&retkey, "_ret_");
     if (err != ZE_OK)
         return err;
-    zdget(poped, (Zob *) retkey, ret);
+    if (zdget(poped, (Zob *) retkey, ret) == 0) {
+        ZNone *znone;
+
+        err = znewnone(&znone);
+        if (err != ZE_OK)
+            return err;
+        *ret = (Zob *) znone;
+    }
     zdelyarr(&retkey);
     zdeldict(&poped);
     return ZE_OK;
