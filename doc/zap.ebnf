@@ -7,7 +7,7 @@ LineBreak = '0x0A' | '0x0D' ['0x0A'].
 
 Statement = {Whitespace} {Assign} \n Expression (BlankLine | Comment).
 Whitespace = '" "'.
-Assign = Identifier '" := "'.
+Assign = Identifier Whitespace.
 Expression = (Identifier | Literal | Function).
 
 Literal = None | Bool | Byte | ByteArray | Word | List | Dict.
