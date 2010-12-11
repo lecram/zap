@@ -148,14 +148,54 @@ remtail(char *str)
 }
 
 int
+splitstt(char *input, char *output, char *parts[])
+{
+    int on = 0;
+    int depth = 0;
+    int length = 0;
+
+    while(*input != '\0') {
+        if (on) {
+            if (isspace(*input) && depth == 0) {
+                on = 0;
+                *output = '\0';
+                depth = 0;
+            }
+            else {
+                *output = *input;
+                if (strchr("([{", *input) != NULL)
+                    depth++;
+                else if (strchr(")]}", *input) != NULL)
+                    depth--;
+            }
+            output++;
+        }
+        else if (!isspace(*input)) {
+            on = 1;
+            parts[length] = output;
+            *output = *input;
+            if (strchr("([{", *input) != NULL)
+                depth++;
+            output++;
+            length++;
+        }
+        input++;
+    }
+    *output = '\0';
+    *(output + 1) = '\0';
+    return length;
+}
+
+int
 cpl_mod(char *srcname)
 {
     FILE *fsrc, *fbin;
     char *binname, *expr_entry, *def, *ext;
-    char *colon, *assign, *stt;
-    char line[256], quoted[256], keyed[256], bin[256];
+    char *assign, *stt;
+    char line[256], bin[256], splitbuffer[256];
+    char *parts[16];
     unsigned int length, linum;
-    int identlevel, identwidth, ident;
+    int identlevel, identwidth, ident, splitlen;
 
     fsrc = fopen(srcname, "r");
     if (fsrc == NULL) {
@@ -185,7 +225,6 @@ cpl_mod(char *srcname)
     identlevel = 0;
     identwidth = 0;
     for (linum = 1; fgets(line, 256, fsrc) != NULL; linum++) {
-        hidequoted(line, quoted);
         remtail(line);
         if (strlen(line) == 0)
             /* Ignore blank lines. */
@@ -221,158 +260,125 @@ cpl_mod(char *srcname)
             else
                 identwidth = ident;
         }
-        if (strncmp(stt, "del ", 4) == 0) {
-            char *name;
-
+        splitlen = splitstt(stt, splitbuffer, parts);
+        if (strcmp(parts[0], "del") == 0) {
             /* Compile del statement. */
             fwrite("\xDE", 1, 1, fbin);
-            name = (char *) stt + 4;
-            skip_space(&name);
-            fwrite(name, 1, strlen(name) + 1, fbin);
+            fwrite(parts[1], 1, strlen(parts[1]) + 1, fbin);
             continue;
         }
-        else if (strncmp(stt, "break", 5) == 0) {
-            if (stt[5] == '\0') {
+        else if (strcmp(parts[0], "break") == 0) {
+            if (splitlen == 1) {
                 /* Compile single break statement. */
                 fwrite("\xBE\x02\x00", 1, 3, fbin);
                 continue;
             }
-            else if (stt[5] == ' ') {
-                char *level, blevel;
+            else {
+                char blevel;
 
                 /* Compile compound break statement. */
                 fwrite("\xBE\x02", 1, 2, fbin);
-                level = (char *) stt + 5;
-                skip_space(&level);
-                blevel = (char) strtol(level, (char **) NULL, 16);
+                blevel = (char) strtol(parts[1], (char **) NULL, 16);
                 fwrite(&blevel, 1, 1, fbin);
                 continue;
             }
         }
-        else if (strncmp(stt, "continue", 8) == 0) {
-            if (stt[8] == '\0') {
+        else if (strcmp(parts[0], "continue") == 0) {
+            if (splitlen == 1) {
                 /* Compile single continue statement. */
                 fwrite("\xBE\x03\x00", 1, 3, fbin);
                 continue;
             }
-            else if (stt[8] == ' ') {
-                char *level, blevel;
+            else {
+                char blevel;
 
                 /* Compile compound continue statement. */
                 fwrite("\xBE\x03", 1, 2, fbin);
-                level = (char *) stt + 8;
-                skip_space(&level);
-                blevel = (char) strtol(level, (char **) NULL, 16);
+                blevel = (char) strtol(parts[1], (char **) NULL, 16);
                 fwrite(&blevel, 1, 1, fbin);
                 continue;
             }
         }
-        else if (strncmp(stt, "return", 6) == 0) {
-            if (stt[6] == '\0') {
+        else if (strcmp(parts[0], "return") == 0) {
+            if (splitlen == 1) {
                 /* Compile return NONE. */
                 fwrite("\xBE\x04\x01", 1, 3, fbin);
                 continue;
             }
-            else if (stt[6] == ' ') {
+            else {
                 /* Compile return statement. */
                 fwrite("\xBE\x04", 1, 2, fbin);
-                expr_entry = (char *) stt + 6;
-                skip_space(&expr_entry);
-                showquoted(line, quoted);
+                expr_entry = parts[1];
                 length = cpl_expr(&expr_entry, bin);
                 fwrite(bin, 1, length, fbin);
                 continue;
             }
         }
-        hidekeyed(line, keyed);
-        colon = strrchr(stt, ':');
-        showkeyed(line, keyed);
-        showquoted(line, quoted);
-        if (colon == NULL)
-            expr_entry = stt;
-        else {
-            colon += 2;
-            if (*colon == '\0') {
-                identlevel++;
-                fwrite("\xB0", 1, 1, fbin);
-                if (strncmp(stt, "while", 5) == 0) {
-                    /* Compile while block header. */
-                    fwrite("\x04", 1, 1, fbin);
-                    expr_entry = (char *) stt + 5;
-                    skip_space(&expr_entry);
-                    length = cpl_expr(&expr_entry, bin);
-                    fwrite(bin, 1, length, fbin);
-                    continue;
-                }
-                else if (strncmp(stt, "if", 2) == 0) {
-                    /* Compile if block header. */
-                    fwrite("\x01", 1, 1, fbin);
-                    expr_entry = (char *) stt + 2;
-                    skip_space(&expr_entry);
-                    length = cpl_expr(&expr_entry, bin);
-                    fwrite(bin, 1, length, fbin);
-                    continue;
-                }
-                else if (strncmp(stt, "elif", 4) == 0) {
-                    /* Compile elif block header. */
-                    fwrite("\x02", 1, 1, fbin);
-                    expr_entry = (char *) stt + 4;
-                    skip_space(&expr_entry);
-                    length = cpl_expr(&expr_entry, bin);
-                    fwrite(bin, 1, length, fbin);
-                    continue;
-                }
-                else if (strncmp(stt, "else", 4) == 0) {
-                    /* Compile else block header. */
-                    fwrite("\x03", 1, 1, fbin);
-                    continue;
-                }
-                else if (strncmp(stt, "def", 3) == 0) {
-                    /* Compile function definition header. */
-                    fwrite("\x05", 1, 1, fbin);
-                    def = (char *) stt + 3;
+        expr_entry = parts[splitlen - 1];
+        if (strcmp(parts[0], "while") == 0) {
+            /* Compile while block header. */
+            identlevel++;
+            fwrite("\xB0\x04", 1, 2, fbin);
+            expr_entry = parts[1];
+            length = cpl_expr(&expr_entry, bin);
+            fwrite(bin, 1, length, fbin);
+            continue;
+        }
+        else if (strcmp(parts[0], "if") == 0) {
+            /* Compile if block header. */
+            identlevel++;
+            fwrite("\xB0\x01", 1, 2, fbin);
+            expr_entry = parts[1];
+            length = cpl_expr(&expr_entry, bin);
+            fwrite(bin, 1, length, fbin);
+            continue;
+        }
+        else if (strcmp(parts[0], "elif") == 0) {
+            /* Compile elif block header. */
+            identlevel++;
+            fwrite("\xB0\x02", 1, 2, fbin);
+            expr_entry = parts[1];
+            length = cpl_expr(&expr_entry, bin);
+            fwrite(bin, 1, length, fbin);
+            continue;
+        }
+        else if (strcmp(parts[0], "else") == 0) {
+            /* Compile else block header. */
+            identlevel++;
+            fwrite("\xB0\x03", 1, 2, fbin);
+            continue;
+        }
+        else if (strcmp(parts[0], "def") == 0) {
+            /* Compile function definition header. */
+            identlevel++;
+            fwrite("\xB0\x05", 1, 2, fbin);
+            def = parts[1];
+            while (*def != '(') {
+                fwrite(def, 1, 1, fbin);
+                def++;
+            }
+            fwrite("\0", 1, 1, fbin);
+            if (*(def + 1) != ')') {
+                while (*def != ')') {
+                    def++;
                     skip_space(&def);
-                    while (*def != '(') {
+                    while (!is_separator(*def)) {
                         fwrite(def, 1, 1, fbin);
                         def++;
                     }
                     fwrite("\0", 1, 1, fbin);
-                    if (*(def + 1) != ')') {
-                        while (*def != ')') {
-                            def++;
-                            skip_space(&def);
-                            while (!is_separator(*def)) {
-                                fwrite(def, 1, 1, fbin);
-                                def++;
-                            }
-                            fwrite("\0", 1, 1, fbin);
-                            skip_space(&def);
-                        }
-                    }
-                    fwrite("\0", 1, 1, fbin);
-                    continue;
+                    skip_space(&def);
                 }
             }
-            else {
-                expr_entry = colon;
-                skip_space(&expr_entry);
-            }
+            fwrite("\0", 1, 1, fbin);
+            continue;
         }
         length = cpl_expr(&expr_entry, bin);
         fwrite(bin, 1, length, fbin);
-        if (colon != NULL) {
-            /* Compile Assignments. */
-            assign = stt;
-            while (assign != colon) {
-                skip_space(&assign);
-                while (!isspace(*assign)) {
-                    fwrite(assign, 1, 1, fbin);
-                    assign++;
-                }
-                skip_space(&assign);
-                assign += 2;
-                fwrite("\0", 1, 1, fbin);
-            }
+        for (splitlen -= 1; splitlen > 0; splitlen--) {
+            /* Compile Assigments. */
+            assign = parts[splitlen - 1];
+            fwrite(assign, 1, strlen(assign) + 1, fbin);
         }
         fwrite("\0", 1, 1, fbin);
     }
