@@ -1,18 +1,18 @@
 # Literals
 
 # None
-nothing := NONE
+nothing NONE
 # Bool
-ok := TRUE
-cancel := FALSE
+ok TRUE
+cancel FALSE
 # Byte
-byte := 0x00
-char := 'A'
+byte 0x00
+char 'A'
 # Word
-word := 0
+word 0
 # ByteArray
-string := "Texto."
+string "Texto."
 # List
-list := [0xFF, 1234, "Blah", [0, 1, 0x02]]
+list [0xFF, 1234, "Blah", [0, 1, 0x02]]
 # Dict
-dict := {"width": 50, "height": 100}
+dict {"width": 50, "height": 100}
