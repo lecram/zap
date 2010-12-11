@@ -360,10 +360,8 @@ cpl_mod(char *srcname)
         }
         length = cpl_expr(&expr_entry, bin);
         fwrite(bin, 1, length, fbin);
-        if (colon == NULL)
-            /* No Assignment. */
-            fwrite("\0", 1, 1, fbin);
-        else {
+        if (colon != NULL) {
+            /* Compile Assignments. */
             assign = stt;
             while (assign != colon) {
                 skip_space(&assign);
@@ -375,8 +373,8 @@ cpl_mod(char *srcname)
                 assign += 2;
                 fwrite("\0", 1, 1, fbin);
             }
-            fwrite("\0", 1, 1, fbin);
         }
+        fwrite("\0", 1, 1, fbin);
     }
     fclose(fsrc);
     /* Block End. */
