@@ -86,51 +86,12 @@ showquoted(char *str, char *quoted)
 }
 
 void
-hidekeyed(char *str, char *keyed)
-{
-    int keying = 0;
-
-    while (*str != '\0') {
-        if (keying) {
-            if (*str == '}')
-                keying = 0;
-            else {
-                *keyed = *str;
-                *str = ' ';
-                keyed++;
-            }
-        }
-        else if (*str == '{')
-            keying = 1;
-        str++;
-    }
-}
-
-void
-showkeyed(char *str, char *keyed)
-{
-    int keying = 0;
-
-    while (*str != '\0') {
-        if (keying) {
-            if (*str == '}')
-                keying = 0;
-            else {
-                *str = *keyed;
-                keyed++;
-            }
-        }
-        else if (*str == '{')
-            keying = 1;
-        str++;
-    }
-}
-
-void
 remtail(char *str)
 {
     char *tail;
+    char quoted[256];
 
+    hidequoted(str, quoted);
     /* Remove comments. */
     tail = strchr(str, '#');
     if (tail != NULL)
@@ -145,6 +106,7 @@ remtail(char *str)
             *(tail + 1) = '\0';
         }
     }
+    showquoted(str, quoted);
 }
 
 int
@@ -153,10 +115,12 @@ splitstt(char *input, char *output, char *parts[])
     int on = 0;
     int depth = 0;
     int length = 0;
+    int squoting = 0;
+    int dquoting = 0;
 
     while(*input != '\0') {
         if (on) {
-            if (isspace(*input) && depth == 0) {
+            if (isspace(*input) && !depth && !squoting && !dquoting) {
                 on = 0;
                 *output = '\0';
                 depth = 0;
@@ -167,6 +131,10 @@ splitstt(char *input, char *output, char *parts[])
                     depth++;
                 else if (strchr(")]}", *input) != NULL)
                     depth--;
+                else if (*input == '\'')
+                    squoting = 1 - squoting;
+                else if (*input == '\"')
+                    dquoting = 1 - dquoting;
             }
             output++;
         }
@@ -176,6 +144,10 @@ splitstt(char *input, char *output, char *parts[])
             *output = *input;
             if (strchr("([{", *input) != NULL)
                 depth++;
+            else if (*input == '\'')
+                squoting = 1 - squoting;
+            else if (*input == '\"')
+                dquoting = 1 - dquoting;
             output++;
             length++;
         }
