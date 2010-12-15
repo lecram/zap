@@ -350,7 +350,46 @@ cpl_mod(char *srcname)
         for (splitlen -= 1; splitlen > 0; splitlen--) {
             /* Compile Assigments. */
             assign = parts[splitlen - 1];
-            fwrite(assign, 1, strlen(assign) + 1, fbin);
+            if (*assign == '(') {
+                int depth = 1;
+                int namelen;
+                char *namechar;
+
+                fwrite("\x10", 1, 1, fbin);
+                assign++;
+                while (depth > 0) {
+                    skip_space(&assign);
+                    if (*assign == '(') {
+                        fwrite("\x10", 1, 1, fbin);
+                        depth++;
+                        assign++;
+                        continue;
+                    }
+                    namechar = assign;
+                    namelen = 0;
+                    while (!isspace(*namechar) &&
+                           *namechar != ')' &&
+                           *namechar != ',') {
+                        namechar++;
+                        namelen++;
+                    }
+                    fwrite(assign, 1, namelen, fbin);
+                    fwrite("\0", 1, 1, fbin);
+                    assign += namelen;
+                    skip_space(&assign);
+                    while (*assign == ')') {
+                        fwrite("\x01", 1, 1, fbin);
+                        depth--;
+                        assign++;
+                        skip_space(&assign);
+                    }
+                    if (*assign == ',') {
+                        assign++;
+                    }
+                }
+            }
+            else
+                fwrite(assign, 1, strlen(assign) + 1, fbin);
         }
         fwrite("\0", 1, 1, fbin);
     }

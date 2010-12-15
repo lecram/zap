@@ -628,8 +628,23 @@ zskip_assign(char **entry)
 {
     char *cursor = *entry;
 
-    while (*cursor != '\0')
-        cursor += strlen(cursor) + 1; /* Skip NAME_END. */
+    while (*cursor != '\0') {
+        if (*cursor == ASGNOPEN) {
+            int depth = 1;
+
+            cursor++;
+            while (depth > 0) {
+                if (*cursor == ASGNOPEN)
+                    depth++;
+                else if (*cursor == ASGNCLOSE)
+                    depth--;
+                cursor++;
+            }
+        }
+        else {
+            cursor += strlen(cursor) + 1; /* Skip NAME_END. */
+        }
+    }
     cursor++; /* Skip ASSIGN_END. */
     *entry = cursor;
 }
@@ -641,22 +656,70 @@ zassign(ZContext *zcontext, Zob *value, char **entry)
     char *cursor = *entry;
     unsigned int wdlen;
     ZError err;
+    ZNode *deepnode;
 
     while (*cursor != '\0') {
-        err = zyarrfromstr(&key, cursor);
-        if (err != ZE_OK)
-            return err;
-        cursor += strlen(cursor) + 1; /* Skip NAME_END. */
-        wdlen = zdlength(zcwdict(zcontext));
-        err = zsetincontext(zcontext, (Zob *) key, value);
-        if (err != ZE_OK) {
-            zdelyarr(&key);
-            return err;
+        if (*cursor == ASGNOPEN) {
+            cursor++;
+            deepnode = ((ZList *) value)->first;
+            err = zdeepassign(zcontext, deepnode, &cursor);
+            if (err != ZE_OK)
+                return err;
         }
-        if (zdlength(zcwdict(zcontext)) == wdlen)
-            zdelyarr(&key);
+        else {
+            err = zyarrfromstr(&key, cursor);
+            if (err != ZE_OK)
+                return err;
+            cursor += strlen(cursor) + 1; /* Skip NAME_END. */
+            wdlen = zdlength(zcwdict(zcontext));
+            err = zsetincontext(zcontext, (Zob *) key, value);
+            if (err != ZE_OK) {
+                zdelyarr(&key);
+                return err;
+            }
+            if (zdlength(zcwdict(zcontext)) == wdlen)
+                zdelyarr(&key);
+        }
     }
     cursor++; /* Skip ASSIGN_END. */
+    *entry = cursor;
+    return ZE_OK;
+}
+
+ZError
+zdeepassign(ZContext *zcontext, ZNode *node, char **entry)
+{
+    ZByteArray *key;
+    char *cursor = *entry;
+    unsigned int wdlen;
+    ZError err;
+    ZNode *deepnode;
+
+    while (*cursor != ASGNCLOSE) {
+        if (*cursor == ASGNOPEN) {
+            cursor++;
+            deepnode = ((ZList *) node->object)->first;
+            err = zdeepassign(zcontext, deepnode, &cursor);
+            if (err != ZE_OK)
+                return err;
+        }
+        else {
+            err = zyarrfromstr(&key, cursor);
+            if (err != ZE_OK)
+                return err;
+            cursor += strlen(cursor) + 1; /* Skip NAME_END. */
+            wdlen = zdlength(zcwdict(zcontext));
+            err = zsetincontext(zcontext, (Zob *) key, node->object);
+            if (err != ZE_OK) {
+                zdelyarr(&key);
+                return err;
+            }
+            if (zdlength(zcwdict(zcontext)) == wdlen)
+                zdelyarr(&key);
+        }
+        node = node->next;
+    }
+    cursor++;
     *entry = cursor;
     return ZE_OK;
 }

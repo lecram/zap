@@ -33,6 +33,8 @@
 #define BREAK       (char) 0x02
 #define CONTINUE    (char) 0x03
 #define RETURN      (char) 0x04
+#define ASGNOPEN    (char) 0x10
+#define ASGNCLOSE   (char) 0x01
 
 /* Block Exit Flags */
 #define BE_END      (char) 0x80
@@ -67,6 +69,7 @@ ZError znameval(ZContext *zcontext, char **entry, Zob **pzob);
 ZError zfeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pret);
 void zskip_assign(char **entry);
 ZError zassign(ZContext *zcontext, Zob *value, char **entry);
+ZError zdeepassign(ZContext *zcontext, ZNode *node, char **entry);
 ZError zrunstatement(ZContext *zcontext, ZList *tmp, char **entry);
 void zskip_block(char **entry);
 ZError zrun_block(ZContext *zcontext,
