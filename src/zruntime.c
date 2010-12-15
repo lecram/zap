@@ -661,6 +661,8 @@ zassign(ZContext *zcontext, Zob *value, char **entry)
     while (*cursor != '\0') {
         if (*cursor == ASGNOPEN) {
             cursor++;
+            if (*value != T_LIST)
+                return ZE_ASSIGN_ERROR;
             deepnode = ((ZList *) value)->first;
             err = zdeepassign(zcontext, deepnode, &cursor);
             if (err != ZE_OK)
@@ -696,8 +698,12 @@ zdeepassign(ZContext *zcontext, ZNode *node, char **entry)
     ZNode *deepnode;
 
     while (*cursor != ASGNCLOSE) {
+        if (node == NULL)
+            return ZE_ASSIGN_ERROR;
         if (*cursor == ASGNOPEN) {
             cursor++;
+            if (*node->object != T_LIST)
+                return ZE_ASSIGN_ERROR;
             deepnode = ((ZList *) node->object)->first;
             err = zdeepassign(zcontext, deepnode, &cursor);
             if (err != ZE_OK)
@@ -719,6 +725,8 @@ zdeepassign(ZContext *zcontext, ZNode *node, char **entry)
         }
         node = node->next;
     }
+    if (node != NULL)
+        return ZE_ASSIGN_ERROR;
     cursor++;
     *entry = cursor;
     return ZE_OK;
