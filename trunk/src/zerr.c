@@ -96,14 +96,17 @@ zraiseerr(ZError err)
         case ZE_OUT_OF_MEMORY:
             puts("ZE_OUT_OF_MEMORY");
             return EXIT_FAILURE;
-        case ZE_INDEX_OUT_OF_RANGE:
-            puts("ZE_INDEX_OUT_OF_RANGE");
-            return EXIT_FAILURE;
         case ZE_NAME_NOT_DEFINED:
             puts("ZE_NAME_NOT_DEFINED");
             return EXIT_FAILURE;
         case ZE_FUNCTION_NAME_NOT_DEFINED:
             puts("ZE_FUNCTION_NAME_NOT_DEFINED");
+            return EXIT_FAILURE;
+        case ZE_INDEX_OUT_OF_RANGE:
+            puts("ZE_INDEX_OUT_OF_RANGE");
+            return EXIT_FAILURE;
+        case ZE_ASSIGN_ERROR:
+            puts("ZE_ASSIGN_ERROR");
             return EXIT_FAILURE;
         case ZE_ARITY_ERROR:
             puts("ZE_ARITY_ERROR");
