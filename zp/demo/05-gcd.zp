@@ -1,0 +1,79 @@
+# This file implements a few versions of Euclid's algorithm
+#  to compute the greatest common divisor (GCD) of two numbers.
+# Control flow structures and multiple assignments are
+#  demonstrated along the way.
+
+# Division-based version.
+def gcd_1(a, b)
+    while !=(b, 0)
+        (a, b) [b, %(a, b)]
+    return a
+
+# Subtraction-based version.
+def gcd_2(a, b)
+    if ==(a, 0)
+        return b
+    while !=(b, 0)
+        if >(a, b)
+            a -(a, b)
+        else
+            b -(b, a)
+    return a
+
+# Recursive version.
+def gcd_3(a, b)
+    if ==(b, 0)
+        return a
+    else
+        return gcd_3(b, %(a, b))
+
+# Extended, iterative version.
+def egcd_1(a, b)
+    y0 x1 0
+    x0 y1 1
+    while !=(b, 0)
+        q /(a, b)
+        (a, b) [b, %(a, b)]
+        (x0, x1) [x1, -(x0, *(q, x1))]
+        (y0, y1) [y1, -(y0, *(q, y1))]
+    return [a, x0, y0]
+
+# Extended, recursive version.
+def egcd_2(a, b)
+    if ==(%(a, b), 0)
+        return [b, 0, 1]
+    else
+        (d, x, y) egcd_2(b, %(a, b))
+        return [d, y, -(x, *(y, /(a, b)))]
+
+# Test case.
+(a, b) [32142, 213411]
+
+args join(["(", repr(a), ", ", repr(b), ")"], "")
+
+func "gcd_1"
+d gcd_1(a, b)
+res concat(" = ", repr(d))
+print(join([func, args, res, "\n"], ""))
+
+func "gcd_2"
+d gcd_2(a, b)
+res concat(" = ", repr(d))
+print(join([func, args, res, "\n"], ""))
+
+func "gcd_3"
+d gcd_3(a, b)
+res concat(" = ", repr(d))
+print(join([func, args, res, "\n"], ""))
+
+func "egcd_1"
+(d, x, y) egcd_1(a, b)
+p1 join([repr(a), "*", repr(x)], " ")
+p2 join([repr(b), "*", repr(y)], " ")
+print(join([func, ":", p1, "+", p2, "=", repr(d), "\n"], " "))
+
+func "egcd_2"
+(d, x, y) egcd_2(a, b)
+p1 join([repr(a), "*", repr(x)], " ")
+p2 join([repr(b), "*", repr(y)], " ")
+print(join([func, ":", p1, "+", p2, "=", repr(d), "\n"], " "))
