@@ -149,13 +149,42 @@ z_concat(ZList *args, Zob **ret)
     Zob *s2;
     ZError err;
 
-    if (*args->first->object != T_BYTE ||
-        *args->first->next->object != T_BYTE)
+    if (*args->first->object != T_YARR ||
+        *args->first->next->object != T_YARR)
         return ZE_INVALID_ARGUMENT;
     *ret = args->first->object;
     s2 = args->first->next->object;
     err = zconcat((ZByteArray *) *ret, (ZByteArray *) s2);
     return err;
+}
+
+/* join([s1, s2, ..., sn], sep) */
+ZError
+z_join(ZList *args, Zob **ret)
+{
+    ZNode *sub;
+    ZByteArray *sep;
+    ZError err;
+
+    if (*args->first->object != T_LIST ||
+        *args->first->next->object != T_YARR)
+        return ZE_INVALID_ARGUMENT;
+    sub = ((ZList *) args->first->object)->first;
+    sep = (ZByteArray *) args->first->next->object;
+    err = zcpyobj(sub->object, ret);
+    if (err != ZE_OK)
+        return err;
+    sub = sub->next;
+    while (sub != NULL) {
+        err = zconcat((ZByteArray *) *ret, sep);
+        if (err != ZE_OK)
+            return err;
+        err = zconcat((ZByteArray *) *ret, (ZByteArray *) sub->object);
+        if (err != ZE_OK)
+            return err;
+        sub = sub->next;
+    }
+    return ZE_OK;
 }
 
 /* push(list, item) */
@@ -777,6 +806,7 @@ zbuild(ZDict **builtins)
       {z_len, "len", 1},
       {z_arr, "arr", 1},
       {z_concat, "concat", 2},
+      {z_join, "join", 2},
       {z_push, "push", 2},
       {z_peek, "peek", 1},
       {z_pop, "pop", 1},
