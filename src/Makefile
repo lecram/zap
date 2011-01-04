@@ -1,4 +1,4 @@
-# Copyright 2010 by Marcel Rodrigues <marcelgmr@gmail.com>
+# Copyright 2010-2011 by Marcel Rodrigues <marcelgmr@gmail.com>
 #
 # This file is part of zap.
 #
