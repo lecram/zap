@@ -1027,6 +1027,7 @@ zrun_block(ZContext *zcontext,
     if (*cursor == RETURN) {
         ZByteArray *key;
         Zob *ret;
+        unsigned int wdlen;
 
         /* Function Return. */
         cursor++;
@@ -1034,11 +1035,18 @@ zrun_block(ZContext *zcontext,
         if (err != ZE_OK)
             return err;
         err = zeval(zcontext, tmp, &cursor, &ret);
-        if (err != ZE_OK)
+        if (err != ZE_OK) {
+            zdelyarr(&key);
             return err;
+        }
+        wdlen = zdlength(zcwdict(zcontext));
         err = zsetincontext(zcontext, (Zob *) key, ret);
-        if (err != ZE_OK)
+        if (err != ZE_OK) {
+            zdelyarr(&key);
             return err;
+        }
+        if (zdlength(zcwdict(zcontext)) == wdlen)
+            zdelyarr(&key);
         *be = 0;
         return ZE_OK;
     }
