@@ -337,7 +337,8 @@ cpl_expr(char **expr, char *bin)
                     bin[1] = c;
                     return 2U;
                 }
-                else if (isdigit(**expr) || (**expr == '-' && isdigit(*(*expr + 1)))) {
+                else if (isdigit(**expr) ||
+                         (**expr == '-' && isdigit(*(*expr + 1)))) {
                     char *d = *expr;
 
                     if (*d == '-')

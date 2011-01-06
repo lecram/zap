@@ -262,7 +262,9 @@ zconcat(ZByteArray *zbytearray, ZByteArray *other)
                                zbytearray->length + other->length);
     if (zbytearray->bytes == NULL)
         return ZE_OUT_OF_MEMORY;
-    memcpy(zbytearray->bytes + zbytearray->length, other->bytes, other->length);
+    memcpy(zbytearray->bytes + zbytearray->length,
+           other->bytes,
+           other->length);
     zbytearray->length += other->length;
     return ZE_OK;
 }
