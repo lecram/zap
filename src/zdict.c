@@ -126,7 +126,7 @@ zrepdict(char *buffer, size_t size, ZDict *zdict)
                 zrepobj(nodebff, 256, cur->object);
                 blen += snprintf(buffer + blen,
                                  size,
-                                 "%s: ",
+                                 "%s:",
                                  nodebff);
                 zrepobj(nodebff, 256, cur->next->object);
                 blen += snprintf(buffer + blen,
@@ -138,12 +138,12 @@ zrepdict(char *buffer, size_t size, ZDict *zdict)
             zrepobj(nodebff, 256, cur->object);
             blen += snprintf(buffer + blen,
                              size,
-                             "%s: ",
+                             "%s:",
                              nodebff);
             zrepobj(nodebff, 256, cur->next->object);
             blen += snprintf(buffer + blen,
                              size,
-                             "%s, ",
+                             "%s ",
                              nodebff);
             cur = cur->next->next;
         }
