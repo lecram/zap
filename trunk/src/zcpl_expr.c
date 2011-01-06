@@ -231,18 +231,13 @@ cpl_list(char **expr, char *bin)
 
     bin[0] = T_LIST;
     bin++;
-    if (*(*expr + 1) != ']') {
-        while (**expr != ']') {
-            (*expr)++;
-            skip_space(expr);
-            length = cpl_expr(expr, bin);
-            skip_space(expr);
-            bin += length;
-            total += length;
-        }
+    (*expr)++;
+    while (**expr != ']') {
+        length = cpl_expr(expr, bin);
+        skip_space(expr);
+        bin += length;
+        total += length;
     }
-    else
-        (*expr)++;
     (*expr)++;
     *bin = '\x00';
     return total;
@@ -255,24 +250,17 @@ cpl_dict(char **expr, char *bin)
 
     bin[0] = T_DICT;
     bin++;
-    if (*(*expr + 1) != '}') {
-        while (**expr != '}') {
-            (*expr)++;
-            skip_space(expr);
-            length = cpl_expr(expr, bin);
-            skip_space(expr);
-            bin += length;
-            total += length;
-            (*expr)++; /* ':' */
-            skip_space(expr);
-            length = cpl_expr(expr, bin);
-            skip_space(expr);
-            bin += length;
-            total += length;
-        }
+    (*expr)++;
+    while (**expr != '}') {
+        length = cpl_expr(expr, bin);
+        bin += length;
+        total += length;
+        (*expr)++; /* ':' */
+        length = cpl_expr(expr, bin);
+        skip_space(expr);
+        bin += length;
+        total += length;
     }
-    else
-        (*expr)++;
     (*expr)++;
     *bin = '\x00';
     return total;
@@ -292,18 +280,13 @@ cpl_func(char **expr, char *bin)
     *expr += total;
     *bin = '\x00';
     bin++;
-    if (*(*expr + 1) != ')') {
-        while (**expr != ')') {
-            (*expr)++;
-            skip_space(expr);
-            length = cpl_expr(expr, bin);
-            skip_space(expr);
-            bin += length;
-            total += length;
-        }
+    (*expr)++;
+    while (**expr != ')') {
+        length = cpl_expr(expr, bin);
+        skip_space(expr);
+        bin += length;
+        total += length;
     }
-    else
-        (*expr)++;
     (*expr)++;
     *bin = '\xF1';
     return total + 3;

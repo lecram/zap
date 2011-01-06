@@ -182,7 +182,7 @@ zreplist(char *buffer, size_t size, ZList *zlist)
                 break;
             }
             zrepobj(nodebff, 256, cur->object);
-            blen += snprintf(buffer + blen, size, "%s, ", nodebff);
+            blen += snprintf(buffer + blen, size, "%s ", nodebff);
             cur = cur->next;
         }
         return blen;

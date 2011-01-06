@@ -330,17 +330,15 @@ cpl_mod(char *srcname)
                 def++;
             }
             fwrite("\0", 1, 1, fbin);
-            if (*(def + 1) != ')') {
-                while (*def != ')') {
+            def++;
+            while (*def != ')') {
+                skip_space(&def);
+                while (!is_separator(*def)) {
+                    fwrite(def, 1, 1, fbin);
                     def++;
-                    skip_space(&def);
-                    while (!is_separator(*def)) {
-                        fwrite(def, 1, 1, fbin);
-                        def++;
-                    }
-                    fwrite("\0", 1, 1, fbin);
-                    skip_space(&def);
                 }
+                fwrite("\0", 1, 1, fbin);
+                skip_space(&def);
             }
             fwrite("\0", 1, 1, fbin);
             continue;
