@@ -16,7 +16,7 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ZByte Array Type */
+/* ZByteArray Type */
 
 #include <stdlib.h>
 #include <stdio.h>
