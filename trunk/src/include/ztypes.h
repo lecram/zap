@@ -27,7 +27,7 @@
 #define T_NONE  1
 #define T_BOOL  2
 #define T_BYTE  3
-#define T_INT  4
+#define T_INT   4
 #define T_YARR  5  /* Byte Array */
 #define T_BNUM  6  /* BigNum     */
 #define T_LIST  7
