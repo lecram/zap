@@ -31,7 +31,8 @@
 #define T_YARR  5  /* Byte Array */
 #define T_BNUM  6  /* BigNum     */
 #define T_LIST  7
-#define T_DICT  8
-#define T_FUNC  9
+#define T_NMTB  8  /* Name Table */
+#define T_DICT  9
+#define T_FUNC 10
 
 typedef unsigned char Zob;
