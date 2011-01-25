@@ -35,6 +35,7 @@
 #include "zbytearray.h"
 #include "zbignum.h"
 #include "zlist.h"
+#include "znametable.h"
 #include "zdict.h"
 #include "zfunc.h"
 
@@ -67,6 +68,9 @@ zdelobj(Zob **zob)
             break;
         case T_LIST:
             zdellist((ZList **) zob);
+            break;
+        case T_NMTB:
+            zdelnable((ZNameTable **) zob);
             break;
         case T_DICT:
             zdeldict((ZDict **) zob);
@@ -104,6 +108,8 @@ zcpyobj(Zob *source, Zob **dest)
             return zcpybnum((ZBigNum *) source, (ZBigNum **) dest);
         case T_LIST:
             return zcpylist((ZList *) source, (ZList **) dest);
+        case T_NMTB:
+            return zcpynable((ZNameTable *) source, (ZNameTable **) dest);
         case T_DICT:
             return zcpydict((ZDict *) source, (ZDict **) dest);
         case T_FUNC:
@@ -148,6 +154,8 @@ ztstobj(Zob *zob)
             return ztstbnum((ZBigNum *) zob);
         case T_LIST:
             return ztstlist((ZList *) zob);
+        case T_NMTB:
+            return ztstnable((ZNameTable *) zob);
         case T_DICT:
             return ztstdict((ZDict *) zob);
         case T_FUNC:
@@ -184,6 +192,8 @@ zcmpobj(Zob *zob, Zob *other)
             return zcmpbnum((ZBigNum *) zob, (ZBigNum *) other);
         case T_LIST:
             return zcmplist((ZList *) zob, (ZList *) other);
+        case T_NMTB:
+            return zcmpnable((ZNameTable *) zob, (ZNameTable *) other);
         case T_DICT:
             return zcmpdict((ZDict *) zob, (ZDict *) other);
         case T_FUNC:
@@ -217,6 +227,8 @@ zrepobj(char *buffer, size_t size, Zob *zob)
             return zrepbnum(buffer, size, (ZBigNum *) zob);
         case T_LIST:
             return zreplist(buffer, size, (ZList *) zob);
+        case T_NMTB:
+            return zrepnable(buffer, size, (ZNameTable *) zob);
         case T_DICT:
             return zrepdict(buffer, size, (ZDict *) zob);
         case T_FUNC:
@@ -261,6 +273,9 @@ ztypename(Zob *zob, Zob **name)
             break;
         case T_LIST:
             err = zyarrfromstr((ZByteArray **) name, "List");
+            break;
+        case T_NMTB:
+            err = zyarrfromstr((ZByteArray **) name, "NameTable");
             break;
         case T_DICT:
             err = zyarrfromstr((ZByteArray **) name, "Dict");
