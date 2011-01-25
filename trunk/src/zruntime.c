@@ -39,6 +39,7 @@
 #include "zbytearray.h"
 #include "zbignum.h"
 #include "zlist.h"
+#include "znametable.h"
 #include "zdict.h"
 #include "zfunc.h"
 

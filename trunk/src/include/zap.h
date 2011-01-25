@@ -17,3 +17,30 @@
  */
 
 /* zap includes */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+#include "ztypes.h"
+#include "zerr.h"
+#include "zgc.h"
+
+#include "znone.h"
+#include "zbool.h"
+#include "zbyte.h"
+#include "zint.h"
+#include "zbytearray.h"
+#include "zbignum.h"
+#include "zlist.h"
+#include "znametable.h"
+#include "zdict.h"
+#include "zfunc.h"
+
+#include "zobject.h"
+#include "zruntime.h"
+#include "zbuiltin.h"
+
+#include "zcpl_expr.h"
+#include "zcpl_mod.h"
