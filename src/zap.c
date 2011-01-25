@@ -35,8 +35,6 @@
 #include "zcpl_expr.h"
 #include "zcpl_mod.h"
 
-#include "zap.h"
-
 void
 zdebug_bin(char *bin, unsigned int length)
 {
