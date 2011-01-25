@@ -41,6 +41,11 @@ types = $(I)znone.h $(I)zbool.h $(I)zbyte.h $(I)zint.h $(I)zbytearray.h \
 dist : $(objects)
 	$(CC) -o zap$(BINEXT) $(objects)
 
+lib : $(objects)
+	ar rvs libzap.a $(objects)
+
+test : libzap.a
+	$(CC) $(CFLAGS) test.c libzap.a -o test.exe
 
 # Base.
 
