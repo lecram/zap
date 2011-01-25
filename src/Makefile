@@ -25,6 +25,12 @@ else ifeq ($(CC), tcc)
 CFLAGS = -Wall -Werror -Wunsupported -Iinclude
 endif
 
+ifeq ($(v), true)
+ARFLAGS = rvs
+else
+ARFLAGS = rs
+endif
+
 I = include/
 
 objects = ztypes.o zerr.o zgc.o znone.o zbool.o zbyte.o zint.o \
@@ -42,9 +48,9 @@ dist : $(objects)
 	$(CC) -o zap$(BINEXT) $(objects)
 
 lib : $(objects)
-	ar rvs libzap.a $(objects)
+	ar $(ARFLAGS) libzap.a $(objects)
 
-test : libzap.a
+test : lib
 	$(CC) $(CFLAGS) test.c libzap.a -o test.exe
 
 # Base.
