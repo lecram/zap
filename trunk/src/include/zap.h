@@ -16,4 +16,4 @@
  * along with zap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* zap (header) */
+/* zap includes */
