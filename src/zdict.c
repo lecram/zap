@@ -183,7 +183,6 @@ zdset(ZDict *zdict, Zob *key, Zob *value)
 
     /* Key not found. */
     /* New key. */
-    /* FIXME: should check ZE_OUT_OF_MEMORY while appending. */
     err = zlappend(zdict->zlist, key);
     if (err != ZE_OK)
         return err;
