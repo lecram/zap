@@ -30,7 +30,7 @@ I = include/
 objects = ztypes.o zerr.o zgc.o znone.o zbool.o zbyte.o zint.o \
           zbytearray.o zbignum.o zlist.o znametable.o zdict.o \
           zfunc.o zobject.o zruntime.o zbuiltin.o zcpl_expr.o \
-		  zcpl_mod.o zap.o
+          zcpl_mod.o zap.o
 
 base = $(I)ztypes.h $(I)zerr.h $(I)zgc.h
 
@@ -107,8 +107,8 @@ zcpl_mod.o : zcpl_mod.c $(I)zerr.h $(I)zcpl_expr.h $(I)zcpl_mod.h
 # Main.
 
 zap.o : zap.c $(I)ztypes.h $(I)zerr.h $(I)zlist.h $(I)znametable.h \
-	    $(I)zdict.h $(I)zobject.h $(I)zruntime.h $(I)zbuiltin.h \
-		$(I)zcpl_expr.h $(I)zcpl_mod.h
+        $(I)zdict.h $(I)zobject.h $(I)zruntime.h $(I)zbuiltin.h \
+        $(I)zcpl_expr.h $(I)zcpl_mod.h
 	$(CC) -c $(CFLAGS) zap.c
 
 
