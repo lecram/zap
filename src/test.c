@@ -100,6 +100,7 @@ test_nable()
 
     zrepobj(buffer, 1024, (Zob *) znable);
     printf("nable = %s\n", buffer);
+    /* nable = {Five:0x05 Four:0x04 One:0x01 Six:0x06 Three:0x03 Two:0x02 Zero:0x00} */
     zdelnable(&znable);
     return ZE_OK;
 }

@@ -31,11 +31,6 @@
 
 #include "zobject.h"
 
-/* A skip list with p = 1/4 and MAX_LEVEL = 8 can safely
- *  accommodate up to 4^8 = 2^16 = 65536 elements.
- */
-#define MAX_LEVEL 8
-
 /* Return a pseudo-random number x, such that 0 <= x < 1. */
 double
 zrandom()
@@ -44,7 +39,8 @@ zrandom()
 }
 
 /* Return a random level for a new entry in a skip list. */
-int ztrndlevel()
+int
+ztrndlevel()
 {
     int level = 0;
 
@@ -59,7 +55,8 @@ int ztrndlevel()
  * If there is not enough memory, return ZE_OUT_OF_MEMORY.
  * Otherwise, return ZE_OK.
  */
-ZError znewentry(int level, char *name, Zob *value, ZEntry **zentry)
+ZError
+znewentry(int level, char *name, Zob *value, ZEntry **zentry)
 {
     int i;
 
@@ -71,20 +68,27 @@ ZError znewentry(int level, char *name, Zob *value, ZEntry **zentry)
         return ZE_OUT_OF_MEMORY;
     strcpy((*zentry)->name, name);
     (*zentry)->value = value;
-    zincrefc(value);
-    *(*zentry)->next = (ZEntry *) malloc(sizeof(ZEntry) * (level + 1));
-    if (*(*zentry)->next == NULL)
+    if (value != EMPTY)
+        zincrefc(value);
+    if ((*zentry)->next == NULL)
         return ZE_OUT_OF_MEMORY;
-    for (i = 0; i <= level; i++)
+    for (i = 0; i <= level; i++) {
+        (*zentry)->next[i] = (ZEntry *) malloc(sizeof(ZEntry));
+        if ((*zentry)->next[i] == NULL)
+            return ZE_OUT_OF_MEMORY;
         (*zentry)->next[i] = NULL;
+    }
     return ZE_OK;
 }
 
 /* Remove 'zentry' from memory, unbinding its object. */
-void zdelentry(ZEntry **zentry)
+void
+zdelentry(ZEntry **zentry)
 {
-    zdecrefc((*zentry)->value);
-    free((*zentry)->name);
+    if ((*zentry)->value != EMPTY)
+        zdecrefc((*zentry)->value);
+    if (*(*zentry)->name != '\0')
+        free((*zentry)->name);
     free((*zentry)->next);
     free(*zentry);
     *zentry = NULL;
@@ -97,8 +101,6 @@ void zdelentry(ZEntry **zentry)
 ZError
 znewnable(ZNameTable **znable)
 {
-    int i;
-
     /* [Re]Initialize pseudo-random number generator. */
     srand(time(NULL));
 
@@ -108,17 +110,7 @@ znewnable(ZNameTable **znable)
     (*znable)->type = T_NMTB;
     (*znable)->refc = 0;
     (*znable)->level = 0;
-    (*znable)->header = (ZEntry *) malloc(sizeof(ZEntry));
-    if ((*znable)->header == NULL)
-        return ZE_OUT_OF_MEMORY;
-    (*znable)->header->name = "";
-    (*znable)->header->value = EMPTY;
-    *(*znable)->header->next = (ZEntry *) malloc(sizeof(ZEntry) * MAX_LEVEL);
-    if (*(*znable)->header->next == NULL)
-        return ZE_OUT_OF_MEMORY;
-    for (i = 0; i < MAX_LEVEL; i++)
-        (*znable)->header->next[i] = NULL;
-    return ZE_OK;
+    return znewentry(MAX_LEVEL - 1, "", EMPTY, &(*znable)->header);
 }
 
 /* Remove 'znable' from memory. */
@@ -269,7 +261,7 @@ ztset(ZNameTable *znable, char *name, Zob *value)
     zentry = znable->header;
     for (i = znable->level; i >= 0; i--) {
         while (zentry->next[i] != NULL) {
-            if (strcmp(zentry->next[i]->name, name) >= 0)
+            if (strcmp((zentry->next)[i]->name, name) >= 0)
                 break;
             zentry = zentry->next[i];
         }

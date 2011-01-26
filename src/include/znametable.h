@@ -18,10 +18,15 @@
 
 /* ZNameTable Type (header) */
 
+/* A skip list with p = 1/4 and MAX_LEVEL = 8 can safely
+ *  accommodate up to 4^8 = 2^16 = 65536 elements.
+ */
+#define MAX_LEVEL 8
+
 typedef struct ZEntry {
     char *name;
     Zob *value;
-    struct ZEntry *next[];
+    struct ZEntry *next[MAX_LEVEL];
 } ZEntry;
 
 typedef struct {
