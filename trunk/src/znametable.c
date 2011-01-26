@@ -111,7 +111,7 @@ znewnable(ZNameTable **znable)
     (*znable)->header = (ZEntry *) malloc(sizeof(ZEntry));
     if ((*znable)->header == NULL)
         return ZE_OUT_OF_MEMORY;
-    (*znable)->header->name = NULL;
+    (*znable)->header->name = "";
     (*znable)->header->value = EMPTY;
     *(*znable)->header->next = (ZEntry *) malloc(sizeof(ZEntry) * MAX_LEVEL);
     if (*(*znable)->header->next == NULL)
@@ -262,7 +262,7 @@ ztset(ZNameTable *znable, char *name, Zob *value)
 {
     ZEntry *zentry;
     ZEntry *update[MAX_LEVEL];
-    int i;
+    int found, i;
     ZError err;
 
     /* Seek name. */
@@ -276,7 +276,10 @@ ztset(ZNameTable *znable, char *name, Zob *value)
         update[i] = zentry;
     }
     zentry = zentry->next[0];
-    if (strcmp(zentry->name, name) == 0) {
+    found = (zentry != NULL);
+    if (found)
+        found = (strcmp(zentry->name, name) == 0);
+    if (found) {
         /* Set value. */
         zdecrefc(zentry->value);
         zentry->value = value;
