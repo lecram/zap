@@ -90,17 +90,37 @@ test_nable()
     err = znewnable(&znable);
     if (err != ZE_OK) return err;
 
+    zrepobj(buffer, 1024, (Zob *) znable);
+    printf("nable = %s\n", buffer);
+
     for (i = 0; strlen(pairs[i].name) > 0; i++) {
         err = znewbyte((ZByte **) &zob);
         if (err != ZE_OK) return err;
         ((ZByte *) zob)->value = pairs[i].value;
         err = ztset(znable, pairs[i].name, zob);
         if (err != ZE_OK) return err;
+        zrepobj(buffer, 1024, (Zob *) znable);
+        printf("nable = %s\n", buffer);
+    }
+
+    zrepnable_detail(znable);
+
+    if (ztremove(znable, "Six")) {
+        ztremove(znable, "Five");
+        ztremove(znable, "Zero");
     }
 
     zrepobj(buffer, 1024, (Zob *) znable);
     printf("nable = %s\n", buffer);
-    /* nable = {Five:0x05 Four:0x04 One:0x01 Six:0x06 Three:0x03 Two:0x02 Zero:0x00} */
+
+    if (ztremove(znable, "Eight")) {
+        ztremove(znable, "One");
+        ztremove(znable, "Two");
+    }
+
+    zrepobj(buffer, 1024, (Zob *) znable);
+    printf("nable = %s\n", buffer);
+
     zdelnable(&znable);
     return ZE_OK;
 }
