@@ -70,12 +70,10 @@ znewentry(int level, char *name, Zob *value, ZEntry **zentry)
     (*zentry)->value = value;
     if (value != EMPTY)
         zincrefc(value);
+    (*zentry)->next = (ZEntry **) malloc((level + 1) * sizeof(ZEntry *));
     if ((*zentry)->next == NULL)
         return ZE_OUT_OF_MEMORY;
     for (i = 0; i <= level; i++) {
-        (*zentry)->next[i] = (ZEntry *) malloc(sizeof(ZEntry));
-        if ((*zentry)->next[i] == NULL)
-            return ZE_OUT_OF_MEMORY;
         (*zentry)->next[i] = NULL;
     }
     return ZE_OK;
@@ -87,8 +85,7 @@ zdelentry(ZEntry **zentry)
 {
     if ((*zentry)->value != EMPTY)
         zdecrefc((*zentry)->value);
-    if (*(*zentry)->name != '\0')
-        free((*zentry)->name);
+    free((*zentry)->name);
     free((*zentry)->next);
     free(*zentry);
     *zentry = NULL;
@@ -230,6 +227,37 @@ zrepnable(char *buffer, size_t size, ZNameTable *znable)
     }
 }
 
+void
+zrepnable_detail(ZNameTable *znable)
+{
+    ZEntry *cur = znable->header;
+    int i;
+
+    for (i = 0; i <= znable->level; i++)
+        printf("%03d ", i);
+    puts("");
+    for (i = 0; i <= znable->level; i++)
+        printf(" |  ");
+    puts("");
+    while (cur->next[0] != NULL) {
+        for (i = 0; i <= znable->level; i++) {
+            if (cur->next[i] == cur->next[0])
+                printf("%03d ", ((int) cur->next[i]) % 1000);
+            else
+                printf(" |  ");
+        }
+        puts("");
+
+        for (i = 0; i <= znable->level; i++)
+            printf(" |  ");
+        puts("");
+        cur = cur->next[0];
+    }
+    for (i = 0; i <= znable->level; i++)
+        printf("--- ");
+    puts("");
+}
+
 /* Return the number of name-value pairs in 'znable'. */
 unsigned int
 ztlength(ZNameTable *znable)
@@ -261,7 +289,7 @@ ztset(ZNameTable *znable, char *name, Zob *value)
     zentry = znable->header;
     for (i = znable->level; i >= 0; i--) {
         while (zentry->next[i] != NULL) {
-            if (strcmp((zentry->next)[i]->name, name) >= 0)
+            if (strcmp(zentry->next[i]->name, name) >= 0)
                 break;
             zentry = zentry->next[i];
         }

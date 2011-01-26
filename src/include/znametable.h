@@ -26,7 +26,7 @@
 typedef struct ZEntry {
     char *name;
     Zob *value;
-    struct ZEntry *next[MAX_LEVEL];
+    struct ZEntry **next;
 } ZEntry;
 
 typedef struct {
@@ -48,6 +48,7 @@ ZError zcpynable(ZNameTable *source, ZNameTable **dest);
 int ztstnable(ZNameTable *znable);
 int zcmpnable(ZNameTable *znable, ZNameTable *other);
 int zrepnable(char *buffer, size_t size, ZNameTable *znable);
+void zrepnable_detail(ZNameTable *znable);
 unsigned int ztlength(ZNameTable *znable);
 ZError ztset(ZNameTable *znable, char *name, Zob *value);
 int ztget(ZNameTable *znable, char *name, Zob **value);
