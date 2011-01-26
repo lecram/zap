@@ -51,7 +51,7 @@ lib : $(objects)
 	ar $(ARFLAGS) libzap.a $(objects)
 
 test : lib
-	$(CC) $(CFLAGS) test.c libzap.a -o test.exe
+	$(CC) $(CFLAGS) test.c libzap.a -o test$(BINEXT)
 
 # Base.
 
