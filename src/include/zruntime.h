@@ -44,7 +44,7 @@
 
 typedef struct {
     /* Global namespace. */
-    ZDict *global;
+    ZNameTable *global;
     /* A stack of local namespaces. */
     ZList *local;
 } ZContext;
@@ -53,11 +53,11 @@ ZError znewcontext(ZContext **zcontext);
 void zdelcontext(ZContext **zcontext);
 ZError zpushlocal(ZContext *zcontext);
 ZError zpoplocal(ZContext *zcontext, Zob **ret);
-ZError zsetincontext(ZContext *zcontext, Zob *key, Zob *value);
-int zgetincontext(ZContext *zcontext, Zob *key, Zob **pvalue);
-int zremincontext(ZContext *zcontext, Zob *key);
-int zhasincontext(ZContext *zcontext, Zob *key);
-ZDict *zcwdict(ZContext *zcontext);
+ZError zsetincontext(ZContext *zcontext, char *name, Zob *value);
+int zgetincontext(ZContext *zcontext, char *name, Zob **pvalue);
+int zremincontext(ZContext *zcontext, char *name);
+int zhasincontext(ZContext *zcontext, char *name);
+ZNameTable *zcwnable(ZContext *zcontext);
 unsigned int zreadword(char **entry);
 unsigned int zread_uvlv(char **entry);
 int zread_svlv(char **entry);

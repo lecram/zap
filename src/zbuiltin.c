@@ -36,6 +36,7 @@
 #include "zbytearray.h"
 #include "zbignum.h"
 #include "zlist.h"
+#include "znametable.h"
 #include "zdict.h"
 #include "zfunc.h"
 
@@ -746,19 +747,18 @@ z_geq(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
-/* Register 'func' in 'dict'.
+/* Register 'func' in 'nable'.
  * If there is not enough memory, return ZE_OUT_OF_MEMORY.
  * Otherwise, return ZE_OK.
  */
 ZError
-regfunc(ZDict *dict,
+regfunc(ZNameTable *nable,
         ZError (*func)(ZList *args, Zob **ret),
         char *name,
         unsigned char arity)
 {
     ZFunc *zfunc;
     ZLowFunc *zlowfunc;
-    ZByteArray *key;
     ZError err;
 
     err = znewlowfunc(&zlowfunc);
@@ -770,28 +770,21 @@ regfunc(ZDict *dict,
         zdellowfunc(&zlowfunc);
         return err;
     }
-    err = zyarrfromstr(&key, name);
+    err = ztset(nable, name, (Zob *) zfunc);
     if (err != ZE_OK) {
         zdellowfunc(&zlowfunc);
         zdelfunc(&zfunc);
-        return err;
-    }
-    err = zdset(dict, (Zob *) key, (Zob *) zfunc);
-    if (err != ZE_OK) {
-        zdellowfunc(&zlowfunc);
-        zdelfunc(&zfunc);
-        zdelyarr(&key);
         return err;
     }
     return ZE_OK;
 }
 
-/* Create a new ZDict with builtins names in 'builtins'.
+/* Create a new ZNameTable with builtins names in 'builtins'.
  * If there is not enough memory, return ZE_OUT_OF_MEMORY.
  * Otherwise, return ZE_OK.
  */
 ZError
-zbuild(ZDict **builtins)
+zbuild(ZNameTable **builtins)
 {
     struct wrap {
         ZError (*func)(ZList *args, Zob **ret);
@@ -837,7 +830,7 @@ zbuild(ZDict **builtins)
     int i;
     ZError err;
 
-    err = znewdict(builtins);
+    err = znewnable(builtins);
     if (err != ZE_OK)
         return err;
     for (i = 0; wraps[i].func != NULL; i++) {

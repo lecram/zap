@@ -108,8 +108,9 @@ zruntime.o : zruntime.c $(base) $(types) $(I)zobject.h $(I)zruntime.h
 zbuiltin.o : zbuiltin.c $(base) $(types) $(I)zobject.h $(I)zbuiltin.h
 	$(CC) -c $(CFLAGS) zbuiltin.c
 
-zcpl_expr.o : zcpl_expr.c $(I)ztypes.h $(I)zbyte.h $(I)zbignum.h \
-              $(I)zlist.h $(I)zdict.h $(I)zruntime.h $(I)zcpl_expr.h
+zcpl_expr.o : zcpl_expr.c $(I)ztypes.h $(I)zbyte.h \
+              $(I)zbignum.h $(I)zlist.h $(I)znametable.h \
+              $(I)zdict.h $(I)zruntime.h $(I)zcpl_expr.h
 	$(CC) -c $(CFLAGS) zcpl_expr.c
 
 zcpl_mod.o : zcpl_mod.c $(I)zerr.h $(I)zcpl_expr.h $(I)zcpl_mod.h

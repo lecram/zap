@@ -26,6 +26,7 @@
 #include "zerr.h"
 
 #include "zlist.h"
+#include "znametable.h"
 #include "zdict.h"
 
 #include "zobject.h"
