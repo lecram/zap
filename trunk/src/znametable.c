@@ -79,9 +79,8 @@ znewentry(int level, char *name, Zob *value, ZEntry **zentry)
     (*zentry)->next = (ZEntry **) malloc((level + 1) * sizeof(ZEntry *));
     if ((*zentry)->next == NULL)
         return ZE_OUT_OF_MEMORY;
-    for (i = 0; i <= level; i++) {
+    for (i = 0; i <= level; i++)
         (*zentry)->next[i] = NULL;
-    }
     return ZE_OK;
 }
 
