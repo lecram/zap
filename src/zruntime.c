@@ -144,9 +144,9 @@ zgetincontext(ZContext *zcontext, char *name, Zob **pvalue)
         ok = ztget(zcontext->global, name, &value);
     }
     *pvalue = value;
-    if (!ok)
-        return 0;
-    return 1;
+    if (ok)
+        return 1;
+    return 0;
 }
 
 /* If 'name' is in 'zcontext',
