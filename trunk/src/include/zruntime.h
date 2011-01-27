@@ -57,7 +57,6 @@ ZError zsetincontext(ZContext *zcontext, char *name, Zob *value);
 int zgetincontext(ZContext *zcontext, char *name, Zob **pvalue);
 int zremincontext(ZContext *zcontext, char *name);
 int zhasincontext(ZContext *zcontext, char *name);
-ZNameTable *zcwnable(ZContext *zcontext);
 unsigned int zreadword(char **entry);
 unsigned int zread_uvlv(char **entry);
 int zread_svlv(char **entry);

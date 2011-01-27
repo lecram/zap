@@ -184,15 +184,6 @@ zhasincontext(ZContext *zcontext, char *name)
     return 0;
 }
 
-/* Return the current namespace to write in 'zcontext'. */
-ZNameTable *
-zcwnable(ZContext *zcontext)
-{
-    if (zcontext->local->length > 0)
-        return (ZNameTable *) zlpeek(zcontext->local);
-    return zcontext->global;
-}
-
 unsigned int
 zreadword(char **entry)
 {
