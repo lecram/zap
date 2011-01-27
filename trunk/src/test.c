@@ -83,8 +83,8 @@ test_dict()
         err = zyarrfromstr(&key, "Six");
         if (err != ZE_OK) return err;
         zdremove(zdict, (Zob *) key);
-        zdelyarr(&key);
     }
+    zdelyarr(&key);
 
     zrepobj(buffer, 1024, (Zob *) zdict);
     printf("%s\n", buffer);
@@ -103,8 +103,8 @@ test_dict()
         err = zyarrfromstr(&key, "Five");
         if (err != ZE_OK) return err;
         zdremove(zdict, (Zob *) key);
-        zdelyarr(&key);
     }
+    zdelyarr(&key);
 
     zrepobj(buffer, 1024, (Zob *) zdict);
     printf("%s\n", buffer);
