@@ -397,7 +397,7 @@ ztremove(ZNameTable *znable, char *name)
 {
     ZEntry *zentry;
     ZEntry *update[SLHEIGHT];
-    int i;
+    int found, i;
 
     /* Seek name. */
     zentry = znable->header;
@@ -410,7 +410,10 @@ ztremove(ZNameTable *znable, char *name)
         update[i] = zentry;
     }
     zentry = zentry->next[0];
-    if (strcmp(zentry->name, name) == 0) {
+    found = (zentry != NULL);
+    if (found)
+        found = (strcmp(zentry->name, name) == 0);
+    if (found) {
         /* Remove pair. */
         for (i = 0; i <= znable->level; i++) {
             if (update[i]->next[i] != zentry)
@@ -448,7 +451,7 @@ int
 zthasname(ZNameTable *znable, char *name)
 {
     ZEntry *zentry;
-    int i;
+    int found, i;
 
     /* Seek name. */
     zentry = znable->header;
@@ -460,7 +463,10 @@ zthasname(ZNameTable *znable, char *name)
         }
     }
     zentry = zentry->next[0];
-    if (strcmp(zentry->name, name) == 0) {
+    found = (zentry != NULL);
+    if (found)
+        found = (strcmp(zentry->name, name) == 0);
+    if (found) {
         /* Name found. */
         return 1;
     }
