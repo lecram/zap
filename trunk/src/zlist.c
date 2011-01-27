@@ -416,8 +416,8 @@ zlremove(ZList *zlist, int index)
         next = prev->next->next;
         zdelnode(&prev->next);
         prev->next = next;
+        zlist->length--;
     }
-    zlist->length--;
     return ZE_OK;
 }
 
