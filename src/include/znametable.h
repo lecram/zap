@@ -18,10 +18,13 @@
 
 /* ZNameTable Type (header) */
 
-/* A skip list with p = 1/4 and MAX_LEVEL = 8 can safely
- *  accommodate up to 4^8 = 2^16 = 65536 elements.
+/* A skip list with p = 1/b = 1/2 and h = 16, where p is the
+ *  probability of a node to be promoted to a higher level
+ *  and h is the maximum level of any node, can safely
+ *  accommodate up to b^h = 2^16 elements.
  */
-#define MAX_LEVEL 8
+#define SLPROB   0.5
+#define SLHEIGHT 16
 
 typedef struct ZEntry {
     char *name;

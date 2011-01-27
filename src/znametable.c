@@ -44,7 +44,7 @@ ztrndlevel()
 {
     int level = 0;
 
-    while (zrandom() < 0.25 && level < (MAX_LEVEL - 1))
+    while (zrandom() < SLPROB && level < (SLHEIGHT - 1))
         level++;
     return level;
 }
@@ -107,7 +107,7 @@ znewnable(ZNameTable **znable)
     (*znable)->type = T_NMTB;
     (*znable)->refc = 0;
     (*znable)->level = 0;
-    return znewentry(MAX_LEVEL - 1, "", EMPTY, &(*znable)->header);
+    return znewentry(SLHEIGHT - 1, "", EMPTY, &(*znable)->header);
 }
 
 /* Remove 'znable' from memory. */
@@ -281,7 +281,7 @@ ZError
 ztset(ZNameTable *znable, char *name, Zob *value)
 {
     ZEntry *zentry;
-    ZEntry *update[MAX_LEVEL];
+    ZEntry *update[SLHEIGHT];
     int found, i;
     ZError err;
 
@@ -382,7 +382,7 @@ int
 ztremove(ZNameTable *znable, char *name)
 {
     ZEntry *zentry;
-    ZEntry *update[MAX_LEVEL];
+    ZEntry *update[SLHEIGHT];
     int i;
 
     /* Seek name. */
