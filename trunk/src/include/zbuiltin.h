@@ -22,8 +22,8 @@
  * They should not be called from anywhere in the API.
  */
 
-ZError regfunc(ZDict *dict,
+ZError regfunc(ZNameTable *nable,
                ZError (*func)(ZList *args, Zob **ret),
                char *name,
                unsigned char arity);
-ZError zbuild(ZDict **builtins);
+ZError zbuild(ZNameTable **builtins);
