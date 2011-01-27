@@ -435,13 +435,16 @@ void
 ztempty(ZNameTable *znable)
 {
     ZEntry *a, *b;
+    int i;
 
     a = znable->header->next[0];
-    do {
+    while (a != NULL) {
         b = a->next[0];
         zdelentry(&a);
         a = b;
-    } while (a != NULL);
+    }
+    for (i = 0; i < SLHEIGHT; i++)
+        znable->header->next[i] = NULL;
 }
 
 /* If 'name' is in 'znable', return nonzero.
