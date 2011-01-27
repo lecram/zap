@@ -345,7 +345,7 @@ int
 ztget(ZNameTable *znable, char *name, Zob **value)
 {
     ZEntry *zentry;
-    int i;
+    int found, i;
 
     /* Seek name. */
     zentry = znable->header;
@@ -357,7 +357,10 @@ ztget(ZNameTable *znable, char *name, Zob **value)
         }
     }
     zentry = zentry->next[0];
-    if (strcmp(zentry->name, name) == 0) {
+    found = (zentry != NULL);
+    if (found)
+        found = (strcmp(zentry->name, name) == 0);
+    if (found) {
         /* Get value. */
         *value = zentry->value;
         return 1;
