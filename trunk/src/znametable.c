@@ -40,11 +40,17 @@ zrandom()
 
 /* Return a random level for a new entry in a skip list. */
 int
-ztrndlevel()
+ztrndlevel(ZNameTable *znable)
 {
     int level = 0;
+    int max;
 
-    while (zrandom() < SLPROB && level < (SLHEIGHT - 1))
+    if (znable->level == SLHEIGHT - 1)
+        max = SLHEIGHT - 1;
+    else
+        /* Dirty Hack. */
+        max = znable->level + 1;
+    while (zrandom() < SLPROB && level < max)
         level++;
     return level;
 }
@@ -230,7 +236,8 @@ zrepnable(char *buffer, size_t size, ZNameTable *znable)
 void
 zrepnable_detail(ZNameTable *znable)
 {
-    ZEntry *cur = znable->header;
+    ZEntry *cur[SLHEIGHT];
+    ZEntry *step = znable->header;
     int i;
 
     for (i = 0; i <= znable->level; i++)
@@ -239,10 +246,15 @@ zrepnable_detail(ZNameTable *znable)
     for (i = 0; i <= znable->level; i++)
         printf(" |  ");
     puts("");
-    while (cur->next[0] != NULL) {
+    for (i = 0; i <= znable->level; i++) {
+        cur[i] = znable->header;
+    }
+    while (step->next[0] != NULL) {
         for (i = 0; i <= znable->level; i++) {
-            if (cur->next[i] == cur->next[0])
-                printf("%03d ", ((int) cur->next[i]) % 1000);
+            if (cur[i]->next[i] == step->next[0]) {
+                printf("%03d ", ((int) cur[i]->next[i]) % 1000);
+                cur[i] = cur[i]->next[0];
+            }
             else
                 printf(" |  ");
         }
@@ -251,7 +263,7 @@ zrepnable_detail(ZNameTable *znable)
         for (i = 0; i <= znable->level; i++)
             printf(" |  ");
         puts("");
-        cur = cur->next[0];
+        step = step->next[0];
     }
     for (i = 0; i <= znable->level; i++)
         printf("--- ");
@@ -308,11 +320,11 @@ ztset(ZNameTable *znable, char *name, Zob *value)
     else {
         /* Name not found. */
         /* New entry. */
-        int level = ztrndlevel();
+        int level = ztrndlevel(znable);
 
         if (level > znable->level) {
-            /* Dirty hack. */
-            level = ++znable->level;
+            /* Assuming Dirty Hack, level == znable->level + 1. */
+            znable->level++;
             update[level] = znable->header;
         }
         err = znewentry(level, name, value, &zentry);
