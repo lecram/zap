@@ -116,13 +116,34 @@ zpoplocal(ZContext *zcontext, Zob **ret)
 ZError
 zsetincontext(ZContext *zcontext, char *name, Zob *value)
 {
-    if (zcontext->local->length > 0) {
-        ZNameTable *local;
+    ZNameTable *nable;
+    char *oldtoken, *newtoken;
+    char *lastname = NULL;
+    int nulls = 0;
 
-        local = (ZNameTable *) zlpeek(zcontext->local);
-        return ztset(local, name, value);
+    if (zcontext->local->length > 0)
+        nable = (ZNameTable *) zlpeek(zcontext->local);
+    else
+        nable = zcontext->global;
+    oldtoken = strtok(name, ".");
+    while (lastname == NULL) {
+        if ((newtoken = strtok(NULL, ".")) == NULL)
+            lastname = oldtoken;
+        else {
+            if (ztget(nable, oldtoken, (Zob **) &nable) == 0)
+                return ZE_NAME_NOT_DEFINED;
+            if (nable->type != T_NMTB)
+                return ZE_NOT_A_NODE;
+            nulls++;
+            oldtoken = newtoken;
+        }
     }
-    return ztset(zcontext->global, name, value);
+    /* Replace null characters -- placed by strtok() calls -- 
+     *  by the original dots.
+     */
+    for (;nulls > 0; nulls--)
+        name[strlen(name)] = '.';
+    return ztset(nable, lastname, value);
 }
 
 /* If 'name' is in 'zcontext', copy its value to 'value' and return nonzero.
@@ -132,21 +153,48 @@ int
 zgetincontext(ZContext *zcontext, char *name, Zob **pvalue)
 {
     Zob *value = *pvalue;
+    ZNameTable *nable, *local = NULL;
+    char *oldtoken, *newtoken;
+    char *lastname = NULL;
+    int nulls = 0;
     int ok = 0;
+    int head = 1;
 
-    if (zcontext->local->length > 0) {
-        ZNameTable *local;
-
+    if (zcontext->local->length > 0)
         local = (ZNameTable *) zlpeek(zcontext->local);
-        ok = ztget(local, name, &value);
+    else
+        head = 0;
+    nable = zcontext->global;
+    oldtoken = strtok(name, ".");
+    while (lastname == NULL) {
+        if ((newtoken = strtok(NULL, ".")) == NULL)
+            lastname = oldtoken;
+        else {
+            if (head) {
+                /* The first name should be searched in locals and globals. */
+                if (ztget(local, oldtoken, (Zob **) &nable) == 0)
+                    if (ztget(nable, oldtoken, (Zob **) &nable) == 0)
+                        return 0;
+                head = 0;
+            }
+            else {
+                if (ztget(nable, oldtoken, (Zob **) &nable) == 0)
+                    return 0;
+            }
+            if (nable->type != T_NMTB)
+                return 0;
+            nulls++;
+            oldtoken = newtoken;
+        }
     }
-    if (!ok) {
-        ok = ztget(zcontext->global, name, &value);
-    }
+    ok = ztget(nable, lastname, &value);
     *pvalue = value;
-    if (ok)
-        return 1;
-    return 0;
+    /* Replace null characters -- placed by strtok() calls -- 
+     *  by the original dots.
+     */
+    for (;nulls > 0; nulls--)
+        name[strlen(name)] = '.';
+    return ok;
 }
 
 /* If 'name' is in 'zcontext',

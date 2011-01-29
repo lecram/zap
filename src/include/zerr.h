@@ -31,6 +31,7 @@ typedef enum {
     ZE_UNKNOWN_TYPE_NUMBER,
     ZE_OPEN_FILE_ERROR,
     ZE_INVALID_ARGUMENT,
+    ZE_NOT_A_NODE,
     ZE_DIVISION_BY_ZERO
 } ZError;
 

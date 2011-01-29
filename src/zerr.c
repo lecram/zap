@@ -126,6 +126,9 @@ zraiseerr(ZError err)
         case ZE_INVALID_ARGUMENT:
             puts("ZE_INVALID_ARGUMENT");
             return EXIT_FAILURE;
+        case ZE_NOT_A_NODE:
+            puts("ZE_NOT_A_NODE");
+            return EXIT_FAILURE;
         case ZE_DIVISION_BY_ZERO:
             puts("ZE_DIVISION_BY_ZERO");
             return EXIT_FAILURE;

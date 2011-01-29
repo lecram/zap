@@ -828,6 +828,7 @@ zbuild(ZNameTable **builtins)
       {NULL, "", 0}
     };
     int i;
+    ZNameTable *at;
     ZError err;
 
     err = znewnable(builtins);
@@ -841,5 +842,9 @@ zbuild(ZNameTable **builtins)
         if (err != ZE_OK)
             return err;
     }
-    return ZE_OK;
+
+    err = znewnable(&at);
+    if (err != ZE_OK)
+        return err;
+    return ztset(*builtins, "@", (Zob *) at);
 }
