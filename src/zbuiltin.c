@@ -117,6 +117,9 @@ z_len(ZList *args, Zob **ret)
         case T_LIST:
             ((ZInt *) *ret)->value = (int) zllength((ZList *) obj);
             break;
+        case T_NMTB:
+            ((ZInt *) *ret)->value = (int) ztlength((ZNameTable *) obj);
+            break;
         case T_DICT:
             ((ZInt *) *ret)->value = (int) zdlength((ZDict *) obj);
             break;
