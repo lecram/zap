@@ -187,7 +187,15 @@ zgetincontext(ZContext *zcontext, char *name, Zob **pvalue)
             oldtoken = newtoken;
         }
     }
-    ok = ztget(nable, lastname, &value);
+    if (head) {
+        /* The first name should be searched in locals and globals. */
+        if (ztget(local, lastname, (Zob **) &value) == 0)
+            if (ztget(nable, lastname, (Zob **) &value) == 0)
+                return 0;
+        ok = 1;
+    }
+    else
+        ok = ztget(nable, lastname, &value);
     *pvalue = value;
     /* Replace null characters -- placed by strtok() calls -- 
      *  by the original dots.
