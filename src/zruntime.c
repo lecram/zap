@@ -141,7 +141,7 @@ zsetincontext(ZContext *zcontext, char *name, Zob *value)
     /* Replace null characters -- placed by strtok() calls -- 
      *  by the original dots.
      */
-    for (;nulls > 0; nulls--)
+    for (; nulls > 0; nulls--)
         name[strlen(name)] = '.';
     return ztset(nable, lastname, value);
 }
@@ -200,7 +200,7 @@ zgetincontext(ZContext *zcontext, char *name, Zob **pvalue)
     /* Replace null characters -- placed by strtok() calls -- 
      *  by the original dots.
      */
-    for (;nulls > 0; nulls--)
+    for (; nulls > 0; nulls--)
         name[strlen(name)] = '.';
     return ok;
 }
