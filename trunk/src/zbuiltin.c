@@ -750,6 +750,13 @@ z_geq(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
+/* node() */
+ZError
+z_node(ZList *args, Zob **ret)
+{
+    return znewnable((ZNameTable **) ret);
+}
+
 /* Register 'func' in 'nable'.
  * If there is not enough memory, return ZE_OUT_OF_MEMORY.
  * Otherwise, return ZE_OK.
@@ -828,10 +835,10 @@ zbuild(ZNameTable **builtins)
       {z_gt, ">", 2},
       {z_leq, "<=", 2},
       {z_geq, ">=", 2},
+      {z_node, "node", 0},
       {NULL, "", 0}
     };
     int i;
-    ZNameTable *at;
     ZError err;
 
     err = znewnable(builtins);
@@ -846,8 +853,5 @@ zbuild(ZNameTable **builtins)
             return err;
     }
 
-    err = znewnable(&at);
-    if (err != ZE_OK)
-        return err;
-    return ztset(*builtins, "@", (Zob *) at);
+    return ZE_OK;
 }

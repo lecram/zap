@@ -627,7 +627,7 @@ zfeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pret)
         }
         if (self != zcontext->global) {
             /* Set the instance reference. */
-            err = zsetincontext(zcontext, "self", (Zob *) self);
+            err = zsetincontext(zcontext, "@", (Zob *) self);
             if (err != ZE_OK) {
                 zdellist(&args);
                 return err;
