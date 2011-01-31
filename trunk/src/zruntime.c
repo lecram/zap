@@ -110,6 +110,8 @@ zpoplocal(ZContext *zcontext, Zob **ret)
 }
 
 /* Define or redefine 'name' in 'zcontext'.
+ * If 'name' contains a non-ZNameTable object followed by a dot,
+ *  return ZE_NOT_A_NODE.
  * If there is not enough memory, return ZE_OUT_OF_MEMORY.
  * Otherwise, return ZE_OK.
  */
