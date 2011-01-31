@@ -54,7 +54,10 @@ void zdelcontext(ZContext **zcontext);
 ZError zpushlocal(ZContext *zcontext);
 ZError zpoplocal(ZContext *zcontext, Zob **ret);
 ZError zsetincontext(ZContext *zcontext, char *name, Zob *value);
-int zgetincontext(ZContext *zcontext, char *name, Zob **pvalue);
+int zgetincontext(ZContext *zcontext,
+                  char *name,
+                  ZNameTable **self,
+                  Zob **pvalue);
 int zremincontext(ZContext *zcontext, char *name);
 int zhasincontext(ZContext *zcontext, char *name);
 unsigned int zreadword(char **entry);
