@@ -148,11 +148,19 @@ zsetincontext(ZContext *zcontext, char *name, Zob *value)
     return ztset(nable, lastname, value);
 }
 
-/* If 'name' is in 'zcontext', copy its value to 'value' and return nonzero.
- * Otherwise, return zero.
+/* If 'name' is in 'zcontext':
+ *  * copy its value to 'value';
+ *  * set 'self' as the last node (ZNameTable) visited;
+ *  * return nonzero.
+ * Otherwise:
+ *  * set 'self' as the last node (ZNameTable) visited;
+ *  * return zero.
  */
 int
-zgetincontext(ZContext *zcontext, char *name, Zob **pvalue)
+zgetincontext(ZContext *zcontext,
+              char *name,
+              ZNameTable **self,
+              Zob **pvalue)
 {
     Zob *value = *pvalue;
     ZNameTable *nable, *local = NULL;
@@ -189,11 +197,15 @@ zgetincontext(ZContext *zcontext, char *name, Zob **pvalue)
             oldtoken = newtoken;
         }
     }
+    *self = nable;
     if (head) {
         /* The first name should be searched in locals and globals. */
-        if (ztget(local, lastname, (Zob **) &value) == 0)
+        if (ztget(local, lastname, (Zob **) &value) == 0) {
             if (ztget(nable, lastname, (Zob **) &value) == 0)
                 return 0;
+        }
+        else
+            *self = local;
         ok = 1;
     }
     else
@@ -552,8 +564,9 @@ znameval(ZContext *zcontext, char **entry, Zob **pzob)
 {
     char *cursor = *entry;
     Zob *zob = *pzob;
+    ZNameTable *self;
 
-    if (zgetincontext(zcontext, cursor, &zob) == 0)
+    if (zgetincontext(zcontext, cursor, &self, &zob) == 0)
         return ZE_NAME_NOT_DEFINED;
     cursor += strlen(cursor) + 1; /* Skip STRING_END. */
     *entry = cursor;
@@ -568,10 +581,11 @@ zfeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pret)
     ZList *args;
     char *fname, *cursor = *entry;
     Zob *ret = *pret;
+    ZNameTable *self;
     ZError err;
 
     /* Get zfunc. */
-    if (zgetincontext(zcontext, cursor, &zfunc) == 0) {
+    if (zgetincontext(zcontext, cursor, &self, &zfunc) == 0) {
         return ZE_FUNCTION_NAME_NOT_DEFINED;
     }
     fname = cursor;
@@ -610,6 +624,14 @@ zfeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pret)
         if (err != ZE_OK) {
             zdellist(&args);
             return err;
+        }
+        if (self != zcontext->global) {
+            /* Set the instance reference. */
+            err = zsetincontext(zcontext, "self", (Zob *) self);
+            if (err != ZE_OK) {
+                zdellist(&args);
+                return err;
+            }
         }
         zapfunc = ((ZHighFunc *) ((ZFunc *) zfunc)->fimp)->func;
         item = args->first;
