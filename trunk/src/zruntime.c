@@ -127,24 +127,28 @@ zsetincontext(ZContext *zcontext, char *name, Zob *value)
         nable = (ZNameTable *) zlpeek(zcontext->local);
     else
         nable = zcontext->global;
-    oldtoken = strtok(name, ".");
-    while (lastname == NULL) {
-        if ((newtoken = strtok(NULL, ".")) == NULL)
-            lastname = oldtoken;
-        else {
-            if (ztget(nable, oldtoken, (Zob **) &nable) == 0)
-                return ZE_NAME_NOT_DEFINED;
-            if (nable->type != T_NMTB)
-                return ZE_NOT_A_NODE;
-            nulls++;
-            oldtoken = newtoken;
+    if (strchr(name, '.') != NULL) {
+        oldtoken = strtok(name, ".");
+        while (lastname == NULL) {
+            if ((newtoken = strtok(NULL, ".")) == NULL)
+                lastname = oldtoken;
+            else {
+                if (ztget(nable, oldtoken, (Zob **) &nable) == 0)
+                    return ZE_NAME_NOT_DEFINED;
+                if (nable->type != T_NMTB)
+                    return ZE_NOT_A_NODE;
+                nulls++;
+                oldtoken = newtoken;
+            }
         }
+        /* Replace null characters -- placed by strtok() calls -- 
+         *  by the original dots.
+         */
+        for (; nulls > 0; nulls--)
+            name[strlen(name)] = '.';
     }
-    /* Replace null characters -- placed by strtok() calls -- 
-     *  by the original dots.
-     */
-    for (; nulls > 0; nulls--)
-        name[strlen(name)] = '.';
+    else
+        lastname = name;
     return ztset(nable, lastname, value);
 }
 
