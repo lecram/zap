@@ -15,6 +15,16 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with zap.  If not, see <http://www.gnu.org/licenses/>.
 
+prefix = /usr/local
+exec_prefix = $(prefix)
+bindir = $(exec_prefix)/bin
+includedir = $(prefix)/include
+libdir = $(exec_prefix)/lib
+
+CP = cp
+SUDO = sudo
+MD = mkdir -p
+
 -include env
 
 ifeq ($(CC), cc)
@@ -52,6 +62,16 @@ lib : $(objects)
 
 test : lib
 	$(CC) $(CFLAGS) test.c libzap.a -o test$(BINEXT)
+
+install : zap$(BINEXT) lib
+	$(SUDO) $(MD) $(bindir)
+	$(SUDO) $(CP) zap$(BINEXT) $(bindir)/zap
+	$(SUDO) $(MD) $(libdir)
+	$(SUDO) $(MD) $(libdir)/zap
+	$(SUDO) $(CP) libzap.a $(libdir)/zap/libzap.a
+	$(SUDO) $(MD) $(includedir)
+	$(SUDO) $(MD) $(includedir)/zap
+	$(SUDO) $(CP) include/*.h $(includedir)/zap/
 
 # Base.
 
