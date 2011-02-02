@@ -1,25 +1,25 @@
 # while and if blocks.
 
 c 'A'
-while <(c +('Z' 0x01))
+\while <(c +('Z' 0x01))
     print(arr(c))
     c +(c 0x01)
 
 print("\n")
 
 c 'A'
-while <(c +('Z' 0x01))
-    if <(c 'G')
+\while <(c +('Z' 0x01))
+    \if <(c 'G')
         print("-")
-    elif <(c 'M')
+    \elif <(c 'M')
         print("+")
-    elif <(c 'T')
+    \elif <(c 'T')
         print("*")
-    elif ==(c 'W')
+    \elif ==(c 'W')
         print("w")
-    elif ==(c 'Z')
+    \elif ==(c 'Z')
         print("!")
-    else
+    \else
         print(arr(c))
     c +(c 0x01)
 
