@@ -329,7 +329,7 @@ cpl_mod(char *srcname)
                 fwrite("\0", 1, 1, fbin);
             }
             else {
-                zraisecpl("Unknown Instruction.", srcname, linum);
+                zraisecpl("Unknown instruction.", srcname, linum);
                 break;
             }
         }
