@@ -175,6 +175,10 @@ zrepplain(char *buffer, size_t size, ZByteArray *zbytearray)
     char character;
     int index, blen = 0;
 
+    if (zbytearray->length == 0U) {
+        *buffer = '\0';
+        return 0;
+    }
     for (index = 0; index < (int) zbytearray->length; index++) {
         character = (char) zbytearray->bytes[index];
         if ((character < 32 && character != '\n') || (character < 0))
