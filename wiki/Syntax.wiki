@@ -10,6 +10,8 @@ All reserved keywords are prepended by a backslash:
 || `\del`   || `\elif` || `\else`  ||
 || `\if`    || `\ret`  || `\while` ||
 
+Comments start with a hash sign (#) and goes to the end of line.
+
 Expressions are made of literal values, identifiers and function calls:
 
 {{{
@@ -39,4 +41,20 @@ Parentheses are used to assign list items to names:
 
 {{{
 (a b c) [0 1 2] # Now a is 0, b is 1 and c is 2.
+}}}
+
+Control flow structures and function definitions are delimited only by indentation (there's no curly braces or begin/end keywords):
+
+{{{
+\if ==(x 1)
+    # The following code is executed only if x is 1.
+    b *(b 3)
+    foo(b)
+\else
+    # The following code is executed if x isn't 1.
+    bar(x)
+    b *(b 7)
+# The following code is always executed.
+baz()
+\del b
 }}}
