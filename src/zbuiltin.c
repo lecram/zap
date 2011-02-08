@@ -90,7 +90,7 @@ z_print(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* printx([s1, o1, s2, o2, ..., sn, on]) */
+/* printx([s1 o1 s2 o2 ... sn on]) */
 ZError
 z_printx(ZList *args, Zob **ret)
 {
@@ -176,7 +176,7 @@ z_arr(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* concat(s1, s2) */
+/* concat(s1 s2) */
 ZError
 z_concat(ZList *args, Zob **ret)
 {
@@ -192,7 +192,7 @@ z_concat(ZList *args, Zob **ret)
     return err;
 }
 
-/* join([s1, s2, ..., sn], sep) */
+/* join([s1 s2 ... sn] sep) */
 ZError
 z_join(ZList *args, Zob **ret)
 {
@@ -221,7 +221,7 @@ z_join(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* push(list, item) */
+/* push(list item) */
 ZError
 z_push(ZList *args, Zob **ret)
 {
@@ -235,7 +235,7 @@ z_push(ZList *args, Zob **ret)
     return zlpush((ZList *) zlist, item);
 }
 
-/* peek(list, item) */
+/* peek(list item) */
 ZError
 z_peek(ZList *args, Zob **ret)
 {
@@ -251,7 +251,7 @@ z_peek(ZList *args, Zob **ret)
         return ZE_OK;
 }
 
-/* pop(list, item) */
+/* pop(list) */
 ZError
 z_pop(ZList *args, Zob **ret)
 {
@@ -267,7 +267,7 @@ z_pop(ZList *args, Zob **ret)
         return ZE_OK;
 }
 
-/* append(list, item) */
+/* append(list item) */
 ZError
 z_append(ZList *args, Zob **ret)
 {
@@ -281,7 +281,7 @@ z_append(ZList *args, Zob **ret)
     return zlappend((ZList *) zlist, item);
 }
 
-/* set(list, index, item) */
+/* set(list index item) */
 ZError
 z_set(ZList *args, Zob **ret)
 {
@@ -299,7 +299,7 @@ z_set(ZList *args, Zob **ret)
     return zlset(zlist, ((ZInt *) index)->value, item);
 }
 
-/* get(list, index) */
+/* get(list index) */
 ZError
 z_get(ZList *args, Zob **ret)
 {
@@ -314,7 +314,7 @@ z_get(ZList *args, Zob **ret)
     return zlget((ZList *) zlist, ((ZInt *) index)->value, ret);
 }
 
-/* ins(list, index, item) */
+/* ins(list index item) */
 ZError
 z_ins(ZList *args, Zob **ret)
 {
@@ -332,7 +332,7 @@ z_ins(ZList *args, Zob **ret)
     return zlinsert(zlist, ((ZInt *) index)->value, item);
 }
 
-/* ext(lista, listb) */
+/* ext(lista listb) */
 ZError
 z_ext(ZList *args, Zob **ret)
 {
@@ -348,7 +348,7 @@ z_ext(ZList *args, Zob **ret)
     return zlextend((ZList *) zlista, (ZList *) zlistb);
 }
 
-/* rem(list, index) */
+/* rem(list index) */
 ZError
 z_rem(ZList *args, Zob **ret)
 {
@@ -365,7 +365,7 @@ z_rem(ZList *args, Zob **ret)
     return zlremove(zlist, ((ZInt *) index)->value);
 }
 
-/* has(list, item) */
+/* has(list item) */
 ZError
 z_has(ZList *args, Zob **ret)
 {
@@ -383,7 +383,7 @@ z_has(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* setkey(dict, key, value) */
+/* setkey(dict key value) */
 ZError
 z_setkey(ZList *args, Zob **ret)
 {
@@ -399,7 +399,7 @@ z_setkey(ZList *args, Zob **ret)
     return zdset(zdict, key, value);
 }
 
-/* getkey(dict, key, defval) */
+/* getkey(dict key defval) */
 ZError
 z_getkey(ZList *args, Zob **ret)
 {
@@ -418,7 +418,7 @@ z_getkey(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* +(a, b) */
+/* +(a b) */
 ZError
 z_sum(ZList *args, Zob **ret)
 {
@@ -448,7 +448,7 @@ z_sum(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
-/* -(a, b) */
+/* -(a b) */
 ZError
 z_sub(ZList *args, Zob **ret)
 {
@@ -478,7 +478,7 @@ z_sub(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
-/* *(a, b) */
+/* *(a b) */
 ZError
 z_mul(ZList *args, Zob **ret)
 {
@@ -508,7 +508,7 @@ z_mul(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
-/* /(a, b) */
+/* /(a b) */
 ZError
 z_div(ZList *args, Zob **ret)
 {
@@ -542,7 +542,7 @@ z_div(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
-/* %(a, b) */
+/* %(a b) */
 ZError
 z_mod(ZList *args, Zob **ret)
 {
@@ -576,7 +576,7 @@ z_mod(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
-/* <<(a, b) */
+/* <<(a b) */
 ZError
 z_lshift(ZList *args, Zob **ret)
 {
@@ -606,7 +606,7 @@ z_lshift(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
-/* >>(a, b) */
+/* >>(a b) */
 ZError
 z_rshift(ZList *args, Zob **ret)
 {
@@ -636,7 +636,7 @@ z_rshift(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
-/* ==(a, b) */
+/* ==(a b) */
 ZError
 z_eq(ZList *args, Zob **ret)
 {
@@ -652,7 +652,7 @@ z_eq(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* !=(a, b) */
+/* !=(a b) */
 ZError
 z_neq(ZList *args, Zob **ret)
 {
@@ -668,7 +668,7 @@ z_neq(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* <(a, b) */
+/* <(a b) */
 ZError
 z_lt(ZList *args, Zob **ret)
 {
@@ -696,7 +696,7 @@ z_lt(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
-/* >(a, b) */
+/* >(a b) */
 ZError
 z_gt(ZList *args, Zob **ret)
 {
@@ -724,7 +724,7 @@ z_gt(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
-/* <=(a, b) */
+/* <=(a b) */
 ZError
 z_leq(ZList *args, Zob **ret)
 {
@@ -752,7 +752,7 @@ z_leq(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
-/* >=(a, b) */
+/* >=(a b) */
 ZError
 z_geq(ZList *args, Zob **ret)
 {
