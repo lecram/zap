@@ -38,7 +38,7 @@ An expression can be assigned to multiple names:
 x y z 0 # Only zero is evaluated, and assigned to x, y and z.
 }}}
 
-Parentheses are used to assign list items to names:
+Parentheses are used to make assignments from list items:
 
 {{{
 (a b c) [0 1 2] # Now a is 0, b is 1 and c is 2.
