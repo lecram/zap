@@ -19,6 +19,7 @@ Expressions are made of literal values, identifiers and function calls:
 "Foo, Bar and Baz" # A literal string value.
 [7 11 13] # A literal list value.
 foo # An identifier.
++-abc_123 # Another valid identifier.
 bar() # A function call.
 f(x 17) # A function call with two arguments.
 +(*(a b) /(256 -(15 7))) # Another valid expression.
