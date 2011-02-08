@@ -2,7 +2,10 @@
 
 = Overview =
 
-zap has a concise syntax, both in terms of rules and representation.
+zap has a concise syntax, both in terms of representation and number of rules.
 
 All reserved keywords are prepended by a backslash:
-`\break` `\cont` `\def` `\del` `\elif` `\else` `\if` `\ret` `\while`
+
+|| `\break` || `\cont` || `\def`   ||
+|| `\del`   || `\elif` || `\else`  ||
+|| `\if`    || `\ret`  || `\while` ||
