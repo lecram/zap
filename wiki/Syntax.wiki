@@ -25,7 +25,7 @@ f(x 17) # A function call with two arguments.
 +(*(a b) /(256 -(15 7))) # Another valid expression.
 }}}
 
-Unlike in many languages, there's no special character for assignments in zap. An assignment is represented by a whitespace between an identifier and an expression:
+Unlike in many languages, there's no special symbol for assignments in zap. An assignment is represented by a whitespace between an identifier and an expression:
 
 {{{
 x 30 # Now x has value 30.
