@@ -2,6 +2,7 @@
 
   * [Tutorial Tutorial]
   * [Language Language Reference]
+    * [Syntax Syntax]
   * [API API Reference]
   * [DevelopersGuide Developers Guide]
     * [Build Building zap]

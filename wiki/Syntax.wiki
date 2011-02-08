@@ -1,0 +1,8 @@
+#summary zap syntax.
+
+= Overview =
+
+zap has a concise syntax, both in terms of rules and representation.
+
+All reserved keywords are prepended by a backslash:
+`\break` `\cont` `\def` `\del` `\elif` `\else` `\if` `\ret` `\while`
