@@ -108,7 +108,7 @@ zinteractive()
 }
 
 ZError
-zrun_mod(char *binname)
+zrun_mod(char *binname, ZContext **endcontext)
 {
     FILE *fzbc;
     int size;
@@ -182,7 +182,7 @@ zrun_mod(char *binname)
     zdellist(&tmp);
     free(szbc);
     szbc = NULL;
-    zdelcontext(&zcontext);
+    *endcontext = zcontext;
 
     return 0;
 }
@@ -192,6 +192,7 @@ main(int argc, char *argv[])
 {
     char *binname, *ext;
     int compile = 0;
+    ZContext *endcontext;
     ZError err = ZE_OK;
 
     if (argc == 2) {
@@ -212,13 +213,16 @@ main(int argc, char *argv[])
                 if (ext != NULL)
                     *ext = '\0';
                 strcat(binname, ".zbc");
-                err = zrun_mod(binname);
+                err = zrun_mod(binname, &endcontext);
+                zdelcontext(&endcontext);
                 free(binname);
                 binname = ext = NULL;
             }
         }
-        else
-            err = zrun_mod(argv[1]);
+        else {
+            err = zrun_mod(argv[1], &endcontext);
+            zdelcontext(&endcontext);
+        }
     }
     else {
         puts("<< zap interpreter >>");
