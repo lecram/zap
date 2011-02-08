@@ -636,6 +636,68 @@ z_rshift(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
+/* ?(o) */
+ZError
+z_tst(ZList *args, Zob **ret)
+{
+    Zob *o;
+    ZError err;
+
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
+    o = args->first->object;
+    ((ZBool *) *ret)->value = ztstobj(o);
+    return ZE_OK;
+}
+
+/* not(o) */
+ZError
+z_not(ZList *args, Zob **ret)
+{
+    Zob *o;
+    ZError err;
+
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
+    o = args->first->object;
+    ((ZBool *) *ret)->value = !ztstobj(o);
+    return ZE_OK;
+}
+
+/* or(a b) */
+ZError
+z_or(ZList *args, Zob **ret)
+{
+    Zob *a, *b;
+    ZError err;
+
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
+    a = args->first->object;
+    b = args->first->next->object;
+    ((ZBool *) *ret)->value = ztstobj(a) || ztstobj(b);
+    return ZE_OK;
+}
+
+/* and(a b) */
+ZError
+z_and(ZList *args, Zob **ret)
+{
+    Zob *a, *b;
+    ZError err;
+
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
+    a = args->first->object;
+    b = args->first->next->object;
+    ((ZBool *) *ret)->value = ztstobj(a) && ztstobj(b);
+    return ZE_OK;
+}
+
 /* ==(a b) */
 ZError
 z_eq(ZList *args, Zob **ret)
@@ -860,6 +922,10 @@ zbuild(ZNameTable **builtins)
       {z_mod, "%", 2},
       {z_lshift, "<<", 2},
       {z_rshift, ">>", 2},
+      {z_tst, "?", 1},
+      {z_not, "not", 1},
+      {z_or, "or", 2},
+      {z_and, "and", 2},
       {z_eq, "==", 2},
       {z_neq, "!=", 2},
       {z_lt, "<", 2},
