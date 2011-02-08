@@ -59,3 +59,21 @@ Control flow structures and function definitions are delimited only by indentati
 baz()
 \del b
 }}}
+
+= Literals =
+
+A literal None value is always `NONE`.
+
+A literal Boolean value is either `TRUE` or `FALSE`.
+
+A literal Byte value is either a hexadecimal in the form `0x61` or a single quoted ASCII character in the form `'a'`.
+
+A literal Integer value is any digit sequence, optionally prefixed with `-`.
+
+A literal ByteArray value is any double quoted sequence of ASCII characters.
+
+A literal List value is a whitespace-separated sequence of expressions enclosed in square brackets (e.g. `[foo 1337 bar()]`).
+
+= Identifiers =
+
+A zap identifier shouldn't start with a digit or a backslash. Also, it shouldn't contain any whitespace, parenthesis, bracket, brace, colon, dot, comma or quote.
