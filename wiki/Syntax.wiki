@@ -4,7 +4,7 @@
 
 zap has a concise syntax, both in terms of representation and number of rules.
 
-All reserved keywords are prepended by a backslash:
+All reserved keywords are prefixed by a backslash:
 
 || `\break` || `\cont` || `\def`   ||
 || `\del`   || `\elif` || `\else`  ||
@@ -80,7 +80,7 @@ A zap identifier shouldn't start with a digit or a backslash. Also, it shouldn't
 
 = Sample Code =
 
-The following code shows the general sintactic aspects of a zap program.
+The following code shows the general syntactic aspects of a zap program.
 
 {{{
 # Returns the floored square root of x.
