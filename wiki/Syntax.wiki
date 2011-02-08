@@ -16,7 +16,7 @@ Expressions are made of literal values, identifiers and function calls:
 
 {{{
 42 # A literal integer value.
-"Foo, Bar and Baz" # A literal string value.
+"Foo, Bar and Baz." # A literal string value.
 [7 11 13] # A literal list value.
 foo # An identifier.
 +-abc_123 # Another valid identifier.
