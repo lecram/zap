@@ -90,6 +90,36 @@ z_print(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
+/* printx([s1, o1, s2, o2, ..., sn, on]) */
+ZError
+z_printx(ZList *args, Zob **ret)
+{
+    char buffer[1024];
+    ZNode *node;
+    int plain = 1;
+    int blen = 0;
+    ZError err;
+
+    if (*args->first->object != T_LIST)
+        return ZE_INVALID_ARGUMENT;
+    *buffer = '\0';
+    node = ((ZList *) args->first->object)->first;
+    while (node != NULL) {
+        if (plain)
+            blen += zrepplain(buffer + blen, 1024, (ZByteArray *) node->object);
+        else
+            blen += zrepobj(buffer + blen, 1024, node->object);
+        plain = !plain;
+        node = node->next;
+    }
+    err = znewint((ZInt **) ret);
+    if (err != ZE_OK)
+        return err;
+    ((ZInt *) *ret)->value = blen;
+    printf("%s", buffer);
+    return ZE_OK;
+}
+
 /* repr(x) */
 ZError
 z_repr(ZList *args, Zob **ret)
@@ -805,6 +835,7 @@ zbuild(ZNameTable **builtins)
       {z_tname, "tname", 1},
       {z_refc, "refc", 1},
       {z_print, "print", 1},
+      {z_printx, "printx", 1},
       {z_repr, "repr", 1},
       {z_len, "len", 1},
       {z_arr, "arr", 1},
