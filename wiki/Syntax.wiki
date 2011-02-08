@@ -70,7 +70,7 @@ A literal Byte value is either a hexadecimal in the form `0x61` or a single quot
 
 A literal Integer value is any digit sequence, optionally prefixed with `-`.
 
-A literal ByteArray value is any double quoted sequence of ASCII characters.
+A literal !ByteArray value is any double quoted sequence of ASCII characters.
 
 A literal List value is a whitespace-separated sequence of expressions enclosed in square brackets (e.g. `[foo 1337 bar()]`).
 
