@@ -22,9 +22,7 @@ Para compilar o código, mova para o subdiretório src:
 % cd zap/src
 }}}
 
-A maneira mais conveniente de compilar os arquivos é invocando o GNU make. Caso você não possa utilizar o GNU make por algum motivo, veja mais abaixo como compilar manualmente.
-
-== Através do Makefile ==
+A maneira mais conveniente de compilar os arquivos é invocando o GNU make.
 
 O arquivo Makefile em zap/src permite compilar o interpretador zap com apenas um comando. Em ambiente Linux normalmente o comando é o mais simples possível:
 
@@ -58,35 +56,3 @@ RM = del
 }}}
 
 Este arquivo permite que o interpretador zap seja compilado no Windows de forma semelhante ao procedimento em ambiente Linux, apenas invocando o GNU make, sem argumentos. A variável RM será utilizada somente para chamadas de "make clean".
-
-== Manualmente ==
-
-Para compilar manualmente, é preciso gerar os arquivos objeto e ordem adequada, e linkeditá-los em seguida.
-
-Supondo que o compilador utilizado é o GCC, os comandos são, em sequência:
-
-{{{
-% gcc -c -Wall -Werror -O2 -I include ztypes.c
-% gcc -c -Wall -Werror -O2 -I include zerr.c
-% gcc -c -Wall -Werror -O2 -I include zgc.c
-% gcc -c -Wall -Werror -O2 -I include znone.c
-% gcc -c -Wall -Werror -O2 -I include zbool.c
-% gcc -c -Wall -Werror -O2 -I include zbyte.c
-% gcc -c -Wall -Werror -O2 -I include zword.c
-% gcc -c -Wall -Werror -O2 -I include zbytearray.c
-% gcc -c -Wall -Werror -O2 -I include zbignum.c
-% gcc -c -Wall -Werror -O2 -I include zlist.c
-% gcc -c -Wall -Werror -O2 -I include zdict.c
-% gcc -c -Wall -Werror -O2 -I include zfunc.c
-% gcc -c -Wall -Werror -O2 -I include zobject.c
-% gcc -c -Wall -Werror -O2 -I include zruntime.c
-% gcc -c -Wall -Werror -O2 -I include zbuiltin.c
-% gcc -c -Wall -Werror -O2 -I include zcpl_expr.c
-% gcc -c -Wall -Werror -O2 -I include zcpl_mod.c
-% gcc -c -Wall -Werror -O2 -I include zap.c
-% gcc -o zap ztypes.o zerr.o zgc.o znone.o zbool.o zbyte.o zword.o zbytearray.o zbignum.o zlist.o zdict.o zfunc.o zobject.o zruntime.o zbuiltin.o zcpl_expr.o zcpl_mod.o zap.o
-}}}
-
-Pode ser necessário especificar a extensão do arquivo binário zap no último comando (e.g. "zap.exe").
-
-É recomendável salvar estes comandos em um script, para facilitar possíveis repetições no processo.
