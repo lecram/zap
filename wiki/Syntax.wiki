@@ -15,20 +15,20 @@ Comments start with a hash sign (`#`) and go to the end of line.
 Expressions are made of literal values, identifiers and function calls:
 
 {{{
-42 # A literal integer value.
-"Foo, Bar and Baz." # A literal string value.
-[7 11 13] # A literal list value.
-foo # An identifier.
-+-abc_123 # Another valid identifier.
-bar() # A function call.
-f(x 17) # A function call with two arguments.
-+(*(a b) /(256 -(15 7))) # Another valid expression.
+42                          # A literal integer value.
+"Foo, Bar and Baz."         # A literal string value.
+[7 11 13]                   # A literal list value.
+foo                         # An identifier.
++-abc_123                   # Another valid identifier.
+bar()                       # A function call.
+f(x 17)                     # A function call with two arguments.
++(*(a b) /(256 -(15 7)))    # Another valid expression.
 }}}
 
 Unlike in many languages, there's no special symbol for assignments in zap. An assignment is represented by a whitespace between an identifier and an expression:
 
 {{{
-x 30 # Now x has value 30.
+x 30     # Now x has value 30.
 y +(x 1) # Now y has value 31.
 }}}
 
