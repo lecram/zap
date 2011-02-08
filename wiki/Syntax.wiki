@@ -77,3 +77,28 @@ A literal List value is a whitespace-separated sequence of expressions enclosed 
 = Identifiers =
 
 A zap identifier shouldn't start with a digit or a backslash. Also, it shouldn't contain any whitespace, parenthesis, bracket, brace, colon, dot, comma or quote.
+
+= Sample Code =
+
+The following code shows the general sintactic aspects of a zap program.
+
+{{{
+# Returns the floored square root of x.
+\def sqrt(x)
+    (r o n) [0 1 x]
+    \while <=(o x)
+        o <<(o 2)
+    o >>(o 2)
+    \while !=(o 0)
+        \if >=(n +(r o))
+            n -(n +(r o))
+            r +(>>(r 1) o)
+        \else
+            r >>(r 1)
+        o >>(o 2)
+    \ret r
+
+a sqrt(49)
+s join([repr(a) "\n"] "")
+print(s) # -> 7
+}}}
