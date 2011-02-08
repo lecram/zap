@@ -151,6 +151,7 @@ zrun_mod(char *binname, ZContext **endcontext)
         szbc = NULL;
         return err;
     }
+    *endcontext = zcontext;
     err = zbuild(&zcontext->global);
     if (err != ZE_OK) {
         zdellist(&tmp);
@@ -175,16 +176,14 @@ zrun_mod(char *binname, ZContext **endcontext)
         zdellist(&tmp);
         free(szbc);
         szbc = NULL;
-        zdelcontext(&zcontext);
         return err;
     }
 
     zdellist(&tmp);
     free(szbc);
     szbc = NULL;
-    *endcontext = zcontext;
 
-    return 0;
+    return ZE_OK;
 }
 
 int
@@ -192,7 +191,7 @@ main(int argc, char *argv[])
 {
     char *binname, *ext;
     int compile = 0;
-    ZContext *endcontext;
+    ZContext *endcontext = NULL;
     ZError err = ZE_OK;
 
     if (argc == 2) {
@@ -214,14 +213,16 @@ main(int argc, char *argv[])
                     *ext = '\0';
                 strcat(binname, ".zbc");
                 err = zrun_mod(binname, &endcontext);
-                zdelcontext(&endcontext);
+                if (endcontext != NULL)
+                    zdelcontext(&endcontext);
                 free(binname);
                 binname = ext = NULL;
             }
         }
         else {
             err = zrun_mod(argv[1], &endcontext);
-            zdelcontext(&endcontext);
+            if (endcontext != NULL)
+                zdelcontext(&endcontext);
         }
     }
     else {
