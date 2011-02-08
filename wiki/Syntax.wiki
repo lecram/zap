@@ -9,3 +9,34 @@ All reserved keywords are prepended by a backslash:
 || `\break` || `\cont` || `\def`   ||
 || `\del`   || `\elif` || `\else`  ||
 || `\if`    || `\ret`  || `\while` ||
+
+Expressions are made of literal values, identifiers and function calls:
+
+{{{
+42 # A literal integer value.
+"Foo, Bar and Baz" # A literal string value.
+[7 11 13] # A literal list value.
+foo # An identifier.
+bar() # A function call.
+f(x 17) # A function call with two arguments.
++(*(a b) /(256 -(15 7))) # Another valid expression.
+}}}
+
+Unlike in many languages, there's no special character for assignments in zap. An assignment is represented by a whitespace between an identifier and an expression:
+
+{{{
+x 30 # Now x has value 30.
+y +(x 1) # Now y has value 31.
+}}}
+
+An expression can be assigned to multiple names:
+
+{{{
+x y z 0 # Only zero is evaluated, and assigned to x, y and z.
+}}}
+
+Parentheses are used to assign list items to names:
+
+{{{
+(a b c) [0 1 2] # Now a is 0, b is 1 and c is 2.
+}}}
