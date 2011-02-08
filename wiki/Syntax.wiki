@@ -10,7 +10,7 @@ All reserved keywords are prepended by a backslash:
 || `\del`   || `\elif` || `\else`  ||
 || `\if`    || `\ret`  || `\while` ||
 
-Comments start with a hash sign (#) and goes to the end of line.
+Comments start with a hash sign (`#`) and goes to the end of line.
 
 Expressions are made of literal values, identifiers and function calls:
 
