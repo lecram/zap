@@ -849,6 +849,109 @@ z_node(ZList *args, Zob **ret)
     return znewnable((ZNameTable **) ret);
 }
 
+/* any(lst) */
+ZError
+z_any(ZList *args, Zob **ret)
+{
+    ZNode *node;
+    ZError err;
+
+    if (*args->first->object != T_LIST)
+        return ZE_INVALID_ARGUMENT;
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
+    node = ((ZList *) args->first->object)->first;
+    while (node != NULL) {
+        if (ztstobj(node->object)) {
+            ((ZBool *) *ret)->value = 1;
+            return ZE_OK;
+        }
+        node = node->next;
+    }
+    ((ZBool *) *ret)->value = 0;
+    return ZE_OK;
+}
+
+/* all(lst) */
+ZError
+z_all(ZList *args, Zob **ret)
+{
+    ZNode *node;
+    ZError err;
+
+    if (*args->first->object != T_LIST)
+        return ZE_INVALID_ARGUMENT;
+    err = znewbool((ZBool **) ret);
+    if (err != ZE_OK)
+        return err;
+    node = ((ZList *) args->first->object)->first;
+    while (node != NULL) {
+        if (!ztstobj(node->object)) {
+            ((ZBool *) *ret)->value = 0;
+            return ZE_OK;
+        }
+        node = node->next;
+    }
+    ((ZBool *) *ret)->value = 1;
+    return ZE_OK;
+}
+
+/* range(start end step) */
+ZError
+z_range(ZList *args, Zob **ret)
+{
+    Zob *zstart, *zend, *zstep;
+    int counter, end, step, stepsign;
+    ZError err;
+
+    zstart = args->first->object;
+    zend = args->first->next->object;
+    zstep = args->first->next->next->object;
+    if (*zstart != *zend  ||  *zstart != *zstep)
+        return ZE_INVALID_ARGUMENT;
+    err = znewlist((ZList **) ret);
+    if (err != ZE_OK)
+        return err;
+    switch (*zstart) {
+        case T_BYTE:
+            counter = (int) ((ZByte *) zstart)->value;
+            end = (int) ((ZByte *) zend)->value;
+            step = (int) ((ZByte *) zstep)->value;
+            stepsign = (int) ((ZByte *) zstep)->value < 0 ? -1 : 1;
+            for (; counter * stepsign < end * stepsign; counter += step) {
+                ZByte *zcounter;
+
+                err = znewbyte(&zcounter);
+                if (err != ZE_OK)
+                    return err;
+                zcounter->value = (unsigned char) counter;
+                err = zlappend((ZList *) *ret, (Zob *) zcounter);
+                if (err != ZE_OK)
+                    return err;
+            }
+            return ZE_OK;
+        case T_INT:
+            counter = ((ZInt *) zstart)->value;
+            end = ((ZInt *) zend)->value;
+            step = ((ZInt *) zstep)->value;
+            stepsign = ((ZInt *) zstep)->value < 0 ? -1 : 1;
+            for (; counter * stepsign < end * stepsign; counter += step) {
+                ZInt *zcounter;
+
+                err = znewint(&zcounter);
+                if (err != ZE_OK)
+                    return err;
+                zcounter->value = counter;
+                err = zlappend((ZList *) *ret, (Zob *) zcounter);
+                if (err != ZE_OK)
+                    return err;
+            }
+            return ZE_OK;
+    }
+    return ZE_INVALID_ARGUMENT;
+}
+
 /* Register 'func' in 'nable'.
  * If there is not enough memory, return ZE_OUT_OF_MEMORY.
  * Otherwise, return ZE_OK.
@@ -933,6 +1036,9 @@ zbuild(ZNameTable **builtins)
       {z_leq, "<=", 2},
       {z_geq, ">=", 2},
       {z_node, "node", 0},
+      {z_any, "any", 1},
+      {z_all, "all", 1},
+      {z_range, "range", 3},
       {NULL, "", 0}
     };
     int i;
