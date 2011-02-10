@@ -161,7 +161,7 @@ zrepyarr(char *buffer, size_t size, ZByteArray *zbytearray)
                              character);
     }
     blen += snprintf(tmpbff + blen, size, "\"");
-    return blen;
+    return ++blen;
 }
 
 /* Print the textual representation of 'zbytearray' on 'buffer'.
