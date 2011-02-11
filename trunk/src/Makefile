@@ -21,10 +21,6 @@ bindir = $(exec_prefix)/bin
 includedir = $(prefix)/include
 libdir = $(exec_prefix)/lib
 
-CP = cp
-SUDO = sudo
-MD = mkdir -p
-
 -include env
 
 ifeq ($(CC), cc)
@@ -39,6 +35,12 @@ ifeq ($(v), true)
 ARFLAGS = rvs
 else
 ARFLAGS = rs
+endif
+
+ifeq ($(SHELL), cmd)
+install = install.cmd
+else
+install = install.sh
 endif
 
 I = include/
@@ -64,14 +66,7 @@ test : lib
 	$(CC) $(CFLAGS) test.c libzap.a -o test$(BINEXT)
 
 install : zap$(BINEXT) lib
-	$(SUDO) $(MD) $(bindir)
-	$(SUDO) $(CP) zap$(BINEXT) $(bindir)/zap
-	$(SUDO) $(MD) $(libdir)
-	$(SUDO) $(MD) $(libdir)/zap
-	$(SUDO) $(CP) libzap.a $(libdir)/zap/libzap.a
-	$(SUDO) $(MD) $(includedir)
-	$(SUDO) $(MD) $(includedir)/zap
-	$(SUDO) $(CP) include/*.h $(includedir)/zap/
+	$(install) $(bindir) $(includedir) $(libdir)
 
 # Base.
 
