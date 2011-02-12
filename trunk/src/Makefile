@@ -40,7 +40,7 @@ endif
 ifeq ($(SHELL), cmd)
 install = install.cmd
 else
-install = install.sh
+install = ./install.sh
 endif
 
 I = include/
