@@ -102,7 +102,7 @@ zcpyyarr(ZByteArray *source, ZByteArray **dest)
     err = znewyarr(dest, source->length);
     if (err != ZE_OK)
         return err;
-    for (index = (int) source->length - 1; index >=0; index--)
+    for (index = (int) source->length - 1; index >= 0; index--)
         *((*dest)->bytes + index) = *(source->bytes + index);
     return ZE_OK;
 }
