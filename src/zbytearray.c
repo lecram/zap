@@ -246,7 +246,7 @@ zconcatstr(ZByteArray *zbytearray, char *s)
     if (length == 0)
         return ZE_OK;
     zbytearray->bytes = realloc(zbytearray->bytes,
-                               zbytearray->length + length);
+                                zbytearray->length + length);
     if (zbytearray->bytes == NULL)
         return ZE_OUT_OF_MEMORY;
     memcpy(zbytearray->bytes + zbytearray->length, s, length);
@@ -264,7 +264,7 @@ zconcat(ZByteArray *zbytearray, ZByteArray *other)
     if (other->length == 0)
         return ZE_OK;
     zbytearray->bytes = realloc(zbytearray->bytes,
-                               zbytearray->length + other->length);
+                                zbytearray->length + other->length);
     if (zbytearray->bytes == NULL)
         return ZE_OUT_OF_MEMORY;
     memcpy(zbytearray->bytes + zbytearray->length,
