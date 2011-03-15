@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "ztypes.h"
 #include "zerr.h"
@@ -152,13 +153,13 @@ zrepyarr(char *buffer, size_t size, ZByteArray *zbytearray)
     *tmpbff++ = '"';
     for (index = 0; index < (int) zbytearray->length; index++) {
         character = (char) zbytearray->bytes[index];
-        if ((character < 32 && character != '\n') || (character < 0))
-            blen += snprintf(tmpbff + blen, size, "?");
-        else
+        if (isgraph(character) || isspace(character))
             blen += snprintf(tmpbff + blen,
                              size,
                              "%c",
                              character);
+        else
+            blen += snprintf(tmpbff + blen, size, "?");
     }
     blen += snprintf(tmpbff + blen, size, "\"");
     return ++blen;
@@ -176,18 +177,18 @@ zrepplain(char *buffer, size_t size, ZByteArray *zbytearray)
     int index, blen = 0;
 
     if (zbytearray->length == 0U) {
-        *buffer = '\0';
+        buffer = "";
         return 0;
     }
     for (index = 0; index < (int) zbytearray->length; index++) {
         character = (char) zbytearray->bytes[index];
-        if ((character < 32 && character != '\n') || (character < 0))
-            blen += snprintf(tmpbff + blen, size, "?");
-        else
+        if (isgraph(character) || isspace(character))
             blen += snprintf(tmpbff + blen,
                              size,
                              "%c",
                              character);
+        else
+            blen += snprintf(tmpbff + blen, size, "?");
     }
     return blen;
 }
