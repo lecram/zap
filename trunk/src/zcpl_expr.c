@@ -44,10 +44,7 @@
 int
 is_separator(char c)
 {
-    if (strchr(" ,)]}:#\n", c) != NULL)
-        return 1;
-    else
-        return 0;
+    return strchr(" ,)]}:#\n", c) != NULL;
 }
 
 void
