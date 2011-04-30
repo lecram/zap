@@ -238,7 +238,12 @@ cpl_mod(char *srcname)
             if (strcmp(parts[0], "\\del") == 0) {
                 /* Compile del statement. */
                 fwrite("\xDE", 1, 1, fbin);
-                fwrite(parts[1], 1, strlen(parts[1]) + 1, fbin);
+                for (splitlen -= 1; splitlen > 0; splitlen--) {
+                    char *name = parts[splitlen];
+
+                    fwrite(name, 1, strlen(name) + 1, fbin);
+                }
+                fwrite("\0", 1, 1, fbin);
             }
             else if (strcmp(parts[0], "\\break") == 0) {
                 if (splitlen == 1) {

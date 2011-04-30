@@ -794,7 +794,9 @@ zskip_block(char **entry)
         }
         else if (*cursor == DELETE) {
             cursor++;
-            cursor += strlen(cursor) + 1;
+            while (*cursor != '\0')
+                cursor += strlen(cursor) + 1;
+            cursor++;
         }
         else if (*cursor == BLOCK) {
             cursor++;
@@ -852,9 +854,12 @@ zrun_block(ZContext *zcontext,
     while (*cursor != BLOCKEXIT) {
         if (*cursor == DELETE) {
             cursor++;
-            if (zremincontext(zcontext, cursor) == 0)
-                return ZE_NAME_NOT_DEFINED;
-            cursor += strlen(cursor) + 1;
+            while (*cursor != '\0') {
+                if (zremincontext(zcontext, cursor) == 0)
+                    return ZE_NAME_NOT_DEFINED;
+                cursor += strlen(cursor) + 1;
+            }
+            cursor++;
         }
         else if (*cursor == BLOCK) {
             cursor++;
