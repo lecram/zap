@@ -118,7 +118,7 @@ zpoplocal(ZContext *zcontext, Zob **ret)
 ZError
 zsetincontext(ZContext *zcontext, char *name, Zob *value)
 {
-    ZNameTable *nable;
+    ZNameTable *nable, **pnable;
     char *oldtoken, *newtoken;
     char *lastname = NULL;
     int nulls = 0;
@@ -127,13 +127,14 @@ zsetincontext(ZContext *zcontext, char *name, Zob *value)
         nable = (ZNameTable *) zlpeek(zcontext->local);
     else
         nable = zcontext->global;
+    pnable = &nable;
     if (strchr(name, '.') != NULL) {
         oldtoken = strtok(name, ".");
         while (lastname == NULL) {
             if ((newtoken = strtok(NULL, ".")) == NULL)
                 lastname = oldtoken;
             else {
-                if (ztget(nable, oldtoken, (Zob **) &nable) == 0)
+                if (ztget(nable, oldtoken, (Zob **) pnable) == 0)
                     return ZE_NAME_NOT_DEFINED;
                 if (nable->type != T_NMTB)
                     return ZE_NOT_A_NODE;
@@ -167,7 +168,7 @@ zgetincontext(ZContext *zcontext,
               Zob **pvalue)
 {
     Zob *value = *pvalue;
-    ZNameTable *nable, *local = NULL;
+    ZNameTable *nable, **pnable, *local = NULL;
     char *oldtoken, *newtoken;
     char *lastname = NULL;
     int nulls = 0;
@@ -179,6 +180,7 @@ zgetincontext(ZContext *zcontext,
     else
         head = 0;
     nable = zcontext->global;
+    pnable = &nable;
     oldtoken = strtok(name, ".");
     while (lastname == NULL) {
         if ((newtoken = strtok(NULL, ".")) == NULL)
@@ -186,13 +188,13 @@ zgetincontext(ZContext *zcontext,
         else {
             if (head) {
                 /* The first name should be searched in locals and globals. */
-                if (ztget(local, oldtoken, (Zob **) &nable) == 0)
-                    if (ztget(nable, oldtoken, (Zob **) &nable) == 0)
+                if (ztget(local, oldtoken, (Zob **) pnable) == 0)
+                    if (ztget(nable, oldtoken, (Zob **) pnable) == 0)
                         return 0;
                 head = 0;
             }
             else {
-                if (ztget(nable, oldtoken, (Zob **) &nable) == 0)
+                if (ztget(nable, oldtoken, (Zob **) pnable) == 0)
                     return 0;
             }
             if (nable->type != T_NMTB)

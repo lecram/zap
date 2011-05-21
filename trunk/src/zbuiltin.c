@@ -918,7 +918,8 @@ z_range(ZList *args, Zob **ret)
             counter = (int) ((ZByte *) zstart)->value;
             end = (int) ((ZByte *) zend)->value;
             step = (int) ((ZByte *) zstep)->value;
-            stepsign = (int) ((ZByte *) zstep)->value < 0 ? -1 : 1;
+            /* A Byte can only store positive values. */
+            stepsign = 1;
             for (; counter * stepsign < end * stepsign; counter += step) {
                 ZByte *zcounter;
 
