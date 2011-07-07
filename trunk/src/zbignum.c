@@ -91,7 +91,7 @@ zstrbitlen(char *s, unsigned int *bitlen)
     return ZE_OK;
 }
 
-/* Create a new ZBigNum in 'zdict'.
+/* Create a new ZBigNum in 'zbignum'.
  * If there is not enough memory, return ZE_OUT_OF_MEMORY.
  * Otherwise, return ZE_OK.
  */
