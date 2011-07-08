@@ -362,8 +362,7 @@ cpl_mod(char *srcname)
                         namechar = assign;
                         namelen = 0;
                         while (!isspace(*namechar) &&
-                               *namechar != ')' &&
-                               *namechar != ',') {
+                               *namechar != ')') {
                             namechar++;
                             namelen++;
                         }
@@ -376,9 +375,6 @@ cpl_mod(char *srcname)
                             depth--;
                             assign++;
                             skip_space(&assign);
-                        }
-                        if (*assign == ',') {
-                            assign++;
                         }
                     }
                 }
