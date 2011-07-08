@@ -342,7 +342,7 @@ cpl_mod(char *srcname)
             length = cpl_expr(&expr_entry, bin);
             fwrite(bin, 1, length, fbin);
             for (splitlen -= 1; splitlen > 0; splitlen--) {
-                /* Compile Assigments. */
+                /* Compile Assignments. */
                 assign = parts[splitlen - 1];
                 if (*assign == '(') {
                     int depth = 1;
@@ -361,8 +361,7 @@ cpl_mod(char *srcname)
                         }
                         namechar = assign;
                         namelen = 0;
-                        while (!isspace(*namechar) &&
-                               *namechar != ')') {
+                        while (!isspace(*namechar) && *namechar != ')') {
                             namechar++;
                             namelen++;
                         }
