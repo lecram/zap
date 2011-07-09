@@ -110,55 +110,6 @@ remtail(char *str)
 }
 
 int
-splitstt(char *input, char *output, char *parts[])
-{
-    int on = 0;
-    int depth = 0;
-    int length = 0;
-    int squoting = 0;
-    int dquoting = 0;
-
-    while(*input != '\0') {
-        if (on) {
-            if (isspace(*input) && !depth && !squoting && !dquoting) {
-                on = 0;
-                *output = '\0';
-                depth = 0;
-            }
-            else {
-                *output = *input;
-                if (strchr("([{", *input) != NULL)
-                    depth++;
-                else if (strchr(")]}", *input) != NULL)
-                    depth--;
-                else if (*input == '\'')
-                    squoting = 1 - squoting;
-                else if (*input == '\"')
-                    dquoting = 1 - dquoting;
-            }
-            output++;
-        }
-        else if (!isspace(*input)) {
-            on = 1;
-            parts[length] = output;
-            *output = *input;
-            if (strchr("([{", *input) != NULL)
-                depth++;
-            else if (*input == '\'')
-                squoting = 1 - squoting;
-            else if (*input == '\"')
-                dquoting = 1 - dquoting;
-            output++;
-            length++;
-        }
-        input++;
-    }
-    *output = '\0';
-    *(output + 1) = '\0';
-    return length;
-}
-
-int
 cpl_mod(char *srcname)
 {
     FILE *fsrc, *fbin;
