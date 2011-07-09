@@ -367,3 +367,126 @@ cpl_expr(char **expr, char *bin)
             }
     }
 }
+
+int
+splitstt(char *input, char *output, char *parts[])
+{
+    int on = 0;
+    int depth = 0;
+    int length = 0;
+    int squoting = 0;
+    int dquoting = 0;
+
+    while(*input != '\0') {
+        if (on) {
+            if (isspace(*input) && !depth && !squoting && !dquoting) {
+                on = 0;
+                *output = '\0';
+                depth = 0;
+            }
+            else {
+                *output = *input;
+                if (strchr("([{", *input) != NULL)
+                    depth++;
+                else if (strchr(")]}", *input) != NULL)
+                    depth--;
+                else if (*input == '\'')
+                    squoting = 1 - squoting;
+                else if (*input == '\"')
+                    dquoting = 1 - dquoting;
+            }
+            output++;
+        }
+        else if (!isspace(*input)) {
+            on = 1;
+            parts[length] = output;
+            *output = *input;
+            if (strchr("([{", *input) != NULL)
+                depth++;
+            else if (*input == '\'')
+                squoting = 1 - squoting;
+            else if (*input == '\"')
+                dquoting = 1 - dquoting;
+            output++;
+            length++;
+        }
+        input++;
+    }
+    *output = '\0';
+    *(output + 1) = '\0';
+    return length;
+}
+
+unsigned int
+cpl_stt(char **pstt, char *bin)
+{
+    char *expr_entry;
+    char *assign, *stt;
+    char splitbuffer[256];
+    char *parts[16];
+    unsigned int length, total = 0;
+    int splitlen;
+
+    stt = *pstt;
+    splitlen = splitstt(stt, splitbuffer, parts);
+    expr_entry = parts[splitlen - 1];
+    length = cpl_expr(&expr_entry, bin);
+    bin += length;
+    total += length;
+    for (splitlen -= 1; splitlen > 0; splitlen--) {
+        /* Compile Assignments. */
+        assign = parts[splitlen - 1];
+        if (*assign == '(') {
+            int depth = 1;
+            int namelen;
+            char *namechar;
+
+            *bin = '\x10';
+            bin++;
+            total++;
+            assign++;
+            while (depth > 0) {
+                skip_space(&assign);
+                if (*assign == '(') {
+                    *bin = '\x10';
+                    bin++;
+                    total++;
+                    depth++;
+                    assign++;
+                    continue;
+                }
+                namechar = assign;
+                namelen = 0;
+                while (!isspace(*namechar) && *namechar != ')') {
+                    namechar++;
+                    namelen++;
+                }
+                strncpy(bin, assign, namelen);
+                bin += namelen;
+                total += namelen;
+                *bin = '\0';
+                bin++;
+                total++;
+                assign += namelen;
+                skip_space(&assign);
+                while (*assign == ')') {
+                    *bin = '\x01';
+                    bin++;
+                    total++;
+                    depth--;
+                    assign++;
+                    skip_space(&assign);
+                }
+            }
+        }
+        else {
+            strncpy(bin, assign, strlen(assign) + 1);
+            bin += strlen(assign) + 1;
+            total += strlen(assign) + 1;
+        }
+    }
+    *bin = '\0';
+    bin++;
+    total++;
+    return total;
+}

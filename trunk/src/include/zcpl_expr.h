@@ -31,3 +31,5 @@ unsigned int cpl_list(char **expr, char *bin);
 unsigned int cpl_dict(char **expr, char *bin);
 unsigned int cpl_func(char **expr, char *bin);
 unsigned int cpl_expr(char **expr, char *bin);
+int splitstt(char *input, char *output, char *parts[]);
+unsigned int cpl_stt(char **pstt, char *bin);

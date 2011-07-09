@@ -52,8 +52,8 @@ ZError
 zinteractive()
 {
     char buffer[1024];
-    char expr[256], bin[256];
-    char *expr_entry, *bin_entry;
+    char stt[256], bin[256];
+    char *stt_entry, *bin_entry;
     Zob *result;
     ZContext *zcontext;
     ZList *tmp;
@@ -81,11 +81,11 @@ zinteractive()
 
     while (1) {
         printf("> ");
-        if (fgets(expr, 256, stdin) == NULL)
+        if (fgets(stt, 256, stdin) == NULL)
             break;
-        if (strcmp(expr, "exit\n") != 0) {
-            expr_entry = expr;
-            length = cpl_expr(&expr_entry, bin);
+        if (strcmp(stt, "exit\n") != 0) {
+            stt_entry = stt;
+            length = cpl_stt(&stt_entry, bin);
             /* zdebug_bin(bin, length); */
             bin_entry = bin;
             err = zeval(zcontext, tmp, &bin_entry, &result);
@@ -94,6 +94,7 @@ zinteractive()
                 zdellist(&tmp);
                 return err;
             }
+            zassign(zcontext, result, &bin_entry);
             zrepobj(buffer, 1024, result);
             printf("%s\n", buffer);
             zlempty(tmp);
