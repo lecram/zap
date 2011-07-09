@@ -60,6 +60,8 @@ zinteractive()
     unsigned int length;
     ZError err;
 
+    strcpy(stt, "_ ");
+
     err = znewcontext(&zcontext);
     if (err != ZE_OK)
         return err;
@@ -81,9 +83,9 @@ zinteractive()
 
     while (1) {
         printf("> ");
-        if (fgets(stt, 256, stdin) == NULL)
+        if (fgets((stt + 2), 256, stdin) == NULL)
             break;
-        if (strcmp(stt, "exit\n") != 0) {
+        if (strcmp((stt + 2), "exit\n") != 0) {
             stt_entry = stt;
             length = cpl_stt(&stt_entry, bin);
             /* zdebug_bin(bin, length); */
