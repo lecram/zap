@@ -61,9 +61,7 @@ int zgetincontext(ZContext *zcontext,
 int zremincontext(ZContext *zcontext, char *name);
 int zhasincontext(ZContext *zcontext, char *name);
 unsigned int zreadword(char **entry);
-unsigned int zread_uvlv(char **entry);
 int zread_svlv(char **entry);
-void zskip_uvlv(char **entry);
 void zskip_svlv(char **entry);
 void zskip_expr(char **entry);
 ZError zeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pzob);

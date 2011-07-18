@@ -279,23 +279,6 @@ zreadword(char **entry)
     return zint;
 }
 
-unsigned int
-zread_uvlv(char **entry)
-{
-    unsigned int n;
-    signed char *cursor = (signed char *) *entry;
-
-    n = (unsigned int) (*cursor & 127);
-    while (*cursor < 0) {
-        n <<= 7;
-        cursor++;
-        n += (unsigned int) (*cursor & 127);
-    }
-    cursor++;
-    *entry = (char *) cursor;
-    return n;
-}
-
 int
 zread_svlv(char **entry)
 {
@@ -313,17 +296,6 @@ zread_svlv(char **entry)
     cursor++;
     *entry = (char *) cursor;
     return n * s;
-}
-
-void
-zskip_uvlv(char **entry)
-{
-    char *cursor = *entry;
-
-    while (*cursor < 0)
-        cursor++;
-    cursor++;
-    *entry = cursor;
 }
 
 void
