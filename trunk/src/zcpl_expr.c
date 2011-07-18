@@ -55,32 +55,6 @@ skip_space(char **str)
 }
 
 unsigned int
-write_uvlv(unsigned int n, signed char vlv[])
-{
-    unsigned int q, r, i, j, k;
-    signed char t;
-
-    i = 0;
-    q = n / 128;
-    r = n % 128;
-    vlv[0] = r;
-    while (q != 0) {
-        i++;
-        n = q;
-        q = n / 128;
-        r = (n % 128) | 128;
-        vlv[i] = r;
-    }
-    for (j = 0; j < (i + 1) / 2; j++) {
-        k = i - j;
-        t = vlv[j];
-        vlv[j] = vlv[k];
-        vlv[k] = t;
-    }
-    return i + 1;
-}
-
-unsigned int
 write_svlv(int n, signed char vlv[])
 {
     int q, r, an;
