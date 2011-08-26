@@ -953,6 +953,21 @@ z_range(ZList *args, Zob **ret)
     return ZE_INVALID_ARGUMENT;
 }
 
+/* arity(func) */
+ZError
+z_arity(ZList *args, Zob **ret)
+{
+    ZError err;
+
+    if (*args->first->object != T_FUNC)
+        return ZE_INVALID_ARGUMENT;
+    err = znewint((ZInt **) ret);
+    if (err != ZE_OK)
+        return err;
+    ((ZInt *) *ret)->value = (int) ((ZFunc *) args->first->object)->arity;
+    return ZE_OK;
+}
+
 /* Register 'func' in 'nable'.
  * If there is not enough memory, return ZE_OUT_OF_MEMORY.
  * Otherwise, return ZE_OK.
@@ -1040,6 +1055,7 @@ zbuild(ZNameTable **builtins)
       {z_any, "any", 1},
       {z_all, "all", 1},
       {z_range, "range", 3},
+      {z_arity, "arity", 1},
       {NULL, "", 0}
     };
     int i;
