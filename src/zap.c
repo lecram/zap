@@ -83,7 +83,7 @@ zinteractive()
 
     while (1) {
         printf("> ");
-        if (fgets((stt + 2), 256, stdin) == NULL)
+        if (fgets((stt + 2), 254, stdin) == NULL)
             break;
         if (strcmp((stt + 2), "exit\n") != 0) {
             stt_entry = stt;
