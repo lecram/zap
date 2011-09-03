@@ -235,7 +235,7 @@ z_push(ZList *args, Zob **ret)
     return zlpush((ZList *) zlist, item);
 }
 
-/* peek(list item) */
+/* peek(list) */
 ZError
 z_peek(ZList *args, Zob **ret)
 {
