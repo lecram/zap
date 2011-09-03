@@ -174,18 +174,21 @@ ztstnable(ZNameTable *znable)
 int
 zcmpnable(ZNameTable *znable, ZNameTable *other)
 {
-    ZEntry *zentry;
-    Zob *object;
+    ZEntry *zentry_a;
+    ZEntry *zentry_b;
 
-    zentry = znable->header->next[0];
-    while (zentry != NULL) {
-        if (ztget(other, zentry->name, &object)) {
-            if (zcmpobj(zentry->value, object) != 0)
-                /* Has key but it is set to a different value. */
-                return 1;
-        }
-        zentry = zentry->next[0];
+    zentry_a = znable->header->next[0];
+    zentry_b = other->header->next[0];
+    while (zentry_a != NULL && zentry_b != NULL) {
+        if (strcmp(zentry_a->name, zentry_b->name) != 0)
+            return 1;
+        if (zcmpobj(zentry_a->value, zentry_b->value) != 0)
+            return 1;
+        zentry_a = zentry_a->next[0];
+        zentry_b = zentry_b->next[0];
     }
+    if (zentry_a != NULL || zentry_b != NULL)
+        return 1;
     return 0;
 }
 
