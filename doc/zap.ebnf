@@ -9,21 +9,22 @@ Statement = {Whitespace} {Assign} \n Expression (BlankLine | Comment).
 Whitespace = '" "'.
 Assign = (Identifier | '(' {{Whitespace} Assign {Whitespace} ','} \n
                            {Whitespace} Assign {Whitespace} ')') Whitespace.
-Expression = (Identifier | Literal | Function).
+Expression = (Identifier {Call}) | Literal.
+Call = ('()') | ('(' {Expression ' '} Expression ')').
 
-Literal = None | Bool | Byte | ByteArray | Word | List | Dict.
+Literal = None | Bool | Byte | ByteArray | Int | List | Dict.
 None = 'NONE'.
 Bool = 'TRUE' | 'FALSE'.
 Byte = ("'" Char "'") | '0x00-0xFF'.
 ByteArray = '"' {Char} '"'.
-Word = Number.
+Int = Number.
 List = '[' {{Whitespace} Expression {Whitespace} ','} \n
            {Whitespace} Expression {Whitespace} ']'.
 Dict = '{' {{Whitespace} DictItem {Whitespace} ','} \n
            {Whitespace} DictItem {Whitespace} '}'.
 DictItem = Expression {Whitespace} ':' {Whitespace} Expression.
 
-Number = Digit {Digit}.
+Number = ['-'] (Digit) {Digit}.
 Digit = '"0"' | '"1"' | '"2"' | '"3"' | '"4"'
       | '"5"' | '"6"' | '"7"' | '"8"' | '"9"'.
 
