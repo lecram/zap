@@ -368,7 +368,7 @@ zlinsert(ZList *zlist, int index, Zob *zob)
 
 /* Concatenate 'other' to 'zlist'.
  * The same pointer can be passed to both args to double 'zlist'.
- * (The local vars 'count' and 'length' prevents an infinity loop
+ * (The local vars 'count' and 'length' prevents an infinite loop
  * when doubling 'zlist').
  * If there is not enough memory, return ZE_OUT_OF_MEMORY.
  * Otherwise, return ZE_OK.
