@@ -376,12 +376,21 @@ zlinsert(ZList *zlist, int index, Zob *zob)
 ZError
 zlextend(ZList *zlist, ZList *other)
 {
-    unsigned int count;
+    unsigned int count = 0;
     unsigned int length = other->length;
     ZNode *ecur = other->first;
     ZError err;
 
-    for (count = 0; count < length; count++) {
+    if (zlist->length == 0) {
+        err = znewnode(ecur->object, &zlist->first);
+        if (err != ZE_OK)
+            return err;
+        zlist->last = zlist->first;
+        zlist->length++;
+        count++;
+        ecur = ecur->next;
+    }
+    for (; count < length; count++) {
         err = znewnode(ecur->object, &zlist->last->next);
         if (err != ZE_OK)
             return err;
