@@ -211,6 +211,8 @@ zlpush(ZList *zlist, Zob *zob)
         return err;
     first->next = zlist->first;
     zlist->first = first;
+    if (zlist->length == 0)
+        zlist->last = first;
     zlist->length++;
     return ZE_OK;
 }
