@@ -557,7 +557,7 @@ zfeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pret)
 {
     Zob *zfunc;
     ZList *args;
-    char *fname, *cursor = *entry;
+    char *cursor = *entry;
     Zob *ret = *pret;
     ZNameTable *self;
     ZError err;
@@ -566,7 +566,6 @@ zfeval(ZContext *zcontext, ZList *tmp, char **entry, Zob **pret)
     if (zgetincontext(zcontext, cursor, &self, &zfunc) == 0) {
         return ZE_FUNCTION_NAME_NOT_DEFINED;
     }
-    fname = cursor;
     cursor += strlen(cursor) + 1; /* Skip STRING_END. */
 
     /* Get arg list. */
