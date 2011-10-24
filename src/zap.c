@@ -36,6 +36,8 @@
 #include "zcpl_expr.h"
 #include "zcpl_mod.h"
 
+#define DEBUG 0
+
 void
 zdebug_bin(char *bin, unsigned int length)
 {
@@ -57,7 +59,9 @@ zinteractive()
     Zob *result;
     ZContext *zcontext;
     ZList *tmp;
+#if DEBUG > 0
     unsigned int length;
+#endif
     ZError err;
 
     strcpy(stt, "_ ");
@@ -87,8 +91,12 @@ zinteractive()
             break;
         if (strcmp((stt + 2), "exit\n") != 0) {
             stt_entry = stt;
+#if DEBUG > 0
             length = cpl_stt(&stt_entry, bin);
-            /* zdebug_bin(bin, length); */
+            zdebug_bin(bin, length);
+#else
+            (void) cpl_stt(&stt_entry, bin);
+#endif
             bin_entry = bin;
             err = zeval(zcontext, tmp, &bin_entry, &result);
             if (err != ZE_OK) {
