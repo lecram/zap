@@ -19,7 +19,7 @@
 /* ZBigNum Type */
 
 /* A ZBigNum object stores a number on an array of words (unsigned int).
- * The words are stored in little-endian: least significant zint first.
+ * The words are stored in little-endian: least significant word first.
  * Bits inside words are in big-endian: most significant bit first.
  */
 
