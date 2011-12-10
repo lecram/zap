@@ -242,10 +242,15 @@ Return _a_ shifted to the right by _b_ bits.
 Return the truth value of _o_.
 
 The truth value of an object is a value that qualifies its content under a boolean perspective.
+
 A NONE object always has a FALSE truth value.
+
 A boolean object has a truth value equivalent to its own value.
+
 A numeric object has a FALSE truth value if and only if its content is equivalent to 0.
+
 A sequence object has a FALSE truth value if and only if its length is 0.
+
 The truth value of an object is TRUE under all other condictions.
 
 == not ==
