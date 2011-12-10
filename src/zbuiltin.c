@@ -849,7 +849,7 @@ z_node(ZList *args, Zob **ret)
     return znewnable((ZNameTable **) ret);
 }
 
-/* any(lst) */
+/* any(list) */
 ZError
 z_any(ZList *args, Zob **ret)
 {
@@ -873,7 +873,7 @@ z_any(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* all(lst) */
+/* all(list) */
 ZError
 z_all(ZList *args, Zob **ret)
 {
