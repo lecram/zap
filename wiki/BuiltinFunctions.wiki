@@ -47,9 +47,9 @@ Equivalent to:
 }}}
 
 == repr ==
-repr(_x_)
+repr(_o_)
 
-Return the textual representation of _x_.
+Return the textual representation of _o_.
 
 == len ==
 len(_x_)
@@ -65,11 +65,34 @@ If _x_ is a nable, return the number of names in _x_.
 If _x_ is a dict, return the number of keys in _x_.
 
 == arr ==
-arr(_i_)
+arr(_c_)
+
+Return the character _c_ converted to a string.
+
 == concat ==
 concat(_s1_ _s2_)
+
+Return the result of the concatenation of _s1_ and _s2_.
+
 == join ==
 join([_s1_ _s2_ ... _sn_] _sep_)
+
+Return the result of the concatenation of _s1_, _sep_, _s2_, ... , _sep_, _sn_.
+
+Equivalent to:
+
+{{{
+\def join(ss sep)
+    \if not(ss)
+        \ret ""
+    res pop(ss)
+    \while ss
+        s pop(ss)
+        res concat(res sep)
+        res concat(res s)
+    \ret res
+}}}
+
 == push ==
 push(_list_ _item_)
 == peek ==
