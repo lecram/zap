@@ -18,14 +18,17 @@ Return the reference count of _o_.
 == print ==
 print(_s_)
 
-Print the string _s_ to standard output.  
+Print the string _s_ to standard output.
+
 Return the number of characters printed.
 
 == printx ==
 printx([_s1_ _o1_ _s2_ _o2_ ... _sn_ _on_])
 
-Print the concatenation of the list items, with every even item passed through [BuiltinFunctions#repr repr]().  
-Return the number of characters printed.  
+Print the concatenation of the list items, with every even item passed through [BuiltinFunctions#repr repr]().
+
+Return the number of characters printed.
+
 Equivalent to:
 
 {{{
@@ -51,10 +54,14 @@ Return the textual representation of _x_.
 == len ==
 len(_x_)
 
-Return the length of _x_.  
-If _x_ is a string, return the number of characters in _x_.  
+Return the length of _x_.
+
+If _x_ is a string, return the number of characters in _x_.
+
 If _x_ is a list, return the number of items in _x_.
+
 If _x_ is a nable, return the number of names in _x_.
+
 If _x_ is a dict, return the number of keys in _x_.
 
 == arr ==
