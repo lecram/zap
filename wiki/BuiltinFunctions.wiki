@@ -35,15 +35,15 @@ Equivalent to:
 \def printx(list)
     total 0
     repring FALSE
-    list [BuiltinFunctions#$ $](list)
+    list $(list)
     \while list
-        item [BuiltinFunctions#pop pop](list)
+        item pop(list)
         \if repring
-            parcial [BuiltinFunctions#print print]([BuiltinFunctions#repr repr](item))
+            parcial print(repr(item))
         \else
-            parcial [BuiltinFunctions#print print](item)
+            parcial print(item)
         total +(total parcial)
-        repring [BuiltinFunctions#not not](repring)
+        repring not(repring)
     \ret total
 }}}
 
@@ -84,14 +84,14 @@ Equivalent to:
 
 {{{
 \def join(ss sep)
-    \if [BuiltinFunctions#not not](ss)
+    \if not(ss)
         \ret ""
     ss $(ss)
-    res [BuiltinFunctions#pop pop](ss)
+    res pop(ss)
     \while ss
-        s [BuiltinFunctions#pop pop](ss)
-        res [BuiltinFunctions#concat concat](res sep)
-        res [BuiltinFunctions#concat concat](res s)
+        s pop(ss)
+        res concat(res sep)
+        res concat(res s)
     \ret res
 }}}
 
@@ -114,7 +114,7 @@ Remove the first item from _list_ and return it.
 
 The following code doesn't change the value of _list_:
 
-`list [BuiltinFunctions#push push](list [BuiltinFunctions#pop pop](list))`
+`list push(list pop(list))`
 
 == append ==
 append(_list_ _item_)
@@ -130,18 +130,18 @@ Set the _index_-th item of _list_ to _item_.
 
 Return a reference to _list_.
 
-If _index_ is negative, the actual index used is `[BuiltinFunctions#+ +]([BuiltinFunctions#len len](_list_) _index_)`.
+If _index_ is negative, the actual index used is `+(len(_list_) _index_)`.
 
 {{{
 > x [0 0 0 0]
 [0 0 0 0]
-> [BuiltinFunctions#set set](x 1 1)
+> set(x 1 1)
 [0 1 0 0]
-> [BuiltinFunctions#set set](x 1 0)
+> set(x 1 0)
 [0 0 0 0]
-> [BuiltinFunctions#set set](x [BuiltinFunctions#- -]([BuiltinFunctions#len len](x) 2) 1)
+> set(x -(len(x) 2) 1)
 [0 0 1 0]
-> [BuiltinFunctions#set set](x -2 0)
+> set(x -2 0)
 [0 0 0 0]
 >
 }}}
@@ -151,7 +151,7 @@ get(_list_ _index_)
 
 Return the _index_-th item of _list_.
 
-If _index_ is negative, the actual index used is `[BuiltinFunctions#+ +]([BuiltinFunctions#len len](_list_) _index_)`.
+If _index_ is negative, the actual index used is `+(len(_list_) _index_)`.
 
 
 == ins ==
@@ -161,7 +161,7 @@ Insert _item_ before _index_-th position in _list_.
 
 Return a reference to _list_.
 
-If _index_ is negative, the actual index used is `[BuiltinFunctions#+ +]([BuiltinFunctions#len len](_list_) _index_)`.
+If _index_ is negative, the actual index used is `+(len(_list_) _index_)`.
 
 If _index_ == len(_list_), append _item_ to _list_.
 
@@ -179,7 +179,7 @@ Remove the item in _index_-th position of _list_.
 
 Return a reference to _list_.
 
-If _index_ is negative, the actual index used is `[BuiltinFunctions#+ +]([BuiltinFunctions#len len](_list_) _index_)`.
+If _index_ is negative, the actual index used is `+(len(_list_) _index_)`.
 
 == has ==
 has(_list_ _item_)
