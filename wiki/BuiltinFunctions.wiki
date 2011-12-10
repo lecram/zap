@@ -345,6 +345,22 @@ Return a _list_ of integers where the following expressions evaluates to TRUE:
 <=(+(get(list -1) step) stop)
 }}}
 
+Equivalent to:
+
+{{{
+\def range(start stop step)
+    \if <(step 0)
+        stepsign -1
+    \else
+        stepsign 1
+    list []
+    counter start
+    \while <(*(counter stepsign) *(stop stepsign))
+        append(list counter)
+        counter +(counter step)
+    \ret list
+}}}
+
 == arity ==
 arity(_func_)
 
