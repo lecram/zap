@@ -253,7 +253,7 @@ zrepnable_detail(ZNameTable *znable)
     while (step->next[0] != NULL) {
         for (i = 0; i <= znable->level; i++) {
             if (cur[i]->next[i] == step->next[0]) {
-                printf("%03d ", ((int) cur[i]->next[i]) % 1000);
+                printf("%03ld ", ((long int) cur[i]->next[i]) % 1000);
                 cur[i] = cur[i]->next[i];
             }
             else
