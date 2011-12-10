@@ -204,45 +204,148 @@ Otherwise, return a copy of _defval_.
 
 == + ==
 +(_a_ _b_)
+
+Return the sum _a_ + _b_.
+
 == - ==
 -(_a_ _b_)
+
+Return the difference _a_ - _b_.
+
 == * ==
 *(_a_ _b_)
+
+Return the product _a_ * _b_.
 == / ==
 /(_a_ _b_)
+
+Return the quotient of the division _a_ / _b_.
+
 == % ==
 %(_a_ _b_)
+
+Return the remainder of the division _a_ / _b_.
+
 == << ==
 <<(_a_ _b_)
+
+Return _a_ shifted to the left by _b_ bits.
+
 == >> ==
 >>(_a_ _b_)
+
+Return _a_ shifted to the right by _b_ bits.
+
 == ? ==
 ?(_o_)
+
+Return the truth value of _o_.
+
+The truth value of an object is a value that qualifies its content under a boolean perspective.
+A NONE object always has a FALSE truth value.
+A boolean object has a truth value equivalent to its own value.
+A numeric object has a FALSE truth value if and only if its content is equivalent to 0.
+A sequence object has a FALSE truth value if and only if its length is 0.
+The truth value of an object is TRUE under all other condictions.
+
 == not ==
 not(_o_)
+
+Return the negation of the truth value of _o_.
+
+See [BuiltinFunctions#? ?].
+
 == or ==
 or(_a_ _b_)
+
+If the truth values of _a_ and _b_ are both FALSE, return FALSE.
+
+Otherwise, return TRUE.
+
 == and ==
 and(_a_ _b_)
+
+If the truth values of _a_ and _b_ are both TRUE, return TRUE.
+
+Otherwise, return FALSE.
+
 == == ==
 ==(_a_ _b_)
+
+If _a_ is equal _b_, return TRUE.
+
+Otherwise, return FALSE.
+
 == != ==
 !=(_a_ _b_)
+
+If _a_ is not equal _b_, return TRUE.
+
+Otherwise, return FALSE.
+
 == < ==
 <(_a_ _b_)
+
+If _a_ is less than _b_, return TRUE.
+
+Otherwise, return FALSE.
+
 == > ==
 >(_a_ _b_)
+
+If _a_ is greater than _b_, return TRUE.
+
+Otherwise, return FALSE.
+
 == <= ==
 <=(_a_ _b_)
+
+If _a_ is less than or equal _b_, return TRUE.
+
+Otherwise, return FALSE.
+
 == >= ==
 >=(_a_ _b_)
+
+If _a_ is greater than or equal _b_, return TRUE.
+
+Otherwise, return FALSE.
+
 == node ==
 node()
+
+Return an empty nable.
+
 == any ==
 any(_list_)
+
+If the truth value of any item of _list_ is TRUE, return TRUE.
+
+Otherwise, return FALSE.
+
 == all ==
 all(_list_)
+
+If the truth value of all items of _list_ is TRUE, return TRUE.
+
+Otherwise, return FALSE.
+
 == range ==
-range(_start_ _end_ _step_)
+range(_start_ _stop_ _step_)
+
+Return a _list_ of integers where the following expressions evaluates to TRUE:
+
+{{{
+==(get(list n) +(start *(step n)))
+# if step is positive:
+<(get(list -1) stop)
+>=(+(get(list -1) step) stop)
+# if step is negative:
+>(get(list -1) stop)
+<=(+(get(list -1) step) stop)
+}}}
+
 == arity ==
 arity(_func_)
+
+Return the arity (number of parameters) of _func_.
