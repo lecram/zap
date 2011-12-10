@@ -203,6 +203,8 @@ z_join(ZList *args, Zob **ret)
     if (*args->first->object != T_LIST ||
         *args->first->next->object != T_YARR)
         return ZE_INVALID_ARGUMENT;
+    if (((ZList *) args->first->object)->length == 0)
+        return zyarrfromstr((ZByteArray **) ret, "");
     sub = ((ZList *) args->first->object)->first;
     sep = (ZByteArray *) args->first->next->object;
     err = zcpyobj(sub->object, ret);
