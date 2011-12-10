@@ -1,0 +1,49 @@
+#summary All zap builtin functions.
+
+= $(_o_) =
+
+Return a copy of _o_.
+
+= tname(_o_) =
+= refc(_o_) =
+= print(_s_) =
+= printx([_s1_ _o1_ _s2_ _o2_ ... _sn_ _on_]) =
+= repr(_x_) =
+= len(_x_) =
+= arr(_i_) =
+= concat(_s1_ _s2_) =
+= join([_s1_ _s2_ ... _sn_] _sep_) =
+= push(_list_ _item_) =
+= peek(_list_) =
+= pop(_list_) =
+= append(_list_ _item_) =
+= set(_list_ _index_ _item_) =
+= get(_list_ _index_) =
+= ins(_list_ _index_ _item_) =
+= ext(_lista_ _listb_) =
+= rem(_list_ _index_) =
+= has(_list_ _item_) =
+= setkey(_dict_ _key_ _value_) =
+= getkey(_dict_ _key_ _defval_) =
+= +(_a_ _b_) =
+= -(_a_ _b_) =
+= *(_a_ _b_) =
+= /(_a_ _b_) =
+= %(_a_ _b_) =
+= <<(_a_ _b_) =
+= >>(_a_ _b_) =
+= ?(_o_) =
+= not(_o_) =
+= or(_a_ _b_) =
+= and(_a_ _b_) =
+= ==(_a_ _b_) =
+= !=(_a_ _b_) =
+= <(_a_ _b_) =
+= >(_a_ _b_) =
+= <=(_a_ _b_) =
+= >=(_a_ _b_) =
+= node() =
+= any(_list_) =
+= all(_list_) =
+= range(_start_ _end_ _step_) =
+= arity(_func_) =
