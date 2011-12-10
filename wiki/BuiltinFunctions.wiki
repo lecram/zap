@@ -130,7 +130,7 @@ Set the _index_-th item of _list_ to _item_.
 
 Return a reference to _list_.
 
-If _index_ is negative, the actual index used is `+(len(_list_) _index_)`.
+If _index_ is negative, the actual index used is `+(len(list) index)`.
 
 {{{
 > x [0 0 0 0]
@@ -151,7 +151,7 @@ get(_list_ _index_)
 
 Return the _index_-th item of _list_.
 
-If _index_ is negative, the actual index used is `+(len(_list_) _index_)`.
+If _index_ is negative, the actual index used is `+(len(list) index)`.
 
 
 == ins ==
@@ -161,7 +161,7 @@ Insert _item_ before _index_-th position in _list_.
 
 Return a reference to _list_.
 
-If _index_ is negative, the actual index used is `+(len(_list_) _index_)`.
+If _index_ is negative, the actual index used is `+(len(list) index)`.
 
 If _index_ == len(_list_), append _item_ to _list_.
 
@@ -179,7 +179,7 @@ Remove the item in _index_-th position of _list_.
 
 Return a reference to _list_.
 
-If _index_ is negative, the actual index used is `+(len(_list_) _index_)`.
+If _index_ is negative, the actual index used is `+(len(list) index)`.
 
 == has ==
 has(_list_ _item_)
