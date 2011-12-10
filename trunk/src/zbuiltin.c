@@ -899,7 +899,7 @@ z_all(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* range(start end step) */
+/* range(start stop step) */
 ZError
 z_range(ZList *args, Zob **ret)
 {
