@@ -35,14 +35,15 @@ Equivalent to:
 \def printx(list)
     total 0
     repring FALSE
+    list [BuiltinFunctions#$ $](list)
     \while list
-        item pop(list)
+        item [BuiltinFunctions#pop pop](list)
         \if repring
-            parcial print(repr(item))
+            parcial [BuiltinFunctions#print print]([BuiltinFunctions#repr repr](item))
         \else
-            parcial print(item)
+            parcial [BuiltinFunctions#print print](item)
         total +(total parcial)
-        repring not(repring)
+        repring [BuiltinFunctions#not not](repring)
     \ret total
 }}}
 
@@ -83,40 +84,124 @@ Equivalent to:
 
 {{{
 \def join(ss sep)
-    \if not(ss)
+    \if [BuiltinFunctions#not not](ss)
         \ret ""
-    res pop(ss)
+    ss $(ss)
+    res [BuiltinFunctions#pop pop](ss)
     \while ss
-        s pop(ss)
-        res concat(res sep)
-        res concat(res s)
+        s [BuiltinFunctions#pop pop](ss)
+        res [BuiltinFunctions#concat concat](res sep)
+        res [BuiltinFunctions#concat concat](res s)
     \ret res
 }}}
 
 == push ==
 push(_list_ _item_)
+
+Insert _item_ at the beginnig of _list_.
+
+Return a reference to _list_.
+
 == peek ==
 peek(_list_)
+
+Return the first item of _list_.
+
 == pop ==
 pop(_list_)
+
+Remove the first item from _list_ and return it.
+
+The following code doesn't change the value of _list_:
+
+`list [BuiltinFunctions#push push](list [BuiltinFunctions#pop pop](list))`
+
 == append ==
 append(_list_ _item_)
+
+Insert _item_ as the last item of _list_.
+
+Return a reference to _list_.
+
 == set ==
 set(_list_ _index_ _item_)
+
+Set the _index_-th item of _list_ to _item_.
+
+Return a reference to _list_.
+
+If _index_ is negative, the actual index used is `[BuiltinFunctions#+ +]([BuiltinFunctions#len len](_list_) _index_)`.
+
+{{{
+> x [0 0 0 0]
+[0 0 0 0]
+> [BuiltinFunctions#set set](x 1 1)
+[0 1 0 0]
+> [BuiltinFunctions#set set](x 1 0)
+[0 0 0 0]
+> [BuiltinFunctions#set set](x [BuiltinFunctions#- -]([BuiltinFunctions#len len](x) 2) 1)
+[0 0 1 0]
+> [BuiltinFunctions#set set](x -2 0)
+[0 0 0 0]
+>
+}}}
+
 == get ==
 get(_list_ _index_)
+
+Return the _index_-th item of _list_.
+
+If _index_ is negative, the actual index used is `[BuiltinFunctions#+ +]([BuiltinFunctions#len len](_list_) _index_)`.
+
+
 == ins ==
 ins(_list_ _index_ _item_)
+
+Insert _item_ before _index_-th position in _list_.
+
+Return a reference to _list_.
+
+If _index_ is negative, the actual index used is `[BuiltinFunctions#+ +]([BuiltinFunctions#len len](_list_) _index_)`.
+
+If _index_ == len(_list_), append _item_ to _list_.
+
 == ext ==
 ext(_lista_ _listb_)
+
+Extend _lista_ with all items in _listb_.
+
+Return a reference to _lista_.
+
 == rem ==
 rem(_list_ _index_)
+
+Remove the item in _index_-th position of _list_.
+
+Return a reference to _list_.
+
+If _index_ is negative, the actual index used is `[BuiltinFunctions#+ +]([BuiltinFunctions#len len](_list_) _index_)`.
+
 == has ==
 has(_list_ _item_)
+
+If _list_ contains an item equal to _item_, return TRUE.
+
+Otherwise, return FALSE.
+
 == setkey ==
 setkey(_dict_ _key_ _value_)
+
+Set the value of _key_ to _value_, in _dict_.
+
+Return a reference to _dict_.
+
 == getkey ==
 getkey(_dict_ _key_ _defval_)
+
+If _dict_ has a key equal to _key_, return its value.
+
+Otherwise, return a copy of _defval_.
+
 == + ==
 +(_a_ _b_)
 == - ==
