@@ -120,7 +120,7 @@ z_printx(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* repr(x) */
+/* repr(o) */
 ZError
 z_repr(ZList *args, Zob **ret)
 {
@@ -159,7 +159,7 @@ z_len(ZList *args, Zob **ret)
     return ZE_OK;
 }
 
-/* arr(i) */
+/* arr(c) */
 ZError
 z_arr(ZList *args, Zob **ret)
 {
