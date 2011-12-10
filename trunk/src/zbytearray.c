@@ -177,7 +177,7 @@ zrepplain(char *buffer, size_t size, ZByteArray *zbytearray)
     int index, blen = 0;
 
     if (zbytearray->length == 0U) {
-        buffer = "";
+        strcpy(buffer, "");
         return 0;
     }
     for (index = 0; index < (int) zbytearray->length; index++) {
