@@ -100,7 +100,7 @@ zcpylist(ZList *source, ZList **dest)
     if (err != ZE_OK)
         return err;
     (*dest)->length = source->length;
-    if (old->next == NULL)
+    if (old == NULL)
         return ZE_OK;
     err = zcpyobj(old->object, &newzob);
     if (err != ZE_OK)
