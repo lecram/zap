@@ -7,12 +7,26 @@ Return a copy of _o_.
 
 == tname ==
 tname(_o_)
+
+Return type name of _o_.
+
 == refc ==
 refc(_o_)
+
+Return the reference count of _o_.
+
 == print ==
 print(_s_)
+
+Print the string _s_ to standard output.
+Return the number of characters printed.
+
 == printx ==
 printx([_s1_ _o1_ _s2_ _o2_ ... _sn_ _on_])
+
+Print the concatenation of the list items, with every even item passed through [BuiltinFunctions#repr repr]().
+Return the number of characters printed.
+
 == repr ==
 repr(_x_)
 == len ==
