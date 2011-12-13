@@ -98,7 +98,7 @@ Equivalent to:
 == push ==
 push(_list_ _item_)
 
-Insert _item_ at the beginnig of _list_.
+Insert _item_ at the beginning of _list_.
 
 Return a reference to _list_.
 
